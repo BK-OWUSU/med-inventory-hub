@@ -1,3 +1,4 @@
+import { NavGroup, NavItem } from "@/types/types/app.type";
 import {
   LayoutDashboard,
   Pill,
@@ -17,7 +18,8 @@ import {
   History,
 } from "lucide-react";
 
-export const navConfig = [
+
+export const navConfig: NavGroup[] = [
   {
     title: "Dashboard",
     accessKey: "dashboard",
@@ -31,21 +33,9 @@ export const navConfig = [
     routeBase: "drugs",
     icon: Pill,
     items: [
-      {
-        title: "Drug List",
-        accessKey: "drug-list",
-        icon: PackageSearch,
-      },
-      {
-        title: "Add Drug",
-        accessKey: "add-drug",
-        icon: PackagePlus,
-      },
-      {
-        title: "Categories",
-        accessKey: "drug-categories",
-        icon: Layers,
-      },
+      { title: "Drug List", accessKey: "drug-list", icon: PackageSearch },
+      { title: "Add Drug", accessKey: "add-drug", icon: PackagePlus },
+      { title: "Categories", accessKey: "drug-categories", icon: Layers },
     ],
   },
 
@@ -55,21 +45,9 @@ export const navConfig = [
     routeBase: "inventory",
     icon: Boxes,
     items: [
-      {
-        title: "Inventory List",
-        accessKey: "inventory-list",
-        icon: PackageSearch,
-      },
-      {
-        title: "Stock Movements",
-        accessKey: "stock-movements",
-        icon: ArrowRightLeft,
-      },
-      {
-        title: "Adjustment History",
-        accessKey: "adjustment-history",
-        icon: History,
-      },
+      { title: "Inventory List", accessKey: "inventory-list", icon: PackageSearch },
+      { title: "Stock Movements", accessKey: "stock-movements", icon: ArrowRightLeft },
+      { title: "Adjustment History", accessKey: "adjustment-history", icon: History },
     ],
   },
 
@@ -79,26 +57,10 @@ export const navConfig = [
     routeBase: "orders",
     icon: ClipboardList,
     items: [
-      {
-        title: "All Orders",
-        accessKey: "all-orders",
-        icon: ClipboardList,
-      },
-      {
-        title: "Incoming Orders",
-        accessKey: "incoming-orders",
-        icon: ArrowRightLeft,
-      },
-      {
-        title: "Outgoing Orders",
-        accessKey: "outgoing-orders",
-        icon: ArrowRightLeft,
-      },
-      {
-        title: "Create Order",
-        accessKey: "create-order",
-        icon: PackagePlus,
-      },
+      { title: "All Orders", accessKey: "all-orders", icon: ClipboardList },
+      { title: "Incoming Orders", accessKey: "incoming-orders", icon: ArrowRightLeft },
+      { title: "Outgoing Orders", accessKey: "outgoing-orders", icon: ArrowRightLeft },
+      { title: "Create Order", accessKey: "create-order", icon: PackagePlus },
     ],
   },
 
@@ -122,31 +84,11 @@ export const navConfig = [
     routeBase: "reports",
     icon: ChartColumn,
     items: [
-      {
-        title: "Inventory Report",
-        accessKey: "inventory-report",
-        icon: Boxes,
-      },
-      {
-        title: "Stock Movement Report",
-        accessKey: "stock-movement-report",
-        icon: ArrowRightLeft,
-      },
-      {
-        title: "Low Stock Report",
-        accessKey: "low-stock-report",
-        icon: PackageSearch,
-      },
-      {
-        title: "Expiry Report",
-        accessKey: "expiry-report",
-        icon: History,
-      },
-      {
-        title: "Order Report",
-        accessKey: "order-report",
-        icon: ClipboardList,
-      },
+      { title: "Inventory Report", accessKey: "inventory-report", icon: Boxes },
+      { title: "Stock Movement Report", accessKey: "stock-movement-report", icon: ArrowRightLeft },
+      { title: "Low Stock Report", accessKey: "low-stock-report", icon: PackageSearch },
+      { title: "Expiry Report", accessKey: "expiry-report", icon: History },
+      { title: "Order Report", accessKey: "order-report", icon: ClipboardList },
     ],
   },
 
@@ -170,16 +112,35 @@ export const navConfig = [
     routeBase: "account",
     icon: UserCircle,
     items: [
-      {
-        title: "Profile",
-        accessKey: "profile",
-        icon: UserCircle,
-      },
-      {
-        title: "Settings",
-        accessKey: "settings",
-        icon: Settings,
-      },
+      { title: "Profile", accessKey: "profile", icon: UserCircle },
+      { title: "Settings", accessKey: "settings", icon: Settings },
     ],
   },
 ];
+
+
+// 2. Transformer parser engine
+export function parseNavConfig(
+  items: NavGroup[]
+): (Omit<NavGroup, 'items'> & { url: string; items?: (NavItem & { url: string })[] })[] {
+  return items.map((group) => {
+    const cleanParentRoute = group.routeBase.replace(/^\//, "");
+    const parentUrl = `/${cleanParentRoute}`;
+
+    return {
+      ...group,
+      url: parentUrl,
+      items: group.items?.map((subItem) => {
+        const cleanSubKey = subItem.accessKey.replace(/^\//, "");
+        
+        return {
+          ...subItem,
+          url: `${parentUrl}/${cleanSubKey}`,
+        };
+      }),
+    };
+  });
+}
+
+// 3. Automated data pipeline export matching your secondary application structure
+export const parsedNavData = parseNavConfig(navConfig);

@@ -1,6 +1,6 @@
 // components/landing/HowItWorks.tsx
 "use client";
-import { StepProps } from "@/types/types/types/landing.type";
+import { StepProps } from "@/types/types/landing.type";
 import { motion } from "motion/react";
 
 const steps: StepProps[] = [

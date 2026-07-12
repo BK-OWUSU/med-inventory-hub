@@ -3,7 +3,7 @@
 import { Box, RefreshCw, Eye, ShieldAlert, KeyRound, ShieldCheck } from "lucide-react";
 import { Card, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { motion } from "motion/react";
-import { FeatureCardProps } from "@/types/types/types/landing.type";
+import { FeatureCardProps } from "@/types/types/landing.type";
 
 const featuresData: FeatureCardProps[] = [
   {

@@ -1,6 +1,6 @@
 // components/landing/Stats.tsx
 "use client";
-import { StatProps } from "@/types/types/types/landing.type";
+import { StatProps } from "@/types/types/landing.type";
 import { motion } from "motion/react";
 const statsData: StatProps[] = [
   { value: "1,200+", label: "Facilities Connected" },

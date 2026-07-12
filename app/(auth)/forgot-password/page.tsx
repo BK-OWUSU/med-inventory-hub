@@ -254,7 +254,7 @@ export default function ForgotPasswordPage() {
                   </CardContent>
                   
                   <div className="bg-slate-50/80 py-4 border-t border-slate-100 text-xs text-slate-400">
-                    Token tracking id: sync-{Math.random().toString(36).substr(2, 9)}
+                    {/* Token tracking id: sync-{Math.random().toString(36).substr(2, 9)} */}
                   </div>
                 </motion.div>
               )}

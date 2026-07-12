@@ -3,7 +3,7 @@
 
 import { Card, CardContent } from "@/components/ui/card";
 import { motion } from "motion/react";
-import { TestimonialProps } from "@/types/types/types/landing.type";
+import { TestimonialProps } from "@/types/types/landing.type";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 const testimonials: TestimonialProps[] = [

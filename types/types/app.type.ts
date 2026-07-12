@@ -1,10 +1,11 @@
 import { UserRole } from "@/generated/prisma/browser";
-import { LucideIcon } from "lucide-react";
+import { ComponentType } from "react";
+import { LucideProps } from "lucide-react";
 
 export interface NavItem {
   title: string;
   accessKey: string;
-  icon?: LucideIcon;
+  icon?: ComponentType<LucideProps>;
   url?: string;
   routeBase?: string;
   isExternal?: boolean;
@@ -14,7 +15,7 @@ export interface NavGroup {
   title: string;
   accessKey: string;
   routeBase: string;
-  icon?: LucideIcon;
+  icon?: ComponentType<LucideProps>;
   isExternal?: boolean;
   items?: NavItem[];
 }
@@ -38,4 +39,11 @@ export type JwtPayload = {
   email: string;
   sessionId?: string;
   needsPasswordChange?: boolean;
+};
+
+export type EmailVerificationPayload = {
+  userId: string, 
+  email: string, 
+  purpose?: string, 
+  facilityId?: string 
 };

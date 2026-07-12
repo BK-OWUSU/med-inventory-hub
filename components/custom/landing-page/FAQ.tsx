@@ -1,7 +1,7 @@
 // components/landing/FAQ.tsx
 "use client";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
-import { FAQProps } from "@/types/types/types/landing.type";
+import { FAQProps } from "@/types/types/landing.type";
 
 const faqItems: FAQProps[] = [
   {
