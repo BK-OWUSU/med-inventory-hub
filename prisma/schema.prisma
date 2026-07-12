@@ -1,0 +1,328 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Get a free hosted Postgres database in seconds: `npx create-db`
+
+generator client {
+  provider = "prisma-client"
+  output   = "../generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+
+// =============================================
+// MODELS
+// =============================================
+
+model Facility {
+  id            String   @id @default(cuid())
+  name          String
+  type          FacilityType
+  location      String
+  address       String?
+  phone         String?
+  email         String?
+  licenseNumber String?  @unique
+  isVerified    Boolean  @default(false)
+  isActive      Boolean @default(true)
+
+  users         User[]
+  inventories   Inventory[]
+  outgoingOrders Order[] @relation("RequesterFacility")
+  incomingOrders Order[] @relation("SupplierFacility")
+  auditLogs     AuditLog[]
+
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  @@map("facilities")
+}
+
+model User {
+  id                  String       @id @default(cuid())
+  email               String       @unique
+  password            String       // Hashed
+  fullName            String
+  role                UserRole     @default(STAFF)
+  phone               String?
+
+  facilityId          String
+  isActive            Boolean @default(true)
+  facility            Facility     @relation(fields: [facilityId], references: [id], onDelete: Cascade)
+
+  requestedOrders     Order[]      @relation("RequestedBy")
+  approvedOrders      Order[]      @relation("ApprovedBy")
+  performedMovements  StockMovement[]
+  auditLogs           AuditLog[]
+  notifications       Notification[]
+
+  createdAt           DateTime     @default(now())
+  updatedAt           DateTime     @updatedAt
+
+  @@index([facilityId])
+  @@index([role])
+  @@map("users")
+}
+
+model Drug {
+  id            String      @id @default(cuid())
+  name          String
+  genericName   String?
+  strength      String?
+  unit          Unit
+  dosageForm    DosageForm?
+  description   String?
+  isControlled  Boolean     @default(false)
+  categoryId    String?
+  isActive Boolean @default(true)
+
+  category      DrugCategory? @relation(fields: [categoryId], references: [id])
+
+  inventories   Inventory[]
+  orderItems    OrderItem[]
+
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
+
+  @@index([categoryId])
+  @@index([name])
+  @@unique([name, strength, dosageForm])
+  @@map("drugs")
+}
+
+
+model DrugCategory {
+  id String @id @default(cuid())
+  name String @unique
+
+  drugs Drug[]
+}
+
+model Inventory {
+  id                  String          @id @default(cuid())
+
+  facilityId          String
+  facility            Facility        @relation(fields: [facilityId], references: [id], onDelete: Cascade)
+
+  drugId              String
+  drug                Drug            @relation(fields: [drugId], references: [id], onDelete: Cascade)
+  manufacturer        String?
+
+  availableQuantity   Int             @default(0)
+  unitPrice           Decimal?
+  minStockLevel       Int             @default(20)
+  batchNumber         String?
+  receivedDate        DateTime?
+  expiryDate          DateTime?
+  lastUpdated         DateTime        @updatedAt
+  createdAt           DateTime        @default(now())
+
+  movements           StockMovement[]
+
+  @@unique([facilityId, drugId, batchNumber])
+  @@index([facilityId])
+  @@index([drugId])
+  @@index([expiryDate])
+  @@map("inventories")
+}
+
+model Order {
+  id                String      @id @default(cuid())
+  orderNumber       String      @unique @default(cuid())
+
+  requesterId       String
+  requester         Facility    @relation("RequesterFacility", fields: [requesterId], references: [id])
+
+  supplierId        String?
+  supplier          Facility?   @relation("SupplierFacility", fields: [supplierId], references: [id])
+
+  type              OrderType   @default(REQUEST)
+  status            OrderStatus @default(PENDING)
+
+  requestedById     String
+  requestedBy       User        @relation("RequestedBy", fields: [requestedById], references: [id])
+
+  approvedById      String?
+  approvedBy        User?       @relation("ApprovedBy", fields: [approvedById], references: [id])
+
+  notes             String?
+  rejectionReason   String?
+  totalValue        Decimal?
+
+  items             OrderItem[]
+
+  createdAt         DateTime    @default(now())
+  updatedAt         DateTime    @updatedAt
+
+  @@index([status])
+  @@index([requesterId])
+  @@index([supplierId])
+  @@map("orders")
+}
+
+model OrderItem {
+  id                  String   @id @default(cuid())
+  orderId             String
+  order               Order    @relation(fields: [orderId], references: [id], onDelete: Cascade)
+
+  drugId              String
+  drugName            String
+  strength            String?
+  dosageForm          DosageForm?
+  unit                Unit
+  drug                Drug     @relation(fields: [drugId], references: [id])
+
+  quantityRequested   Int
+  quantitySupplied    Int?
+  unitPrice           Decimal? @db.Decimal(10,2)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("order_items")
+  stockMovements StockMovement[]
+}
+
+// ==================== LOGGING MODELS ====================
+
+model StockMovement {
+  id            String            @id @default(cuid())
+
+  inventoryId   String
+  inventory     Inventory         @relation(fields: [inventoryId], references: [id])
+  referenceNo   String?
+
+  orderItemId   String?
+  orderItem     OrderItem?        @relation(fields: [orderItemId], references: [id])
+
+  type          StockMovementType
+  quantity      Int
+  notes         String?
+  performedById String
+  performedBy   User              @relation(fields: [performedById], references: [id])
+
+  createdAt     DateTime          @default(now())
+
+  @@index([inventoryId])
+  @@index([performedById])
+  @@map("stock_movements")
+}
+
+
+model Notification {
+  id String @id @default(cuid())
+
+  userId String
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  title String
+  message String
+
+  isRead Boolean @default(false)
+
+  createdAt DateTime @default(now())
+
+  @@index([userId])
+  @@index([isRead])
+  @@map("notifications")
+}
+
+
+model AuditLog {
+  id          String   @id @default(cuid())
+
+  userId      String?
+  user        User?    @relation(fields: [userId], references: [id])
+
+  facilityId  String?
+  facility    Facility? @relation(fields: [facilityId], references: [id])
+
+  action      AuditAction   // e.g., "ORDER_CREATED", "ORDER_STATUS_CHANGED", "INVENTORY_UPDATED", "USER_LOGIN", "FACILITY_VERIFIED"
+  entityType  String?  // "Order", "Inventory", "User", "Facility", etc.
+  entityId    String?  // ID of the affected record
+  details     Json?    // Store additional context (old values, new values, etc.)
+  ipAddress   String?
+  userAgent   String?
+
+  createdAt   DateTime @default(now())
+
+  @@index([action])
+  @@index([entityType, entityId])
+  @@map("audit_logs")
+}
+
+enum Unit {
+  BOX
+  BOTTLE
+  VIAL
+  TUBE
+  AMPOULE
+  PACK
+  PIECE
+}
+
+enum DosageForm {
+  TABLET
+  CAPSULE
+  SYRUP
+  VIAL
+  INJECTION
+  CREAM
+  DROPS
+  SUSPENSION
+  OINTMENT
+}
+
+enum UserRole {
+  ADMIN
+  PHARMACIST
+  STAFF
+  VIEWER
+}
+
+enum FacilityType {
+  HOSPITAL
+  PHARMACY
+  CLINIC
+}
+
+enum OrderStatus {
+  PENDING
+  APPROVED
+  PARTIALLY_FULFILLED
+  SHIPPED
+  RECEIVED
+  DELIVERED
+  REJECTED
+  CANCELLED
+}
+
+enum OrderType {
+  REQUEST
+  SUPPLY
+}
+
+enum StockMovementType {
+  IN
+  OUT
+  ADJUSTMENT
+  EXPIRY
+  RETURN
+  TRANSFER
+}
+
+enum AuditAction {
+  LOGIN
+  LOGOUT
+  ORDER_CREATED
+  ORDER_APPROVED
+  ORDER_REJECTED
+  ORDER_DELIVERED
+  INVENTORY_UPDATED
+  INVENTORY_CREATED
+  USER_CREATED
+  FACILITY_CREATED
+}
