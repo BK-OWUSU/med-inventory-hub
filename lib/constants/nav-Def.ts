@@ -20,6 +20,16 @@ import {
 
 
 export const navConfig: NavGroup[] = [
+   {
+    title: "Admin Controls",
+    accessKey: "admin",
+    routeBase: "admin",
+    icon: UserCircle,
+    items: [
+      { title: "Admin Dashboard", accessKey: "admin-dashboard", icon: UserCircle },
+      // { title: "Settings", accessKey: "settings", icon: Settings },
+    ],
+  },
   {
     title: "Dashboard",
     accessKey: "dashboard",
@@ -34,7 +44,7 @@ export const navConfig: NavGroup[] = [
     icon: Pill,
     items: [
       { title: "Drug List", accessKey: "drug-list", icon: PackageSearch },
-      { title: "Add Drug", accessKey: "add-drug", icon: PackagePlus },
+      // { title: "Add Drug", accessKey: "add-drug", icon: PackagePlus },
       { title: "Categories", accessKey: "drug-categories", icon: Layers },
     ],
   },
@@ -142,5 +152,12 @@ export function parseNavConfig(
   });
 }
 
+const NON_VISIBLE_ROUTES = ["add-drug"]
 // 3. Automated data pipeline export matching your secondary application structure
 export const parsedNavData = parseNavConfig(navConfig);
+const configRouteKeys = parsedNavData.flatMap((group) => [
+  group.accessKey,
+  ...(group.items?.map((item) => item.accessKey) || []),
+]);
+
+export const All_ROUTE_LIST = Array.from(new Set([...configRouteKeys, ...NON_VISIBLE_ROUTES]));

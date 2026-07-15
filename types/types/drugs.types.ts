@@ -10,6 +10,16 @@ export type DrugListResponse = {
           name: true;
         };
       };
+      inventories: {
+        include: {
+          facility: {
+            select: {
+              id: true;
+              name: true;
+            };
+          };
+        };
+      };
     };
   }>[];
 };
@@ -21,14 +31,20 @@ export type DrugWithCategory = DrugListResponse["drugs"][number];
 
 //DRUGS TYPES:
 
-export interface DrugCategoryTableRow {
-  id: string
-  name: string
-  description?: string    // Included to match the UI row text column layout
-  drugsCount: number      // Calculated via Prisma's `_count.drugs` aggregator
-  status: boolean
-  createdAt: Date | string
-}
+export type DrugCategoryListResponse = {
+  categories: Prisma.DrugCategoryGetPayload<{
+    include: {
+      _count: {
+        select: {
+          drugs: true;
+        };
+      };
+    };
+  }>[];
+};
+
+// Reusable single drug category type helper inferred from the array payload
+export type DrugCategoryWithCount = DrugCategoryListResponse["categories"][number];
 /**
  * Complete UI Dashboard State Type
  * Maps cleanly to the top metric summary items: Total | Active | Inactive | Total Drugs

@@ -6,6 +6,7 @@ import {SidebarInset,SidebarProvider,SidebarTrigger} from "@/components/ui/sideb
 import { useRouter, usePathname } from "next/navigation"
 import { toast, Toaster } from "sonner"
 import { AppSidebar } from "@/components/app-sidebar"
+import { AuthGuard } from "@/securityContext/AuthGuard"
 
 
 
@@ -99,7 +100,11 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
             <NavbarUser /> */}
           </div>
         </header>
-         <main className="flex flex-1 flex-col gap-4 p-4">{children}</main>
+         <main className="flex flex-1 flex-col gap-4 p-4">
+             <AuthGuard>
+              {children}
+             </AuthGuard>
+         </main>
       </SidebarInset>
     </SidebarProvider>
   );

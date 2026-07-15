@@ -12,7 +12,9 @@ import {
   Info, 
   Sparkles, 
   MessageSquare, 
-  HelpCircle 
+  HelpCircle, 
+  ArrowLeft,
+  RefreshCw
 } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
@@ -31,16 +33,24 @@ import {
 
 import { drugFormSchema, DrugFormValues } from "@/types/schemas/drug.schema"
 import { DosageForm, Unit } from "@/generated/prisma/enums"
+import { useRouter } from "next/navigation"
+import { toast } from "sonner"
+import { createDrugAction } from "@/lib/actions/drugs-actions"
+import { useDrugStore } from "@/store/drugStore"
+import { DRUG_CATEGORIES } from "@/lib/constants/categories"
 
-const MOCK_CATEGORIES = [
-  { id: "cat-1", name: "Antibiotics" },
-  { id: "cat-2", name: "Analgesics" },
-  { id: "cat-3", name: "Anti-inflammatory" },
-  { id: "cat-4", name: "Respiratory" },
-  { id: "cat-5", name: "Sedatives" },
-]
 
 export default function AddNewDrugPage() {
+  const {fetchDrugs} = useDrugStore();
+  const router = useRouter();
+  const drugListPath = "/drugs/drug-list";
+  const handleCancel = () => {
+    router.push(drugListPath)
+  }
+
+  const [isPending, startTransition] = React.useTransition();
+  const MOCK_CATEGORIES = DRUG_CATEGORIES
+
   const form = useForm<DrugFormValues>({
     resolver: zodResolver(drugFormSchema),
     defaultValues: {
@@ -70,6 +80,25 @@ export default function AddNewDrugPage() {
 
   function onSubmit(data: DrugFormValues) {
     console.log("Verified structural drug asset payload:", data)
+        startTransition(() => {      
+        toast.promise(
+          async () => {
+            const res = await createDrugAction(data);
+            if (!res.success) {
+              throw new Error(res.error || "Failed to create drug");
+            }
+            return res;
+          }, 
+          {
+            loading: "Creating drug...",
+            success: (res) => {
+              fetchDrugs();
+              return res.message || "Drug created successfully";
+            },
+            error: (err) => err.message || "Error creating drug"
+          }
+        );
+    });
   }
 
   return (
@@ -77,10 +106,19 @@ export default function AddNewDrugPage() {
       
       {/* Title View Layout Workspace Section */}
       <div className="space-y-1">
-        <h1 className="text-2xl font-bold tracking-tight text-slate-900">Add New Drug</h1>
-        <p className="text-sm text-slate-500 font-normal">
-          Add a new medicine to the central drug catalogue.
-        </p>
+        <div className="flex justify-between items-center">
+          <div>
+            <h1 className="text-2xl font-bold tracking-tight text-slate-900">Add New Drug</h1>
+            <p className="text-sm text-slate-500 font-normal">
+              Add a new medicine to the central drug catalogue.
+            </p>
+          </div>
+           <Button type="button"  onClick={handleCancel}
+           className="h-9 text-xs font-semibold bg-emerald-800 hover:bg-emerald-700 text-white shadow-xs rounded-lg gap-1.5 px-5"
+           >
+              <ArrowLeft className="h-4 w-4" /> Back
+            </Button>
+        </div>
       </div>
 
       {/* Core Multi-Column Operational Viewport Interface Grid */}
@@ -141,7 +179,7 @@ export default function AddNewDrugPage() {
                           </SelectTrigger>
                           <SelectContent className="rounded-lg">
                             {MOCK_CATEGORIES.map((cat) => (
-                              <SelectItem key={cat.id} value={cat.id} className="text-sm">{cat.name}</SelectItem>
+                              <SelectItem key={cat.key} value={cat.key} className="text-sm">{cat.name}</SelectItem>
                             ))}
                           </SelectContent>
                         </Select>
@@ -251,7 +289,7 @@ export default function AddNewDrugPage() {
                 <Textarea 
                   id="description"
                   placeholder="Enter drug description, indications, usage or other relevant information..." 
-                  className="min-h-[100px] resize-none text-sm border-slate-200 focus-visible:ring-emerald-600 focus-visible:border-emerald-600 rounded-lg pb-6"
+                  className="min-h-25 resize-none text-sm border-slate-200 focus-visible:ring-emerald-600 focus-visible:border-emerald-600 rounded-lg pb-6"
                   maxLength={500}
                   {...register("description")}
                 />
@@ -310,7 +348,7 @@ export default function AddNewDrugPage() {
                 <Textarea 
                   id="notes"
                   placeholder="Any additional notes..." 
-                  className="min-h-[80px] resize-none text-sm border-slate-200 focus-visible:ring-emerald-600 focus-visible:border-emerald-600 rounded-lg pb-6"
+                  className="min-h-20 resize-none text-sm border-slate-200 focus-visible:ring-emerald-600 focus-visible:border-emerald-600 rounded-lg pb-6"
                   maxLength={300}
                   {...register("notes")}
                 />
@@ -324,15 +362,15 @@ export default function AddNewDrugPage() {
 
           {/* Bottom Actions Execution Bar Container */}
           <div className="flex items-center justify-between pt-2">
-            <Button type="button" variant="outline" className="h-9 text-xs font-semibold border-slate-200 text-slate-700 rounded-lg bg-white px-5 hover:bg-slate-50">
+            <Button onClick={handleCancel} type="button" variant="outline" className="h-9 text-xs font-semibold border-slate-200 text-slate-700 rounded-lg bg-white px-5 hover:bg-slate-50">
               Cancel
             </Button>
             <div className="flex items-center gap-2">
               <Button type="button" variant="outline" className="h-9 text-xs font-semibold border-emerald-200 text-emerald-800 bg-emerald-50/40 rounded-lg px-5 hover:bg-emerald-50">
                 Save & Add Another
               </Button>
-              <Button type="submit" className="h-9 text-xs font-semibold bg-emerald-800 hover:bg-emerald-700 text-white shadow-xs rounded-lg gap-1.5 px-5">
-                <Save className="h-4 w-4" /> Save Drug
+              <Button disabled = {isPending} type="submit" className="h-9 text-xs font-semibold bg-emerald-800 hover:bg-emerald-700 text-white shadow-xs rounded-lg gap-1.5 px-5">
+                 {isPending ? <RefreshCw className={`h-4 w-4 text-slate-600 ${isPending ? "animate-spin" : ""}`} />: <span><Save className="h-4 w-4" /> Save Drug</span>}
               </Button>
             </div>
           </div>

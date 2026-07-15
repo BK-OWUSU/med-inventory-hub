@@ -376,7 +376,7 @@ export default function TableMain<TData, TValue>({columns, data, searchKey, plac
                 <TableHeader className="sticky top-0 z-10"> 
                     {table.getHeaderGroups().map((headerGroup) => (
                     <React.Fragment key={headerGroup.id}>    
-                    <TableRow key={headerGroup.id} className="bg-green-950 hover:bg-green-950">
+                    <TableRow key={headerGroup.id} className="bg-green-800 hover:bg-green-700">
                         {headerGroup.headers.map((header) => {
                         const isSelect = header.id === "select";
                         
@@ -390,7 +390,7 @@ export default function TableMain<TData, TValue>({columns, data, searchKey, plac
                             // 10. HELPER CSS: Pinned header must have opaque bg matching header color (bg-green-950)
                             className={cn(
                                 `border relative text-white first:rounded-tl-md font-semibold last:rounded-tr-md group ${isSelect ? "p-2" : "px-4"}`,
-                                isPinnedRightHeader ? 'bg-green-950' : '' 
+                                isPinnedRightHeader ? 'bg-green-800' : '' 
                             )}
                             style={{ 
                                 width: header.getSize(),
@@ -489,7 +489,7 @@ export default function TableMain<TData, TValue>({columns, data, searchKey, plac
                                     else newValue = undefined;
                                     column.setFilterValue(newValue);
                                     }}>
-                                    <SelectTrigger className="h-8 w-full border text-xs focus:ring-1 focus:ring-green-900">
+                                    <SelectTrigger className="h-8 w-full border text-xs focus:ring-1 focus:ring-green-800">
                                     <SelectValue placeholder="All" />
                                     </SelectTrigger>
                                     <SelectContent>
@@ -507,7 +507,7 @@ export default function TableMain<TData, TValue>({columns, data, searchKey, plac
                                     );
                                     }}
                                 >
-                                    <SelectTrigger className="h-8 w-full border text-xs focus:ring-1 focus:ring-green-900">
+                                    <SelectTrigger className="h-8 w-full border text-xs focus:ring-1 focus:ring-green-800">
                                     <SelectValue placeholder="All" />
                                     </SelectTrigger>
 

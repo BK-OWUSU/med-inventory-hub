@@ -31,8 +31,13 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { LoginFormValues, loginSchema } from "@/types/schemas/auth.schema";
+import { AppResponse, JwtPayload } from "@/types/types/app.type";
+import { useAuthStore } from "@/store/authStore";
+import { useRouter } from "next/navigation";
 
 export default function LoginPage() {
+  const login  = useAuthStore((state)=> state.login);
+  const router = useRouter();
   const [showPassword, setShowPassword] = useState(false);
   const [serverError, setServerError] = useState<string | null>(null);
 
@@ -53,14 +58,27 @@ export default function LoginPage() {
 
   const rememberMeValue = watch("rememberMe");
 
-  const onSubmit = async (data: LoginFormValues) => {
+const onSubmit = async (data: LoginFormValues) => {
     setServerError(null);
     try {
-      // Simulate enterprise federated auth pipeline latency
-      await new Promise((resolve) => setTimeout(resolve, 1800));
-      console.log("Authentication requested for:", data.email);
+      // 1. Send the data to the store (it handles catching the 403 and mapping success: true)
+      const response = await login(data) as AppResponse;
+      
+      if (!response.success) {
+        setServerError(response.message || "Invalid clinical operational credentials.");
+        return;
+      }
+
+      // 2. Safely trigger the client-side router transition
+      if (response.redirectTo) {
+        console.log("Redirecting browser layout to:", response.redirectTo); // Should print "/change-password"
+        router.push(response.redirectTo);
+        return;
+      }
+
     } catch (err) {
-      setServerError("Invalid clinical operational credentials. Please verify your token state.");
+      console.error("Frontend Login Submission Catch Block Error:", err);
+      setServerError("An unexpected error occurred during login. Please try again.");
     }
   };
 
@@ -77,7 +95,7 @@ export default function LoginPage() {
           initial={{ opacity: 0, scale: 0.98, y: 15 }}
           animate={{ opacity: 1, scale: 1, y: 0 }}
           transition={{ duration: 0.8, ease: "easeOut" }}
-          className="relative w-full max-w-xl aspect-[4/5] rounded-2xl overflow-hidden shadow-2xl border border-green-800/50 group"
+          className="relative w-full max-w-xl aspect-4/5 rounded-2xl overflow-hidden shadow-2xl border border-green-800/50 group"
         >
           <Image
             src="/img/pharmacy-1.webp"
@@ -88,7 +106,7 @@ export default function LoginPage() {
             sizes="(max-w-7xl) 40vw, 100vw"
           />
           {/* Subtle Dynamic Overlay Matrix */}
-          <div className="absolute inset-0 bg-gradient-to-t from-green-950/90 via-green-900/40 to-transparent" />
+          <div className="absolute inset-0 bg-linear-to-t from-green-950/90 via-green-900/40 to-transparent" />
           
           {/* Static Branding overlay parameters inside the visual stage */}
           <div className="absolute bottom-0 inset-x-0 p-8 z-10 space-y-3">
@@ -146,7 +164,7 @@ export default function LoginPage() {
           initial={{ opacity: 0, y: 12 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, ease: "easeOut" }}
-          className="w-full max-w-[440px] space-y-6"
+          className="w-full max-w-110 space-y-6"
         >
           {/* Enterprise Anchor Identity Banner */}
           <div className="flex items-center justify-between lg:justify-start gap-2 mb-8">
@@ -269,7 +287,7 @@ export default function LoginPage() {
                 <Button
                   type="submit"
                   disabled={isSubmitting}
-                  className="w-full h-11 bg-gradient-to-r from-green-700 to-green-600 hover:from-green-800 hover:to-green-700 text-white font-medium rounded-xl shadow-md transition-all duration-200 ease-in-out transform active:scale-[0.99] mt-2 disabled:opacity-70 disabled:cursor-not-allowed"
+                  className="w-full h-11 bg-linear-to-r from-green-700 to-green-600 hover:from-green-800 hover:to-green-700 text-white font-medium rounded-xl shadow-md transition-all duration-200 ease-in-out transform active:scale-[0.99] mt-2 disabled:opacity-70 disabled:cursor-not-allowed"
                 >
                   {isSubmitting ? (
                     <span className="flex items-center gap-2 justify-center">

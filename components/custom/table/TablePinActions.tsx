@@ -78,7 +78,7 @@ const HeaderIconButton = <TData,>({ className }: HeaderIconButtonProps) => {
           }
         }}
         className={cn(
-            "h-7 w-7 p-0 text-blue-950 bg-white hover:bg-amber-100 hover:text-blue-700 focus-visible:ring-blue-300 cursor-pointer",
+            "h-7 w-7 p-0 text-green-800 bg-white hover:bg-amber-100 hover:text-green-700 focus-visible:ring-green-300 cursor-pointer",
             className
         )}
         title={isActionsPinned ? "Unpin this column" : "Pin this column to the right"}
@@ -120,7 +120,7 @@ const PinActionsButton = <TData,>() => {
           }));
         }
       }}
-      className="flex items-center p-4 gap-2 border-blue-900 text-blue-900 hover:bg-blue-50"
+      className="flex items-center p-4 gap-2 border-green-800 text-green-900 hover:bg-green-50"
       title={isActionsPinned ? "Unpin actions column" : "Pin actions column"}
     >
       {isActionsPinned ? <PinOff className="h-4 w-4" /> : <Pin className="h-4 w-4" />}

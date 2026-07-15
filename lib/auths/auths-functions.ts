@@ -5,9 +5,9 @@ import { NextResponse } from "next/server";
 import {jwtVerify, decodeJwt, errors, SignJWT} from "jose"
 import { cookies, headers } from "next/headers";
 import { EmailVerificationPayload, JwtPayload } from "@/types/types/app.type";
-const POS_COOKIE_NAME = "med_inv_hub_token";
-const VERIFY_COOKIE_NAME = "med_hub_verify_token";
-const PASSWORD_RESET_COOKIE_NAME = "password_reset";
+const APP_COOKIE_NAME = "med_inv_hub_token_";
+const VERIFY_COOKIE_NAME = "med_hub_verify_token_";
+const PASSWORD_CHANGE_COOKIE_NAME = "med_hub_password_reset_";
 
 
 // For hashing passwords, 
@@ -84,7 +84,7 @@ export async function verifyAppTokenEdge(token: string): Promise<{payload: JwtPa
 // Utility function to get session in API routes
 export async function getAppSession(): Promise<JwtPayload | null> {
   const cookieStore = await cookies();
-  const token = cookieStore.get(POS_COOKIE_NAME)?.value;
+  const token = cookieStore.get(APP_COOKIE_NAME)?.value;
   if (!token) return null;
   return verifyAppToken(token) as JwtPayload;
 }
@@ -112,7 +112,7 @@ export async function updateSessionPayload(updates: Partial<JwtPayload>): Promis
   try {
     const JWT_SECRET = process.env.JWT_SECRET!;
     const cookieStore = await cookies();
-    const existingCookie = cookieStore.get(POS_COOKIE_NAME);
+    const existingCookie = cookieStore.get(APP_COOKIE_NAME);
     if (!existingCookie || !existingCookie.value) return false; 
     
     if (!JWT_SECRET) {
@@ -142,7 +142,7 @@ export async function updateSessionPayload(updates: Partial<JwtPayload>): Promis
       .sign(SECRET_KEY);
 
     // 5. Overwrite cookie directly from within the NextJS server action boundary runtime context
-    cookieStore.set(POS_COOKIE_NAME, newToken, {
+    cookieStore.set(APP_COOKIE_NAME, newToken, {
       httpOnly: true,
       sameSite: "lax",
       secure: process.env.NODE_ENV === "production",
@@ -161,7 +161,7 @@ export async function updateSessionPayload(updates: Partial<JwtPayload>): Promis
 //SET MAIN POS APP TOKEN FOR LOGIN
 export function setAppSessionCookie(response: NextResponse, payload: JwtPayload): void {
   const token = generateAppToken(payload);
-  response.cookies.set(POS_COOKIE_NAME, token, {
+  response.cookies.set(APP_COOKIE_NAME, token, {
     httpOnly: true,
     sameSite: "lax",
     secure: process.env.NODE_ENV === "production",
@@ -186,7 +186,7 @@ export function setEmailVerificationSessionCookie(response: NextResponse, payloa
 //EMAIL PASSWORD RESET TOKEN 
 export function setPasswordResetSessionCookie(response: NextResponse, payload: EmailVerificationPayload): void {
   const token = generateEmailVerificationToken(payload);
-  response.cookies.set(PASSWORD_RESET_COOKIE_NAME, token, {
+  response.cookies.set(PASSWORD_CHANGE_COOKIE_NAME, token, {
     httpOnly: true,
     sameSite: "lax",
     secure: process.env.NODE_ENV === "production",
@@ -200,7 +200,7 @@ export function setPasswordResetSessionCookie(response: NextResponse, payload: E
 
  //MAIN POS APP
 export function clearAppAppSessionCookie(response: NextResponse): void {
-  response.cookies.set(POS_COOKIE_NAME, "",{
+  response.cookies.set(APP_COOKIE_NAME, "",{
     httpOnly: true,
     sameSite: "lax",
     secure: process.env.NODE_ENV === "production",
@@ -223,7 +223,7 @@ export function clearEmailVerificationSessionCookie(response: NextResponse): voi
 
 //PASSWORD RESET TOKEN CLEARING 
 export function clearPasswordResetSessionCookie(response: NextResponse): void {
-  response.cookies.set(PASSWORD_RESET_COOKIE_NAME, "", {
+  response.cookies.set(PASSWORD_CHANGE_COOKIE_NAME, "", {
     httpOnly: true,
     sameSite: "lax",
     expires: new Date(0), 
@@ -257,4 +257,4 @@ export async function getRequestMeta(): Promise<RequestMeta> {
 }
 
 
-export { POS_COOKIE_NAME, VERIFY_COOKIE_NAME,PASSWORD_RESET_COOKIE_NAME};
+export { APP_COOKIE_NAME, VERIFY_COOKIE_NAME,PASSWORD_CHANGE_COOKIE_NAME};

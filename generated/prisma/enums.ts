@@ -9,6 +9,18 @@
 * 🟢 You can import this file directly.
 */
 
+export const SessionReason = {
+  LOGIN: 'LOGIN',
+  LOGOUT: 'LOGOUT',
+  SESSION_EXPIRED: 'SESSION_EXPIRED',
+  FORCED_LOGOUT: 'FORCED_LOGOUT',
+  PASSWORD_CHANGED: 'PASSWORD_CHANGED',
+  ACCOUNT_DISABLED: 'ACCOUNT_DISABLED'
+} as const
+
+export type SessionReason = (typeof SessionReason)[keyof typeof SessionReason]
+
+
 export const Unit = {
   BOX: 'BOX',
   BOTTLE: 'BOTTLE',
@@ -38,6 +50,7 @@ export type DosageForm = (typeof DosageForm)[keyof typeof DosageForm]
 
 
 export const UserRole = {
+  SUPER_ADMIN: 'SUPER_ADMIN',
   ADMIN: 'ADMIN',
   PHARMACIST: 'PHARMACIST',
   STAFF: 'STAFF',
@@ -50,7 +63,8 @@ export type UserRole = (typeof UserRole)[keyof typeof UserRole]
 export const FacilityType = {
   HOSPITAL: 'HOSPITAL',
   PHARMACY: 'PHARMACY',
-  CLINIC: 'CLINIC'
+  CLINIC: 'CLINIC',
+  SYSTEM_GLOBAL: 'SYSTEM_GLOBAL'
 } as const
 
 export type FacilityType = (typeof FacilityType)[keyof typeof FacilityType]
@@ -100,7 +114,20 @@ export const AuditAction = {
   INVENTORY_UPDATED: 'INVENTORY_UPDATED',
   INVENTORY_CREATED: 'INVENTORY_CREATED',
   USER_CREATED: 'USER_CREATED',
-  FACILITY_CREATED: 'FACILITY_CREATED'
+  FACILITY_CREATED: 'FACILITY_CREATED',
+  PASSWORD_RESET: 'PASSWORD_RESET'
 } as const
 
 export type AuditAction = (typeof AuditAction)[keyof typeof AuditAction]
+
+
+export const AuditEntity = {
+  USER: 'USER',
+  FACILITY: 'FACILITY',
+  DRUG: 'DRUG',
+  INVENTORY: 'INVENTORY',
+  ORDER: 'ORDER',
+  STOCK_MOVEMENT: 'STOCK_MOVEMENT'
+} as const
+
+export type AuditEntity = (typeof AuditEntity)[keyof typeof AuditEntity]

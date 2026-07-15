@@ -32,12 +32,13 @@ export type AppResponse = {
 
 export type JwtPayload = {
   userId: string;
-  facilityId: string;
-  facilityName: string;
+  customId: string;
+  facilityId?: string;
+  facilityName?: string;
   role: UserRole;
   fullName: string;
   email: string;
-  sessionId?: string;
+  sessionId?: string; //login session id
   needsPasswordChange?: boolean;
 };
 

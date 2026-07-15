@@ -70,7 +70,7 @@ export function NavMain({ items }: { items: ParsedNavGroup[] }) {
                 isActive={isParentActive}
                 className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all duration-200 ${
                   isParentActive 
-                    ? "font-semibold text-white bg-green-800/40 animate-pulse" 
+                    ? "font-semibold text-white! bg-green-800/70! animate-pulse" 
                     : "text-green-100/80 hover:text-white hover:bg-green-800/30"
                 }`}
               >
@@ -121,8 +121,8 @@ export function NavMain({ items }: { items: ParsedNavGroup[] }) {
           isActive={isParentActive}
           className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all duration-200 ${
             isParentActive
-              ? "font-semibold bg-white text-green-900 shadow-sm hover:bg-white hover:text-green-900" 
-              : "text-green-100/80 hover:text-white hover:bg-green-800/40"
+              ? "font-semibold bg-white  text-green-900 shadow-sm hover:bg-white hover:text-green-900" 
+              : "text-green-100/80  hover:text-white hover:bg-green-800/40"
           }`}
         >
           <Link href={group.url}>

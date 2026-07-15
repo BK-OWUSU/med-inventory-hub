@@ -386,6 +386,7 @@ type FieldRefInputType<Model, FieldType> = Model extends never ? never : FieldRe
 export const ModelName = {
   Facility: 'Facility',
   User: 'User',
+  UserSessionLog: 'UserSessionLog',
   Drug: 'Drug',
   DrugCategory: 'DrugCategory',
   Inventory: 'Inventory',
@@ -393,7 +394,8 @@ export const ModelName = {
   OrderItem: 'OrderItem',
   StockMovement: 'StockMovement',
   Notification: 'Notification',
-  AuditLog: 'AuditLog'
+  AuditLog: 'AuditLog',
+  Sequence: 'Sequence'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -409,7 +411,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "facility" | "user" | "drug" | "drugCategory" | "inventory" | "order" | "orderItem" | "stockMovement" | "notification" | "auditLog"
+    modelProps: "facility" | "user" | "userSessionLog" | "drug" | "drugCategory" | "inventory" | "order" | "orderItem" | "stockMovement" | "notification" | "auditLog" | "sequence"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -558,6 +560,80 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         count: {
           args: Prisma.UserCountArgs<ExtArgs>
           result: runtime.Types.Utils.Optional<Prisma.UserCountAggregateOutputType> | number
+        }
+      }
+    }
+    UserSessionLog: {
+      payload: Prisma.$UserSessionLogPayload<ExtArgs>
+      fields: Prisma.UserSessionLogFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.UserSessionLogFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$UserSessionLogPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.UserSessionLogFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$UserSessionLogPayload>
+        }
+        findFirst: {
+          args: Prisma.UserSessionLogFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$UserSessionLogPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.UserSessionLogFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$UserSessionLogPayload>
+        }
+        findMany: {
+          args: Prisma.UserSessionLogFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$UserSessionLogPayload>[]
+        }
+        create: {
+          args: Prisma.UserSessionLogCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$UserSessionLogPayload>
+        }
+        createMany: {
+          args: Prisma.UserSessionLogCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.UserSessionLogCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$UserSessionLogPayload>[]
+        }
+        delete: {
+          args: Prisma.UserSessionLogDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$UserSessionLogPayload>
+        }
+        update: {
+          args: Prisma.UserSessionLogUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$UserSessionLogPayload>
+        }
+        deleteMany: {
+          args: Prisma.UserSessionLogDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.UserSessionLogUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.UserSessionLogUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$UserSessionLogPayload>[]
+        }
+        upsert: {
+          args: Prisma.UserSessionLogUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$UserSessionLogPayload>
+        }
+        aggregate: {
+          args: Prisma.UserSessionLogAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateUserSessionLog>
+        }
+        groupBy: {
+          args: Prisma.UserSessionLogGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.UserSessionLogGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.UserSessionLogCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.UserSessionLogCountAggregateOutputType> | number
         }
       }
     }
@@ -1153,6 +1229,80 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         }
       }
     }
+    Sequence: {
+      payload: Prisma.$SequencePayload<ExtArgs>
+      fields: Prisma.SequenceFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.SequenceFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SequencePayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.SequenceFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SequencePayload>
+        }
+        findFirst: {
+          args: Prisma.SequenceFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SequencePayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.SequenceFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SequencePayload>
+        }
+        findMany: {
+          args: Prisma.SequenceFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SequencePayload>[]
+        }
+        create: {
+          args: Prisma.SequenceCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SequencePayload>
+        }
+        createMany: {
+          args: Prisma.SequenceCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.SequenceCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SequencePayload>[]
+        }
+        delete: {
+          args: Prisma.SequenceDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SequencePayload>
+        }
+        update: {
+          args: Prisma.SequenceUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SequencePayload>
+        }
+        deleteMany: {
+          args: Prisma.SequenceDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.SequenceUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.SequenceUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SequencePayload>[]
+        }
+        upsert: {
+          args: Prisma.SequenceUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SequencePayload>
+        }
+        aggregate: {
+          args: Prisma.SequenceAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateSequence>
+        }
+        groupBy: {
+          args: Prisma.SequenceGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.SequenceGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.SequenceCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.SequenceCountAggregateOutputType> | number
+        }
+      }
+    }
   }
 } & {
   other: {
@@ -1194,6 +1344,7 @@ export type TransactionIsolationLevel = (typeof TransactionIsolationLevel)[keyof
 
 export const FacilityScalarFieldEnum = {
   id: 'id',
+  customId: 'customId',
   name: 'name',
   type: 'type',
   location: 'location',
@@ -1212,22 +1363,43 @@ export type FacilityScalarFieldEnum = (typeof FacilityScalarFieldEnum)[keyof typ
 
 export const UserScalarFieldEnum = {
   id: 'id',
+  customId: 'customId',
   email: 'email',
   password: 'password',
   fullName: 'fullName',
   role: 'role',
   phone: 'phone',
   facilityId: 'facilityId',
+  needsPasswordChange: 'needsPasswordChange',
   isActive: 'isActive',
   createdAt: 'createdAt',
-  updatedAt: 'updatedAt'
+  updatedAt: 'updatedAt',
+  lastLoginAt: 'lastLoginAt'
 } as const
 
 export type UserScalarFieldEnum = (typeof UserScalarFieldEnum)[keyof typeof UserScalarFieldEnum]
 
 
+export const UserSessionLogScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  facilityId: 'facilityId',
+  sessionToken: 'sessionToken',
+  reason: 'reason',
+  loginAt: 'loginAt',
+  logoutAt: 'logoutAt',
+  isActive: 'isActive',
+  ipAddress: 'ipAddress',
+  userAgent: 'userAgent',
+  createdAt: 'createdAt'
+} as const
+
+export type UserSessionLogScalarFieldEnum = (typeof UserSessionLogScalarFieldEnum)[keyof typeof UserSessionLogScalarFieldEnum]
+
+
 export const DrugScalarFieldEnum = {
   id: 'id',
+  customId: 'customId',
   name: 'name',
   genericName: 'genericName',
   strength: 'strength',
@@ -1237,6 +1409,7 @@ export const DrugScalarFieldEnum = {
   isControlled: 'isControlled',
   categoryId: 'categoryId',
   isActive: 'isActive',
+  notes: 'notes',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 } as const
@@ -1246,7 +1419,11 @@ export type DrugScalarFieldEnum = (typeof DrugScalarFieldEnum)[keyof typeof Drug
 
 export const DrugCategoryScalarFieldEnum = {
   id: 'id',
-  name: 'name'
+  name: 'name',
+  key: 'key',
+  isActive: 'isActive',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
 } as const
 
 export type DrugCategoryScalarFieldEnum = (typeof DrugCategoryScalarFieldEnum)[keyof typeof DrugCategoryScalarFieldEnum]
@@ -1264,7 +1441,8 @@ export const InventoryScalarFieldEnum = {
   receivedDate: 'receivedDate',
   expiryDate: 'expiryDate',
   lastUpdated: 'lastUpdated',
-  createdAt: 'createdAt'
+  createdAt: 'createdAt',
+  isActive: 'isActive'
 } as const
 
 export type InventoryScalarFieldEnum = (typeof InventoryScalarFieldEnum)[keyof typeof InventoryScalarFieldEnum]
@@ -1273,6 +1451,7 @@ export type InventoryScalarFieldEnum = (typeof InventoryScalarFieldEnum)[keyof t
 export const OrderScalarFieldEnum = {
   id: 'id',
   orderNumber: 'orderNumber',
+  customId: 'customId',
   requesterId: 'requesterId',
   supplierId: 'supplierId',
   type: 'type',
@@ -1283,7 +1462,10 @@ export const OrderScalarFieldEnum = {
   rejectionReason: 'rejectionReason',
   totalValue: 'totalValue',
   createdAt: 'createdAt',
-  updatedAt: 'updatedAt'
+  updatedAt: 'updatedAt',
+  approvedAt: 'approvedAt',
+  receivedAt: 'receivedAt',
+  deliveredAt: 'deliveredAt'
 } as const
 
 export type OrderScalarFieldEnum = (typeof OrderScalarFieldEnum)[keyof typeof OrderScalarFieldEnum]
@@ -1309,6 +1491,7 @@ export type OrderItemScalarFieldEnum = (typeof OrderItemScalarFieldEnum)[keyof t
 
 export const StockMovementScalarFieldEnum = {
   id: 'id',
+  customId: 'customId',
   inventoryId: 'inventoryId',
   referenceNo: 'referenceNo',
   orderItemId: 'orderItemId',
@@ -1316,7 +1499,7 @@ export const StockMovementScalarFieldEnum = {
   quantity: 'quantity',
   notes: 'notes',
   performedById: 'performedById',
-  createdAt: 'createdAt'
+  performedAt: 'performedAt'
 } as const
 
 export type StockMovementScalarFieldEnum = (typeof StockMovementScalarFieldEnum)[keyof typeof StockMovementScalarFieldEnum]
@@ -1324,6 +1507,7 @@ export type StockMovementScalarFieldEnum = (typeof StockMovementScalarFieldEnum)
 
 export const NotificationScalarFieldEnum = {
   id: 'id',
+  facilityId: 'facilityId',
   userId: 'userId',
   title: 'title',
   message: 'message',
@@ -1348,6 +1532,18 @@ export const AuditLogScalarFieldEnum = {
 } as const
 
 export type AuditLogScalarFieldEnum = (typeof AuditLogScalarFieldEnum)[keyof typeof AuditLogScalarFieldEnum]
+
+
+export const SequenceScalarFieldEnum = {
+  id: 'id',
+  facilityId: 'facilityId',
+  type: 'type',
+  currentNo: 'currentNo',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type SequenceScalarFieldEnum = (typeof SequenceScalarFieldEnum)[keyof typeof SequenceScalarFieldEnum]
 
 
 export const SortOrder = {
@@ -1461,6 +1657,20 @@ export type ListEnumUserRoleFieldRefInput<$PrismaModel> = FieldRefInputType<$Pri
 
 
 /**
+ * Reference to a field of type 'SessionReason'
+ */
+export type EnumSessionReasonFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'SessionReason'>
+    
+
+
+/**
+ * Reference to a field of type 'SessionReason[]'
+ */
+export type ListEnumSessionReasonFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'SessionReason[]'>
+    
+
+
+/**
  * Reference to a field of type 'Unit'
  */
 export type EnumUnitFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Unit'>
@@ -1569,6 +1779,20 @@ export type EnumAuditActionFieldRefInput<$PrismaModel> = FieldRefInputType<$Pris
  * Reference to a field of type 'AuditAction[]'
  */
 export type ListEnumAuditActionFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'AuditAction[]'>
+    
+
+
+/**
+ * Reference to a field of type 'AuditEntity'
+ */
+export type EnumAuditEntityFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'AuditEntity'>
+    
+
+
+/**
+ * Reference to a field of type 'AuditEntity[]'
+ */
+export type ListEnumAuditEntityFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'AuditEntity[]'>
     
 
 
@@ -1711,6 +1935,7 @@ export type PrismaClientOptions = ({
 export type GlobalOmitConfig = {
   facility?: Prisma.FacilityOmit
   user?: Prisma.UserOmit
+  userSessionLog?: Prisma.UserSessionLogOmit
   drug?: Prisma.DrugOmit
   drugCategory?: Prisma.DrugCategoryOmit
   inventory?: Prisma.InventoryOmit
@@ -1719,6 +1944,7 @@ export type GlobalOmitConfig = {
   stockMovement?: Prisma.StockMovementOmit
   notification?: Prisma.NotificationOmit
   auditLog?: Prisma.AuditLogOmit
+  sequence?: Prisma.SequenceOmit
 }
 
 /* Types for Logging */

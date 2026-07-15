@@ -52,6 +52,11 @@ export type Facility = Prisma.FacilityModel
  */
 export type User = Prisma.UserModel
 /**
+ * Model UserSessionLog
+ * 
+ */
+export type UserSessionLog = Prisma.UserSessionLogModel
+/**
  * Model Drug
  * 
  */
@@ -91,3 +96,8 @@ export type Notification = Prisma.NotificationModel
  * 
  */
 export type AuditLog = Prisma.AuditLogModel
+/**
+ * Model Sequence
+ * 
+ */
+export type Sequence = Prisma.SequenceModel

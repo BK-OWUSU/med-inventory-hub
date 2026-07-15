@@ -10,6 +10,7 @@
  */
 export type * from './models/Facility'
 export type * from './models/User'
+export type * from './models/UserSessionLog'
 export type * from './models/Drug'
 export type * from './models/DrugCategory'
 export type * from './models/Inventory'
@@ -18,4 +19,5 @@ export type * from './models/OrderItem'
 export type * from './models/StockMovement'
 export type * from './models/Notification'
 export type * from './models/AuditLog'
+export type * from './models/Sequence'
 export type * from './commonInputTypes'

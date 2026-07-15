@@ -26,6 +26,7 @@ export type AggregateFacility = {
 
 export type FacilityMinAggregateOutputType = {
   id: string | null
+  customId: string | null
   name: string | null
   type: $Enums.FacilityType | null
   location: string | null
@@ -41,6 +42,7 @@ export type FacilityMinAggregateOutputType = {
 
 export type FacilityMaxAggregateOutputType = {
   id: string | null
+  customId: string | null
   name: string | null
   type: $Enums.FacilityType | null
   location: string | null
@@ -56,6 +58,7 @@ export type FacilityMaxAggregateOutputType = {
 
 export type FacilityCountAggregateOutputType = {
   id: number
+  customId: number
   name: number
   type: number
   location: number
@@ -73,6 +76,7 @@ export type FacilityCountAggregateOutputType = {
 
 export type FacilityMinAggregateInputType = {
   id?: true
+  customId?: true
   name?: true
   type?: true
   location?: true
@@ -88,6 +92,7 @@ export type FacilityMinAggregateInputType = {
 
 export type FacilityMaxAggregateInputType = {
   id?: true
+  customId?: true
   name?: true
   type?: true
   location?: true
@@ -103,6 +108,7 @@ export type FacilityMaxAggregateInputType = {
 
 export type FacilityCountAggregateInputType = {
   id?: true
+  customId?: true
   name?: true
   type?: true
   location?: true
@@ -191,6 +197,7 @@ export type FacilityGroupByArgs<ExtArgs extends runtime.Types.Extensions.Interna
 
 export type FacilityGroupByOutputType = {
   id: string
+  customId: string
   name: string
   type: $Enums.FacilityType
   location: string
@@ -227,6 +234,7 @@ export type FacilityWhereInput = {
   OR?: Prisma.FacilityWhereInput[]
   NOT?: Prisma.FacilityWhereInput | Prisma.FacilityWhereInput[]
   id?: Prisma.StringFilter<"Facility"> | string
+  customId?: Prisma.StringFilter<"Facility"> | string
   name?: Prisma.StringFilter<"Facility"> | string
   type?: Prisma.EnumFacilityTypeFilter<"Facility"> | $Enums.FacilityType
   location?: Prisma.StringFilter<"Facility"> | string
@@ -243,10 +251,13 @@ export type FacilityWhereInput = {
   outgoingOrders?: Prisma.OrderListRelationFilter
   incomingOrders?: Prisma.OrderListRelationFilter
   auditLogs?: Prisma.AuditLogListRelationFilter
+  userSessionLogs?: Prisma.UserSessionLogListRelationFilter
+  notifications?: Prisma.NotificationListRelationFilter
 }
 
 export type FacilityOrderByWithRelationInput = {
   id?: Prisma.SortOrder
+  customId?: Prisma.SortOrder
   name?: Prisma.SortOrder
   type?: Prisma.SortOrder
   location?: Prisma.SortOrder
@@ -263,10 +274,13 @@ export type FacilityOrderByWithRelationInput = {
   outgoingOrders?: Prisma.OrderOrderByRelationAggregateInput
   incomingOrders?: Prisma.OrderOrderByRelationAggregateInput
   auditLogs?: Prisma.AuditLogOrderByRelationAggregateInput
+  userSessionLogs?: Prisma.UserSessionLogOrderByRelationAggregateInput
+  notifications?: Prisma.NotificationOrderByRelationAggregateInput
 }
 
 export type FacilityWhereUniqueInput = Prisma.AtLeast<{
   id?: string
+  customId?: string
   licenseNumber?: string
   AND?: Prisma.FacilityWhereInput | Prisma.FacilityWhereInput[]
   OR?: Prisma.FacilityWhereInput[]
@@ -286,10 +300,13 @@ export type FacilityWhereUniqueInput = Prisma.AtLeast<{
   outgoingOrders?: Prisma.OrderListRelationFilter
   incomingOrders?: Prisma.OrderListRelationFilter
   auditLogs?: Prisma.AuditLogListRelationFilter
-}, "id" | "licenseNumber">
+  userSessionLogs?: Prisma.UserSessionLogListRelationFilter
+  notifications?: Prisma.NotificationListRelationFilter
+}, "id" | "customId" | "licenseNumber">
 
 export type FacilityOrderByWithAggregationInput = {
   id?: Prisma.SortOrder
+  customId?: Prisma.SortOrder
   name?: Prisma.SortOrder
   type?: Prisma.SortOrder
   location?: Prisma.SortOrder
@@ -311,6 +328,7 @@ export type FacilityScalarWhereWithAggregatesInput = {
   OR?: Prisma.FacilityScalarWhereWithAggregatesInput[]
   NOT?: Prisma.FacilityScalarWhereWithAggregatesInput | Prisma.FacilityScalarWhereWithAggregatesInput[]
   id?: Prisma.StringWithAggregatesFilter<"Facility"> | string
+  customId?: Prisma.StringWithAggregatesFilter<"Facility"> | string
   name?: Prisma.StringWithAggregatesFilter<"Facility"> | string
   type?: Prisma.EnumFacilityTypeWithAggregatesFilter<"Facility"> | $Enums.FacilityType
   location?: Prisma.StringWithAggregatesFilter<"Facility"> | string
@@ -326,6 +344,7 @@ export type FacilityScalarWhereWithAggregatesInput = {
 
 export type FacilityCreateInput = {
   id?: string
+  customId: string
   name: string
   type: $Enums.FacilityType
   location: string
@@ -342,10 +361,13 @@ export type FacilityCreateInput = {
   outgoingOrders?: Prisma.OrderCreateNestedManyWithoutRequesterInput
   incomingOrders?: Prisma.OrderCreateNestedManyWithoutSupplierInput
   auditLogs?: Prisma.AuditLogCreateNestedManyWithoutFacilityInput
+  userSessionLogs?: Prisma.UserSessionLogCreateNestedManyWithoutFacilityInput
+  notifications?: Prisma.NotificationCreateNestedManyWithoutFacilityInput
 }
 
 export type FacilityUncheckedCreateInput = {
   id?: string
+  customId: string
   name: string
   type: $Enums.FacilityType
   location: string
@@ -362,10 +384,13 @@ export type FacilityUncheckedCreateInput = {
   outgoingOrders?: Prisma.OrderUncheckedCreateNestedManyWithoutRequesterInput
   incomingOrders?: Prisma.OrderUncheckedCreateNestedManyWithoutSupplierInput
   auditLogs?: Prisma.AuditLogUncheckedCreateNestedManyWithoutFacilityInput
+  userSessionLogs?: Prisma.UserSessionLogUncheckedCreateNestedManyWithoutFacilityInput
+  notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutFacilityInput
 }
 
 export type FacilityUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
+  customId?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
   type?: Prisma.EnumFacilityTypeFieldUpdateOperationsInput | $Enums.FacilityType
   location?: Prisma.StringFieldUpdateOperationsInput | string
@@ -382,10 +407,13 @@ export type FacilityUpdateInput = {
   outgoingOrders?: Prisma.OrderUpdateManyWithoutRequesterNestedInput
   incomingOrders?: Prisma.OrderUpdateManyWithoutSupplierNestedInput
   auditLogs?: Prisma.AuditLogUpdateManyWithoutFacilityNestedInput
+  userSessionLogs?: Prisma.UserSessionLogUpdateManyWithoutFacilityNestedInput
+  notifications?: Prisma.NotificationUpdateManyWithoutFacilityNestedInput
 }
 
 export type FacilityUncheckedUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
+  customId?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
   type?: Prisma.EnumFacilityTypeFieldUpdateOperationsInput | $Enums.FacilityType
   location?: Prisma.StringFieldUpdateOperationsInput | string
@@ -402,10 +430,13 @@ export type FacilityUncheckedUpdateInput = {
   outgoingOrders?: Prisma.OrderUncheckedUpdateManyWithoutRequesterNestedInput
   incomingOrders?: Prisma.OrderUncheckedUpdateManyWithoutSupplierNestedInput
   auditLogs?: Prisma.AuditLogUncheckedUpdateManyWithoutFacilityNestedInput
+  userSessionLogs?: Prisma.UserSessionLogUncheckedUpdateManyWithoutFacilityNestedInput
+  notifications?: Prisma.NotificationUncheckedUpdateManyWithoutFacilityNestedInput
 }
 
 export type FacilityCreateManyInput = {
   id?: string
+  customId: string
   name: string
   type: $Enums.FacilityType
   location: string
@@ -421,6 +452,7 @@ export type FacilityCreateManyInput = {
 
 export type FacilityUpdateManyMutationInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
+  customId?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
   type?: Prisma.EnumFacilityTypeFieldUpdateOperationsInput | $Enums.FacilityType
   location?: Prisma.StringFieldUpdateOperationsInput | string
@@ -436,6 +468,7 @@ export type FacilityUpdateManyMutationInput = {
 
 export type FacilityUncheckedUpdateManyInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
+  customId?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
   type?: Prisma.EnumFacilityTypeFieldUpdateOperationsInput | $Enums.FacilityType
   location?: Prisma.StringFieldUpdateOperationsInput | string
@@ -451,6 +484,7 @@ export type FacilityUncheckedUpdateManyInput = {
 
 export type FacilityCountOrderByAggregateInput = {
   id?: Prisma.SortOrder
+  customId?: Prisma.SortOrder
   name?: Prisma.SortOrder
   type?: Prisma.SortOrder
   location?: Prisma.SortOrder
@@ -466,6 +500,7 @@ export type FacilityCountOrderByAggregateInput = {
 
 export type FacilityMaxOrderByAggregateInput = {
   id?: Prisma.SortOrder
+  customId?: Prisma.SortOrder
   name?: Prisma.SortOrder
   type?: Prisma.SortOrder
   location?: Prisma.SortOrder
@@ -481,6 +516,7 @@ export type FacilityMaxOrderByAggregateInput = {
 
 export type FacilityMinOrderByAggregateInput = {
   id?: Prisma.SortOrder
+  customId?: Prisma.SortOrder
   name?: Prisma.SortOrder
   type?: Prisma.SortOrder
   location?: Prisma.SortOrder
@@ -494,14 +530,14 @@ export type FacilityMinOrderByAggregateInput = {
   updatedAt?: Prisma.SortOrder
 }
 
-export type FacilityScalarRelationFilter = {
-  is?: Prisma.FacilityWhereInput
-  isNot?: Prisma.FacilityWhereInput
-}
-
 export type FacilityNullableScalarRelationFilter = {
   is?: Prisma.FacilityWhereInput | null
   isNot?: Prisma.FacilityWhereInput | null
+}
+
+export type FacilityScalarRelationFilter = {
+  is?: Prisma.FacilityWhereInput
+  isNot?: Prisma.FacilityWhereInput
 }
 
 export type StringFieldUpdateOperationsInput = {
@@ -530,12 +566,28 @@ export type FacilityCreateNestedOneWithoutUsersInput = {
   connect?: Prisma.FacilityWhereUniqueInput
 }
 
-export type FacilityUpdateOneRequiredWithoutUsersNestedInput = {
+export type FacilityUpdateOneWithoutUsersNestedInput = {
   create?: Prisma.XOR<Prisma.FacilityCreateWithoutUsersInput, Prisma.FacilityUncheckedCreateWithoutUsersInput>
   connectOrCreate?: Prisma.FacilityCreateOrConnectWithoutUsersInput
   upsert?: Prisma.FacilityUpsertWithoutUsersInput
+  disconnect?: Prisma.FacilityWhereInput | boolean
+  delete?: Prisma.FacilityWhereInput | boolean
   connect?: Prisma.FacilityWhereUniqueInput
   update?: Prisma.XOR<Prisma.XOR<Prisma.FacilityUpdateToOneWithWhereWithoutUsersInput, Prisma.FacilityUpdateWithoutUsersInput>, Prisma.FacilityUncheckedUpdateWithoutUsersInput>
+}
+
+export type FacilityCreateNestedOneWithoutUserSessionLogsInput = {
+  create?: Prisma.XOR<Prisma.FacilityCreateWithoutUserSessionLogsInput, Prisma.FacilityUncheckedCreateWithoutUserSessionLogsInput>
+  connectOrCreate?: Prisma.FacilityCreateOrConnectWithoutUserSessionLogsInput
+  connect?: Prisma.FacilityWhereUniqueInput
+}
+
+export type FacilityUpdateOneRequiredWithoutUserSessionLogsNestedInput = {
+  create?: Prisma.XOR<Prisma.FacilityCreateWithoutUserSessionLogsInput, Prisma.FacilityUncheckedCreateWithoutUserSessionLogsInput>
+  connectOrCreate?: Prisma.FacilityCreateOrConnectWithoutUserSessionLogsInput
+  upsert?: Prisma.FacilityUpsertWithoutUserSessionLogsInput
+  connect?: Prisma.FacilityWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.FacilityUpdateToOneWithWhereWithoutUserSessionLogsInput, Prisma.FacilityUpdateWithoutUserSessionLogsInput>, Prisma.FacilityUncheckedUpdateWithoutUserSessionLogsInput>
 }
 
 export type FacilityCreateNestedOneWithoutInventoriesInput = {
@@ -582,6 +634,20 @@ export type FacilityUpdateOneWithoutIncomingOrdersNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.FacilityUpdateToOneWithWhereWithoutIncomingOrdersInput, Prisma.FacilityUpdateWithoutIncomingOrdersInput>, Prisma.FacilityUncheckedUpdateWithoutIncomingOrdersInput>
 }
 
+export type FacilityCreateNestedOneWithoutNotificationsInput = {
+  create?: Prisma.XOR<Prisma.FacilityCreateWithoutNotificationsInput, Prisma.FacilityUncheckedCreateWithoutNotificationsInput>
+  connectOrCreate?: Prisma.FacilityCreateOrConnectWithoutNotificationsInput
+  connect?: Prisma.FacilityWhereUniqueInput
+}
+
+export type FacilityUpdateOneRequiredWithoutNotificationsNestedInput = {
+  create?: Prisma.XOR<Prisma.FacilityCreateWithoutNotificationsInput, Prisma.FacilityUncheckedCreateWithoutNotificationsInput>
+  connectOrCreate?: Prisma.FacilityCreateOrConnectWithoutNotificationsInput
+  upsert?: Prisma.FacilityUpsertWithoutNotificationsInput
+  connect?: Prisma.FacilityWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.FacilityUpdateToOneWithWhereWithoutNotificationsInput, Prisma.FacilityUpdateWithoutNotificationsInput>, Prisma.FacilityUncheckedUpdateWithoutNotificationsInput>
+}
+
 export type FacilityCreateNestedOneWithoutAuditLogsInput = {
   create?: Prisma.XOR<Prisma.FacilityCreateWithoutAuditLogsInput, Prisma.FacilityUncheckedCreateWithoutAuditLogsInput>
   connectOrCreate?: Prisma.FacilityCreateOrConnectWithoutAuditLogsInput
@@ -600,6 +666,7 @@ export type FacilityUpdateOneWithoutAuditLogsNestedInput = {
 
 export type FacilityCreateWithoutUsersInput = {
   id?: string
+  customId: string
   name: string
   type: $Enums.FacilityType
   location: string
@@ -615,10 +682,13 @@ export type FacilityCreateWithoutUsersInput = {
   outgoingOrders?: Prisma.OrderCreateNestedManyWithoutRequesterInput
   incomingOrders?: Prisma.OrderCreateNestedManyWithoutSupplierInput
   auditLogs?: Prisma.AuditLogCreateNestedManyWithoutFacilityInput
+  userSessionLogs?: Prisma.UserSessionLogCreateNestedManyWithoutFacilityInput
+  notifications?: Prisma.NotificationCreateNestedManyWithoutFacilityInput
 }
 
 export type FacilityUncheckedCreateWithoutUsersInput = {
   id?: string
+  customId: string
   name: string
   type: $Enums.FacilityType
   location: string
@@ -634,6 +704,8 @@ export type FacilityUncheckedCreateWithoutUsersInput = {
   outgoingOrders?: Prisma.OrderUncheckedCreateNestedManyWithoutRequesterInput
   incomingOrders?: Prisma.OrderUncheckedCreateNestedManyWithoutSupplierInput
   auditLogs?: Prisma.AuditLogUncheckedCreateNestedManyWithoutFacilityInput
+  userSessionLogs?: Prisma.UserSessionLogUncheckedCreateNestedManyWithoutFacilityInput
+  notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutFacilityInput
 }
 
 export type FacilityCreateOrConnectWithoutUsersInput = {
@@ -654,6 +726,7 @@ export type FacilityUpdateToOneWithWhereWithoutUsersInput = {
 
 export type FacilityUpdateWithoutUsersInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
+  customId?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
   type?: Prisma.EnumFacilityTypeFieldUpdateOperationsInput | $Enums.FacilityType
   location?: Prisma.StringFieldUpdateOperationsInput | string
@@ -669,10 +742,13 @@ export type FacilityUpdateWithoutUsersInput = {
   outgoingOrders?: Prisma.OrderUpdateManyWithoutRequesterNestedInput
   incomingOrders?: Prisma.OrderUpdateManyWithoutSupplierNestedInput
   auditLogs?: Prisma.AuditLogUpdateManyWithoutFacilityNestedInput
+  userSessionLogs?: Prisma.UserSessionLogUpdateManyWithoutFacilityNestedInput
+  notifications?: Prisma.NotificationUpdateManyWithoutFacilityNestedInput
 }
 
 export type FacilityUncheckedUpdateWithoutUsersInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
+  customId?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
   type?: Prisma.EnumFacilityTypeFieldUpdateOperationsInput | $Enums.FacilityType
   location?: Prisma.StringFieldUpdateOperationsInput | string
@@ -688,10 +764,117 @@ export type FacilityUncheckedUpdateWithoutUsersInput = {
   outgoingOrders?: Prisma.OrderUncheckedUpdateManyWithoutRequesterNestedInput
   incomingOrders?: Prisma.OrderUncheckedUpdateManyWithoutSupplierNestedInput
   auditLogs?: Prisma.AuditLogUncheckedUpdateManyWithoutFacilityNestedInput
+  userSessionLogs?: Prisma.UserSessionLogUncheckedUpdateManyWithoutFacilityNestedInput
+  notifications?: Prisma.NotificationUncheckedUpdateManyWithoutFacilityNestedInput
+}
+
+export type FacilityCreateWithoutUserSessionLogsInput = {
+  id?: string
+  customId: string
+  name: string
+  type: $Enums.FacilityType
+  location: string
+  address?: string | null
+  phone?: string | null
+  email?: string | null
+  licenseNumber?: string | null
+  isVerified?: boolean
+  isActive?: boolean
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  users?: Prisma.UserCreateNestedManyWithoutFacilityInput
+  inventories?: Prisma.InventoryCreateNestedManyWithoutFacilityInput
+  outgoingOrders?: Prisma.OrderCreateNestedManyWithoutRequesterInput
+  incomingOrders?: Prisma.OrderCreateNestedManyWithoutSupplierInput
+  auditLogs?: Prisma.AuditLogCreateNestedManyWithoutFacilityInput
+  notifications?: Prisma.NotificationCreateNestedManyWithoutFacilityInput
+}
+
+export type FacilityUncheckedCreateWithoutUserSessionLogsInput = {
+  id?: string
+  customId: string
+  name: string
+  type: $Enums.FacilityType
+  location: string
+  address?: string | null
+  phone?: string | null
+  email?: string | null
+  licenseNumber?: string | null
+  isVerified?: boolean
+  isActive?: boolean
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  users?: Prisma.UserUncheckedCreateNestedManyWithoutFacilityInput
+  inventories?: Prisma.InventoryUncheckedCreateNestedManyWithoutFacilityInput
+  outgoingOrders?: Prisma.OrderUncheckedCreateNestedManyWithoutRequesterInput
+  incomingOrders?: Prisma.OrderUncheckedCreateNestedManyWithoutSupplierInput
+  auditLogs?: Prisma.AuditLogUncheckedCreateNestedManyWithoutFacilityInput
+  notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutFacilityInput
+}
+
+export type FacilityCreateOrConnectWithoutUserSessionLogsInput = {
+  where: Prisma.FacilityWhereUniqueInput
+  create: Prisma.XOR<Prisma.FacilityCreateWithoutUserSessionLogsInput, Prisma.FacilityUncheckedCreateWithoutUserSessionLogsInput>
+}
+
+export type FacilityUpsertWithoutUserSessionLogsInput = {
+  update: Prisma.XOR<Prisma.FacilityUpdateWithoutUserSessionLogsInput, Prisma.FacilityUncheckedUpdateWithoutUserSessionLogsInput>
+  create: Prisma.XOR<Prisma.FacilityCreateWithoutUserSessionLogsInput, Prisma.FacilityUncheckedCreateWithoutUserSessionLogsInput>
+  where?: Prisma.FacilityWhereInput
+}
+
+export type FacilityUpdateToOneWithWhereWithoutUserSessionLogsInput = {
+  where?: Prisma.FacilityWhereInput
+  data: Prisma.XOR<Prisma.FacilityUpdateWithoutUserSessionLogsInput, Prisma.FacilityUncheckedUpdateWithoutUserSessionLogsInput>
+}
+
+export type FacilityUpdateWithoutUserSessionLogsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  customId?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  type?: Prisma.EnumFacilityTypeFieldUpdateOperationsInput | $Enums.FacilityType
+  location?: Prisma.StringFieldUpdateOperationsInput | string
+  address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  licenseNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  users?: Prisma.UserUpdateManyWithoutFacilityNestedInput
+  inventories?: Prisma.InventoryUpdateManyWithoutFacilityNestedInput
+  outgoingOrders?: Prisma.OrderUpdateManyWithoutRequesterNestedInput
+  incomingOrders?: Prisma.OrderUpdateManyWithoutSupplierNestedInput
+  auditLogs?: Prisma.AuditLogUpdateManyWithoutFacilityNestedInput
+  notifications?: Prisma.NotificationUpdateManyWithoutFacilityNestedInput
+}
+
+export type FacilityUncheckedUpdateWithoutUserSessionLogsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  customId?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  type?: Prisma.EnumFacilityTypeFieldUpdateOperationsInput | $Enums.FacilityType
+  location?: Prisma.StringFieldUpdateOperationsInput | string
+  address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  licenseNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  users?: Prisma.UserUncheckedUpdateManyWithoutFacilityNestedInput
+  inventories?: Prisma.InventoryUncheckedUpdateManyWithoutFacilityNestedInput
+  outgoingOrders?: Prisma.OrderUncheckedUpdateManyWithoutRequesterNestedInput
+  incomingOrders?: Prisma.OrderUncheckedUpdateManyWithoutSupplierNestedInput
+  auditLogs?: Prisma.AuditLogUncheckedUpdateManyWithoutFacilityNestedInput
+  notifications?: Prisma.NotificationUncheckedUpdateManyWithoutFacilityNestedInput
 }
 
 export type FacilityCreateWithoutInventoriesInput = {
   id?: string
+  customId: string
   name: string
   type: $Enums.FacilityType
   location: string
@@ -707,10 +890,13 @@ export type FacilityCreateWithoutInventoriesInput = {
   outgoingOrders?: Prisma.OrderCreateNestedManyWithoutRequesterInput
   incomingOrders?: Prisma.OrderCreateNestedManyWithoutSupplierInput
   auditLogs?: Prisma.AuditLogCreateNestedManyWithoutFacilityInput
+  userSessionLogs?: Prisma.UserSessionLogCreateNestedManyWithoutFacilityInput
+  notifications?: Prisma.NotificationCreateNestedManyWithoutFacilityInput
 }
 
 export type FacilityUncheckedCreateWithoutInventoriesInput = {
   id?: string
+  customId: string
   name: string
   type: $Enums.FacilityType
   location: string
@@ -726,6 +912,8 @@ export type FacilityUncheckedCreateWithoutInventoriesInput = {
   outgoingOrders?: Prisma.OrderUncheckedCreateNestedManyWithoutRequesterInput
   incomingOrders?: Prisma.OrderUncheckedCreateNestedManyWithoutSupplierInput
   auditLogs?: Prisma.AuditLogUncheckedCreateNestedManyWithoutFacilityInput
+  userSessionLogs?: Prisma.UserSessionLogUncheckedCreateNestedManyWithoutFacilityInput
+  notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutFacilityInput
 }
 
 export type FacilityCreateOrConnectWithoutInventoriesInput = {
@@ -746,6 +934,7 @@ export type FacilityUpdateToOneWithWhereWithoutInventoriesInput = {
 
 export type FacilityUpdateWithoutInventoriesInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
+  customId?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
   type?: Prisma.EnumFacilityTypeFieldUpdateOperationsInput | $Enums.FacilityType
   location?: Prisma.StringFieldUpdateOperationsInput | string
@@ -761,10 +950,13 @@ export type FacilityUpdateWithoutInventoriesInput = {
   outgoingOrders?: Prisma.OrderUpdateManyWithoutRequesterNestedInput
   incomingOrders?: Prisma.OrderUpdateManyWithoutSupplierNestedInput
   auditLogs?: Prisma.AuditLogUpdateManyWithoutFacilityNestedInput
+  userSessionLogs?: Prisma.UserSessionLogUpdateManyWithoutFacilityNestedInput
+  notifications?: Prisma.NotificationUpdateManyWithoutFacilityNestedInput
 }
 
 export type FacilityUncheckedUpdateWithoutInventoriesInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
+  customId?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
   type?: Prisma.EnumFacilityTypeFieldUpdateOperationsInput | $Enums.FacilityType
   location?: Prisma.StringFieldUpdateOperationsInput | string
@@ -780,10 +972,13 @@ export type FacilityUncheckedUpdateWithoutInventoriesInput = {
   outgoingOrders?: Prisma.OrderUncheckedUpdateManyWithoutRequesterNestedInput
   incomingOrders?: Prisma.OrderUncheckedUpdateManyWithoutSupplierNestedInput
   auditLogs?: Prisma.AuditLogUncheckedUpdateManyWithoutFacilityNestedInput
+  userSessionLogs?: Prisma.UserSessionLogUncheckedUpdateManyWithoutFacilityNestedInput
+  notifications?: Prisma.NotificationUncheckedUpdateManyWithoutFacilityNestedInput
 }
 
 export type FacilityCreateWithoutOutgoingOrdersInput = {
   id?: string
+  customId: string
   name: string
   type: $Enums.FacilityType
   location: string
@@ -799,10 +994,13 @@ export type FacilityCreateWithoutOutgoingOrdersInput = {
   inventories?: Prisma.InventoryCreateNestedManyWithoutFacilityInput
   incomingOrders?: Prisma.OrderCreateNestedManyWithoutSupplierInput
   auditLogs?: Prisma.AuditLogCreateNestedManyWithoutFacilityInput
+  userSessionLogs?: Prisma.UserSessionLogCreateNestedManyWithoutFacilityInput
+  notifications?: Prisma.NotificationCreateNestedManyWithoutFacilityInput
 }
 
 export type FacilityUncheckedCreateWithoutOutgoingOrdersInput = {
   id?: string
+  customId: string
   name: string
   type: $Enums.FacilityType
   location: string
@@ -818,6 +1016,8 @@ export type FacilityUncheckedCreateWithoutOutgoingOrdersInput = {
   inventories?: Prisma.InventoryUncheckedCreateNestedManyWithoutFacilityInput
   incomingOrders?: Prisma.OrderUncheckedCreateNestedManyWithoutSupplierInput
   auditLogs?: Prisma.AuditLogUncheckedCreateNestedManyWithoutFacilityInput
+  userSessionLogs?: Prisma.UserSessionLogUncheckedCreateNestedManyWithoutFacilityInput
+  notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutFacilityInput
 }
 
 export type FacilityCreateOrConnectWithoutOutgoingOrdersInput = {
@@ -827,6 +1027,7 @@ export type FacilityCreateOrConnectWithoutOutgoingOrdersInput = {
 
 export type FacilityCreateWithoutIncomingOrdersInput = {
   id?: string
+  customId: string
   name: string
   type: $Enums.FacilityType
   location: string
@@ -842,10 +1043,13 @@ export type FacilityCreateWithoutIncomingOrdersInput = {
   inventories?: Prisma.InventoryCreateNestedManyWithoutFacilityInput
   outgoingOrders?: Prisma.OrderCreateNestedManyWithoutRequesterInput
   auditLogs?: Prisma.AuditLogCreateNestedManyWithoutFacilityInput
+  userSessionLogs?: Prisma.UserSessionLogCreateNestedManyWithoutFacilityInput
+  notifications?: Prisma.NotificationCreateNestedManyWithoutFacilityInput
 }
 
 export type FacilityUncheckedCreateWithoutIncomingOrdersInput = {
   id?: string
+  customId: string
   name: string
   type: $Enums.FacilityType
   location: string
@@ -861,6 +1065,8 @@ export type FacilityUncheckedCreateWithoutIncomingOrdersInput = {
   inventories?: Prisma.InventoryUncheckedCreateNestedManyWithoutFacilityInput
   outgoingOrders?: Prisma.OrderUncheckedCreateNestedManyWithoutRequesterInput
   auditLogs?: Prisma.AuditLogUncheckedCreateNestedManyWithoutFacilityInput
+  userSessionLogs?: Prisma.UserSessionLogUncheckedCreateNestedManyWithoutFacilityInput
+  notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutFacilityInput
 }
 
 export type FacilityCreateOrConnectWithoutIncomingOrdersInput = {
@@ -881,6 +1087,7 @@ export type FacilityUpdateToOneWithWhereWithoutOutgoingOrdersInput = {
 
 export type FacilityUpdateWithoutOutgoingOrdersInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
+  customId?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
   type?: Prisma.EnumFacilityTypeFieldUpdateOperationsInput | $Enums.FacilityType
   location?: Prisma.StringFieldUpdateOperationsInput | string
@@ -896,10 +1103,13 @@ export type FacilityUpdateWithoutOutgoingOrdersInput = {
   inventories?: Prisma.InventoryUpdateManyWithoutFacilityNestedInput
   incomingOrders?: Prisma.OrderUpdateManyWithoutSupplierNestedInput
   auditLogs?: Prisma.AuditLogUpdateManyWithoutFacilityNestedInput
+  userSessionLogs?: Prisma.UserSessionLogUpdateManyWithoutFacilityNestedInput
+  notifications?: Prisma.NotificationUpdateManyWithoutFacilityNestedInput
 }
 
 export type FacilityUncheckedUpdateWithoutOutgoingOrdersInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
+  customId?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
   type?: Prisma.EnumFacilityTypeFieldUpdateOperationsInput | $Enums.FacilityType
   location?: Prisma.StringFieldUpdateOperationsInput | string
@@ -915,6 +1125,8 @@ export type FacilityUncheckedUpdateWithoutOutgoingOrdersInput = {
   inventories?: Prisma.InventoryUncheckedUpdateManyWithoutFacilityNestedInput
   incomingOrders?: Prisma.OrderUncheckedUpdateManyWithoutSupplierNestedInput
   auditLogs?: Prisma.AuditLogUncheckedUpdateManyWithoutFacilityNestedInput
+  userSessionLogs?: Prisma.UserSessionLogUncheckedUpdateManyWithoutFacilityNestedInput
+  notifications?: Prisma.NotificationUncheckedUpdateManyWithoutFacilityNestedInput
 }
 
 export type FacilityUpsertWithoutIncomingOrdersInput = {
@@ -930,6 +1142,7 @@ export type FacilityUpdateToOneWithWhereWithoutIncomingOrdersInput = {
 
 export type FacilityUpdateWithoutIncomingOrdersInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
+  customId?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
   type?: Prisma.EnumFacilityTypeFieldUpdateOperationsInput | $Enums.FacilityType
   location?: Prisma.StringFieldUpdateOperationsInput | string
@@ -945,10 +1158,13 @@ export type FacilityUpdateWithoutIncomingOrdersInput = {
   inventories?: Prisma.InventoryUpdateManyWithoutFacilityNestedInput
   outgoingOrders?: Prisma.OrderUpdateManyWithoutRequesterNestedInput
   auditLogs?: Prisma.AuditLogUpdateManyWithoutFacilityNestedInput
+  userSessionLogs?: Prisma.UserSessionLogUpdateManyWithoutFacilityNestedInput
+  notifications?: Prisma.NotificationUpdateManyWithoutFacilityNestedInput
 }
 
 export type FacilityUncheckedUpdateWithoutIncomingOrdersInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
+  customId?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
   type?: Prisma.EnumFacilityTypeFieldUpdateOperationsInput | $Enums.FacilityType
   location?: Prisma.StringFieldUpdateOperationsInput | string
@@ -964,10 +1180,13 @@ export type FacilityUncheckedUpdateWithoutIncomingOrdersInput = {
   inventories?: Prisma.InventoryUncheckedUpdateManyWithoutFacilityNestedInput
   outgoingOrders?: Prisma.OrderUncheckedUpdateManyWithoutRequesterNestedInput
   auditLogs?: Prisma.AuditLogUncheckedUpdateManyWithoutFacilityNestedInput
+  userSessionLogs?: Prisma.UserSessionLogUncheckedUpdateManyWithoutFacilityNestedInput
+  notifications?: Prisma.NotificationUncheckedUpdateManyWithoutFacilityNestedInput
 }
 
-export type FacilityCreateWithoutAuditLogsInput = {
+export type FacilityCreateWithoutNotificationsInput = {
   id?: string
+  customId: string
   name: string
   type: $Enums.FacilityType
   location: string
@@ -983,10 +1202,13 @@ export type FacilityCreateWithoutAuditLogsInput = {
   inventories?: Prisma.InventoryCreateNestedManyWithoutFacilityInput
   outgoingOrders?: Prisma.OrderCreateNestedManyWithoutRequesterInput
   incomingOrders?: Prisma.OrderCreateNestedManyWithoutSupplierInput
+  auditLogs?: Prisma.AuditLogCreateNestedManyWithoutFacilityInput
+  userSessionLogs?: Prisma.UserSessionLogCreateNestedManyWithoutFacilityInput
 }
 
-export type FacilityUncheckedCreateWithoutAuditLogsInput = {
+export type FacilityUncheckedCreateWithoutNotificationsInput = {
   id?: string
+  customId: string
   name: string
   type: $Enums.FacilityType
   location: string
@@ -1002,6 +1224,112 @@ export type FacilityUncheckedCreateWithoutAuditLogsInput = {
   inventories?: Prisma.InventoryUncheckedCreateNestedManyWithoutFacilityInput
   outgoingOrders?: Prisma.OrderUncheckedCreateNestedManyWithoutRequesterInput
   incomingOrders?: Prisma.OrderUncheckedCreateNestedManyWithoutSupplierInput
+  auditLogs?: Prisma.AuditLogUncheckedCreateNestedManyWithoutFacilityInput
+  userSessionLogs?: Prisma.UserSessionLogUncheckedCreateNestedManyWithoutFacilityInput
+}
+
+export type FacilityCreateOrConnectWithoutNotificationsInput = {
+  where: Prisma.FacilityWhereUniqueInput
+  create: Prisma.XOR<Prisma.FacilityCreateWithoutNotificationsInput, Prisma.FacilityUncheckedCreateWithoutNotificationsInput>
+}
+
+export type FacilityUpsertWithoutNotificationsInput = {
+  update: Prisma.XOR<Prisma.FacilityUpdateWithoutNotificationsInput, Prisma.FacilityUncheckedUpdateWithoutNotificationsInput>
+  create: Prisma.XOR<Prisma.FacilityCreateWithoutNotificationsInput, Prisma.FacilityUncheckedCreateWithoutNotificationsInput>
+  where?: Prisma.FacilityWhereInput
+}
+
+export type FacilityUpdateToOneWithWhereWithoutNotificationsInput = {
+  where?: Prisma.FacilityWhereInput
+  data: Prisma.XOR<Prisma.FacilityUpdateWithoutNotificationsInput, Prisma.FacilityUncheckedUpdateWithoutNotificationsInput>
+}
+
+export type FacilityUpdateWithoutNotificationsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  customId?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  type?: Prisma.EnumFacilityTypeFieldUpdateOperationsInput | $Enums.FacilityType
+  location?: Prisma.StringFieldUpdateOperationsInput | string
+  address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  licenseNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  users?: Prisma.UserUpdateManyWithoutFacilityNestedInput
+  inventories?: Prisma.InventoryUpdateManyWithoutFacilityNestedInput
+  outgoingOrders?: Prisma.OrderUpdateManyWithoutRequesterNestedInput
+  incomingOrders?: Prisma.OrderUpdateManyWithoutSupplierNestedInput
+  auditLogs?: Prisma.AuditLogUpdateManyWithoutFacilityNestedInput
+  userSessionLogs?: Prisma.UserSessionLogUpdateManyWithoutFacilityNestedInput
+}
+
+export type FacilityUncheckedUpdateWithoutNotificationsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  customId?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  type?: Prisma.EnumFacilityTypeFieldUpdateOperationsInput | $Enums.FacilityType
+  location?: Prisma.StringFieldUpdateOperationsInput | string
+  address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  licenseNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  users?: Prisma.UserUncheckedUpdateManyWithoutFacilityNestedInput
+  inventories?: Prisma.InventoryUncheckedUpdateManyWithoutFacilityNestedInput
+  outgoingOrders?: Prisma.OrderUncheckedUpdateManyWithoutRequesterNestedInput
+  incomingOrders?: Prisma.OrderUncheckedUpdateManyWithoutSupplierNestedInput
+  auditLogs?: Prisma.AuditLogUncheckedUpdateManyWithoutFacilityNestedInput
+  userSessionLogs?: Prisma.UserSessionLogUncheckedUpdateManyWithoutFacilityNestedInput
+}
+
+export type FacilityCreateWithoutAuditLogsInput = {
+  id?: string
+  customId: string
+  name: string
+  type: $Enums.FacilityType
+  location: string
+  address?: string | null
+  phone?: string | null
+  email?: string | null
+  licenseNumber?: string | null
+  isVerified?: boolean
+  isActive?: boolean
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  users?: Prisma.UserCreateNestedManyWithoutFacilityInput
+  inventories?: Prisma.InventoryCreateNestedManyWithoutFacilityInput
+  outgoingOrders?: Prisma.OrderCreateNestedManyWithoutRequesterInput
+  incomingOrders?: Prisma.OrderCreateNestedManyWithoutSupplierInput
+  userSessionLogs?: Prisma.UserSessionLogCreateNestedManyWithoutFacilityInput
+  notifications?: Prisma.NotificationCreateNestedManyWithoutFacilityInput
+}
+
+export type FacilityUncheckedCreateWithoutAuditLogsInput = {
+  id?: string
+  customId: string
+  name: string
+  type: $Enums.FacilityType
+  location: string
+  address?: string | null
+  phone?: string | null
+  email?: string | null
+  licenseNumber?: string | null
+  isVerified?: boolean
+  isActive?: boolean
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  users?: Prisma.UserUncheckedCreateNestedManyWithoutFacilityInput
+  inventories?: Prisma.InventoryUncheckedCreateNestedManyWithoutFacilityInput
+  outgoingOrders?: Prisma.OrderUncheckedCreateNestedManyWithoutRequesterInput
+  incomingOrders?: Prisma.OrderUncheckedCreateNestedManyWithoutSupplierInput
+  userSessionLogs?: Prisma.UserSessionLogUncheckedCreateNestedManyWithoutFacilityInput
+  notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutFacilityInput
 }
 
 export type FacilityCreateOrConnectWithoutAuditLogsInput = {
@@ -1022,6 +1350,7 @@ export type FacilityUpdateToOneWithWhereWithoutAuditLogsInput = {
 
 export type FacilityUpdateWithoutAuditLogsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
+  customId?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
   type?: Prisma.EnumFacilityTypeFieldUpdateOperationsInput | $Enums.FacilityType
   location?: Prisma.StringFieldUpdateOperationsInput | string
@@ -1037,10 +1366,13 @@ export type FacilityUpdateWithoutAuditLogsInput = {
   inventories?: Prisma.InventoryUpdateManyWithoutFacilityNestedInput
   outgoingOrders?: Prisma.OrderUpdateManyWithoutRequesterNestedInput
   incomingOrders?: Prisma.OrderUpdateManyWithoutSupplierNestedInput
+  userSessionLogs?: Prisma.UserSessionLogUpdateManyWithoutFacilityNestedInput
+  notifications?: Prisma.NotificationUpdateManyWithoutFacilityNestedInput
 }
 
 export type FacilityUncheckedUpdateWithoutAuditLogsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
+  customId?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
   type?: Prisma.EnumFacilityTypeFieldUpdateOperationsInput | $Enums.FacilityType
   location?: Prisma.StringFieldUpdateOperationsInput | string
@@ -1056,6 +1388,8 @@ export type FacilityUncheckedUpdateWithoutAuditLogsInput = {
   inventories?: Prisma.InventoryUncheckedUpdateManyWithoutFacilityNestedInput
   outgoingOrders?: Prisma.OrderUncheckedUpdateManyWithoutRequesterNestedInput
   incomingOrders?: Prisma.OrderUncheckedUpdateManyWithoutSupplierNestedInput
+  userSessionLogs?: Prisma.UserSessionLogUncheckedUpdateManyWithoutFacilityNestedInput
+  notifications?: Prisma.NotificationUncheckedUpdateManyWithoutFacilityNestedInput
 }
 
 
@@ -1069,6 +1403,8 @@ export type FacilityCountOutputType = {
   outgoingOrders: number
   incomingOrders: number
   auditLogs: number
+  userSessionLogs: number
+  notifications: number
 }
 
 export type FacilityCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -1077,6 +1413,8 @@ export type FacilityCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensio
   outgoingOrders?: boolean | FacilityCountOutputTypeCountOutgoingOrdersArgs
   incomingOrders?: boolean | FacilityCountOutputTypeCountIncomingOrdersArgs
   auditLogs?: boolean | FacilityCountOutputTypeCountAuditLogsArgs
+  userSessionLogs?: boolean | FacilityCountOutputTypeCountUserSessionLogsArgs
+  notifications?: boolean | FacilityCountOutputTypeCountNotificationsArgs
 }
 
 /**
@@ -1124,9 +1462,24 @@ export type FacilityCountOutputTypeCountAuditLogsArgs<ExtArgs extends runtime.Ty
   where?: Prisma.AuditLogWhereInput
 }
 
+/**
+ * FacilityCountOutputType without action
+ */
+export type FacilityCountOutputTypeCountUserSessionLogsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.UserSessionLogWhereInput
+}
+
+/**
+ * FacilityCountOutputType without action
+ */
+export type FacilityCountOutputTypeCountNotificationsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.NotificationWhereInput
+}
+
 
 export type FacilitySelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
+  customId?: boolean
   name?: boolean
   type?: boolean
   location?: boolean
@@ -1143,11 +1496,14 @@ export type FacilitySelect<ExtArgs extends runtime.Types.Extensions.InternalArgs
   outgoingOrders?: boolean | Prisma.Facility$outgoingOrdersArgs<ExtArgs>
   incomingOrders?: boolean | Prisma.Facility$incomingOrdersArgs<ExtArgs>
   auditLogs?: boolean | Prisma.Facility$auditLogsArgs<ExtArgs>
+  userSessionLogs?: boolean | Prisma.Facility$userSessionLogsArgs<ExtArgs>
+  notifications?: boolean | Prisma.Facility$notificationsArgs<ExtArgs>
   _count?: boolean | Prisma.FacilityCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["facility"]>
 
 export type FacilitySelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
+  customId?: boolean
   name?: boolean
   type?: boolean
   location?: boolean
@@ -1163,6 +1519,7 @@ export type FacilitySelectCreateManyAndReturn<ExtArgs extends runtime.Types.Exte
 
 export type FacilitySelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
+  customId?: boolean
   name?: boolean
   type?: boolean
   location?: boolean
@@ -1178,6 +1535,7 @@ export type FacilitySelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Exte
 
 export type FacilitySelectScalar = {
   id?: boolean
+  customId?: boolean
   name?: boolean
   type?: boolean
   location?: boolean
@@ -1191,13 +1549,15 @@ export type FacilitySelectScalar = {
   updatedAt?: boolean
 }
 
-export type FacilityOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "name" | "type" | "location" | "address" | "phone" | "email" | "licenseNumber" | "isVerified" | "isActive" | "createdAt" | "updatedAt", ExtArgs["result"]["facility"]>
+export type FacilityOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "customId" | "name" | "type" | "location" | "address" | "phone" | "email" | "licenseNumber" | "isVerified" | "isActive" | "createdAt" | "updatedAt", ExtArgs["result"]["facility"]>
 export type FacilityInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   users?: boolean | Prisma.Facility$usersArgs<ExtArgs>
   inventories?: boolean | Prisma.Facility$inventoriesArgs<ExtArgs>
   outgoingOrders?: boolean | Prisma.Facility$outgoingOrdersArgs<ExtArgs>
   incomingOrders?: boolean | Prisma.Facility$incomingOrdersArgs<ExtArgs>
   auditLogs?: boolean | Prisma.Facility$auditLogsArgs<ExtArgs>
+  userSessionLogs?: boolean | Prisma.Facility$userSessionLogsArgs<ExtArgs>
+  notifications?: boolean | Prisma.Facility$notificationsArgs<ExtArgs>
   _count?: boolean | Prisma.FacilityCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type FacilityIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {}
@@ -1211,9 +1571,12 @@ export type $FacilityPayload<ExtArgs extends runtime.Types.Extensions.InternalAr
     outgoingOrders: Prisma.$OrderPayload<ExtArgs>[]
     incomingOrders: Prisma.$OrderPayload<ExtArgs>[]
     auditLogs: Prisma.$AuditLogPayload<ExtArgs>[]
+    userSessionLogs: Prisma.$UserSessionLogPayload<ExtArgs>[]
+    notifications: Prisma.$NotificationPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
+    customId: string
     name: string
     type: $Enums.FacilityType
     location: string
@@ -1624,6 +1987,8 @@ export interface Prisma__FacilityClient<T, Null = never, ExtArgs extends runtime
   outgoingOrders<T extends Prisma.Facility$outgoingOrdersArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Facility$outgoingOrdersArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$OrderPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   incomingOrders<T extends Prisma.Facility$incomingOrdersArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Facility$incomingOrdersArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$OrderPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   auditLogs<T extends Prisma.Facility$auditLogsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Facility$auditLogsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$AuditLogPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  userSessionLogs<T extends Prisma.Facility$userSessionLogsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Facility$userSessionLogsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$UserSessionLogPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  notifications<T extends Prisma.Facility$notificationsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Facility$notificationsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$NotificationPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -1654,6 +2019,7 @@ export interface Prisma__FacilityClient<T, Null = never, ExtArgs extends runtime
  */
 export interface FacilityFieldRefs {
   readonly id: Prisma.FieldRef<"Facility", 'String'>
+  readonly customId: Prisma.FieldRef<"Facility", 'String'>
   readonly name: Prisma.FieldRef<"Facility", 'String'>
   readonly type: Prisma.FieldRef<"Facility", 'FacilityType'>
   readonly location: Prisma.FieldRef<"Facility", 'String'>
@@ -2175,6 +2541,54 @@ export type Facility$auditLogsArgs<ExtArgs extends runtime.Types.Extensions.Inte
   take?: number
   skip?: number
   distinct?: Prisma.AuditLogScalarFieldEnum | Prisma.AuditLogScalarFieldEnum[]
+}
+
+/**
+ * Facility.userSessionLogs
+ */
+export type Facility$userSessionLogsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the UserSessionLog
+   */
+  select?: Prisma.UserSessionLogSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the UserSessionLog
+   */
+  omit?: Prisma.UserSessionLogOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.UserSessionLogInclude<ExtArgs> | null
+  where?: Prisma.UserSessionLogWhereInput
+  orderBy?: Prisma.UserSessionLogOrderByWithRelationInput | Prisma.UserSessionLogOrderByWithRelationInput[]
+  cursor?: Prisma.UserSessionLogWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.UserSessionLogScalarFieldEnum | Prisma.UserSessionLogScalarFieldEnum[]
+}
+
+/**
+ * Facility.notifications
+ */
+export type Facility$notificationsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the Notification
+   */
+  select?: Prisma.NotificationSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the Notification
+   */
+  omit?: Prisma.NotificationOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.NotificationInclude<ExtArgs> | null
+  where?: Prisma.NotificationWhereInput
+  orderBy?: Prisma.NotificationOrderByWithRelationInput | Prisma.NotificationOrderByWithRelationInput[]
+  cursor?: Prisma.NotificationWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.NotificationScalarFieldEnum | Prisma.NotificationScalarFieldEnum[]
 }
 
 /**

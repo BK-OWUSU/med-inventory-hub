@@ -53,6 +53,7 @@ export const AnyNull = runtime.AnyNull
 export const ModelName = {
   Facility: 'Facility',
   User: 'User',
+  UserSessionLog: 'UserSessionLog',
   Drug: 'Drug',
   DrugCategory: 'DrugCategory',
   Inventory: 'Inventory',
@@ -60,7 +61,8 @@ export const ModelName = {
   OrderItem: 'OrderItem',
   StockMovement: 'StockMovement',
   Notification: 'Notification',
-  AuditLog: 'AuditLog'
+  AuditLog: 'AuditLog',
+  Sequence: 'Sequence'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -81,6 +83,7 @@ export type TransactionIsolationLevel = (typeof TransactionIsolationLevel)[keyof
 
 export const FacilityScalarFieldEnum = {
   id: 'id',
+  customId: 'customId',
   name: 'name',
   type: 'type',
   location: 'location',
@@ -99,22 +102,43 @@ export type FacilityScalarFieldEnum = (typeof FacilityScalarFieldEnum)[keyof typ
 
 export const UserScalarFieldEnum = {
   id: 'id',
+  customId: 'customId',
   email: 'email',
   password: 'password',
   fullName: 'fullName',
   role: 'role',
   phone: 'phone',
   facilityId: 'facilityId',
+  needsPasswordChange: 'needsPasswordChange',
   isActive: 'isActive',
   createdAt: 'createdAt',
-  updatedAt: 'updatedAt'
+  updatedAt: 'updatedAt',
+  lastLoginAt: 'lastLoginAt'
 } as const
 
 export type UserScalarFieldEnum = (typeof UserScalarFieldEnum)[keyof typeof UserScalarFieldEnum]
 
 
+export const UserSessionLogScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  facilityId: 'facilityId',
+  sessionToken: 'sessionToken',
+  reason: 'reason',
+  loginAt: 'loginAt',
+  logoutAt: 'logoutAt',
+  isActive: 'isActive',
+  ipAddress: 'ipAddress',
+  userAgent: 'userAgent',
+  createdAt: 'createdAt'
+} as const
+
+export type UserSessionLogScalarFieldEnum = (typeof UserSessionLogScalarFieldEnum)[keyof typeof UserSessionLogScalarFieldEnum]
+
+
 export const DrugScalarFieldEnum = {
   id: 'id',
+  customId: 'customId',
   name: 'name',
   genericName: 'genericName',
   strength: 'strength',
@@ -124,6 +148,7 @@ export const DrugScalarFieldEnum = {
   isControlled: 'isControlled',
   categoryId: 'categoryId',
   isActive: 'isActive',
+  notes: 'notes',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 } as const
@@ -133,7 +158,11 @@ export type DrugScalarFieldEnum = (typeof DrugScalarFieldEnum)[keyof typeof Drug
 
 export const DrugCategoryScalarFieldEnum = {
   id: 'id',
-  name: 'name'
+  name: 'name',
+  key: 'key',
+  isActive: 'isActive',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
 } as const
 
 export type DrugCategoryScalarFieldEnum = (typeof DrugCategoryScalarFieldEnum)[keyof typeof DrugCategoryScalarFieldEnum]
@@ -151,7 +180,8 @@ export const InventoryScalarFieldEnum = {
   receivedDate: 'receivedDate',
   expiryDate: 'expiryDate',
   lastUpdated: 'lastUpdated',
-  createdAt: 'createdAt'
+  createdAt: 'createdAt',
+  isActive: 'isActive'
 } as const
 
 export type InventoryScalarFieldEnum = (typeof InventoryScalarFieldEnum)[keyof typeof InventoryScalarFieldEnum]
@@ -160,6 +190,7 @@ export type InventoryScalarFieldEnum = (typeof InventoryScalarFieldEnum)[keyof t
 export const OrderScalarFieldEnum = {
   id: 'id',
   orderNumber: 'orderNumber',
+  customId: 'customId',
   requesterId: 'requesterId',
   supplierId: 'supplierId',
   type: 'type',
@@ -170,7 +201,10 @@ export const OrderScalarFieldEnum = {
   rejectionReason: 'rejectionReason',
   totalValue: 'totalValue',
   createdAt: 'createdAt',
-  updatedAt: 'updatedAt'
+  updatedAt: 'updatedAt',
+  approvedAt: 'approvedAt',
+  receivedAt: 'receivedAt',
+  deliveredAt: 'deliveredAt'
 } as const
 
 export type OrderScalarFieldEnum = (typeof OrderScalarFieldEnum)[keyof typeof OrderScalarFieldEnum]
@@ -196,6 +230,7 @@ export type OrderItemScalarFieldEnum = (typeof OrderItemScalarFieldEnum)[keyof t
 
 export const StockMovementScalarFieldEnum = {
   id: 'id',
+  customId: 'customId',
   inventoryId: 'inventoryId',
   referenceNo: 'referenceNo',
   orderItemId: 'orderItemId',
@@ -203,7 +238,7 @@ export const StockMovementScalarFieldEnum = {
   quantity: 'quantity',
   notes: 'notes',
   performedById: 'performedById',
-  createdAt: 'createdAt'
+  performedAt: 'performedAt'
 } as const
 
 export type StockMovementScalarFieldEnum = (typeof StockMovementScalarFieldEnum)[keyof typeof StockMovementScalarFieldEnum]
@@ -211,6 +246,7 @@ export type StockMovementScalarFieldEnum = (typeof StockMovementScalarFieldEnum)
 
 export const NotificationScalarFieldEnum = {
   id: 'id',
+  facilityId: 'facilityId',
   userId: 'userId',
   title: 'title',
   message: 'message',
@@ -235,6 +271,18 @@ export const AuditLogScalarFieldEnum = {
 } as const
 
 export type AuditLogScalarFieldEnum = (typeof AuditLogScalarFieldEnum)[keyof typeof AuditLogScalarFieldEnum]
+
+
+export const SequenceScalarFieldEnum = {
+  id: 'id',
+  facilityId: 'facilityId',
+  type: 'type',
+  currentNo: 'currentNo',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type SequenceScalarFieldEnum = (typeof SequenceScalarFieldEnum)[keyof typeof SequenceScalarFieldEnum]
 
 
 export const SortOrder = {
