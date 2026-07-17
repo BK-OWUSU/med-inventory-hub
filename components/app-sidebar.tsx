@@ -12,45 +12,26 @@ import {
   SidebarHeader,
   SidebarRail,
 } from "@/components/ui/sidebar"
-import { FrameIcon, PieChartIcon, MapIcon } from "lucide-react"
 import { parsedNavData } from "@/lib/constants/nav-Def"
+import { useAuthStore } from "@/store/authStore"
 
 // This is sample data.
 const data = {
   user: {
-    name: "shadcn",
-    email: "m@example.com",
+    name: "PharmSync User",
+    email: "pharmsyn@email.com",
     avatar: "/avatars/shadcn.jpg",
   },
-  projects: [
-    {
-      name: "Design Engineering",
-      url: "#",
-      icon: (
-        <FrameIcon
-        />
-      ),
-    },
-    {
-      name: "Sales & Marketing",
-      url: "#",
-      icon: (
-        <PieChartIcon
-        />
-      ),
-    },
-    {
-      name: "Travel",
-      url: "#",
-      icon: (
-        <MapIcon
-        />
-      ),
-    },
-  ],
 }
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
+  const {user} = useAuthStore();
+  const userData = {
+    user: {
+    name: user ?  user?.fullName : data.user.name,
+    email: user ? user?.email : data.user.email,
+    avatar: "/img/system-user.png"
+  }}
   return (
     <Sidebar collapsible="icon" {...props}>
       <SidebarHeader className="bg-green-900 text-white">
@@ -60,7 +41,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         <NavMain items={parsedNavData} />
       </SidebarContent>
       <SidebarFooter className="bg-green-900 text-white">
-        <NavUser user={data.user} />
+        <NavUser user={userData.user} />
       </SidebarFooter>
       <SidebarRail />
     </Sidebar>

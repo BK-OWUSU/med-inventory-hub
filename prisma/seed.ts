@@ -4,6 +4,7 @@ import { generateNextCustomId } from "@/lib/utils"
 import { sendTempPasswordEmail } from "@/lib/mailer/email"
 import { prisma } from "@/lib/database/dbConnection"
 import { FacilityType } from '@/generated/prisma/enums'
+import { DRUG_CATEGORIES } from '@/lib/constants/categories'
 
 async function main() {
   console.log("🚀 Starting database seeding pipeline...")
@@ -18,24 +19,47 @@ async function main() {
     )
   }
 
+  // 1. Seed Drug Categories (Idempotent: runs regardless of Admin status)
+  console.log("📦 Seed Step 1/2: Checking global pharmaceutical drug categories...")
+  let categoriesSeeded = 0;
+
+  for (const cat of DRUG_CATEGORIES) {
+    await prisma.drugCategory.upsert({
+      where: { name: cat.name },
+      update: {
+        description: cat.description,
+      },
+      create: {
+        name: cat.name,
+        description: cat.description,
+        isActive: true,
+      },
+    })
+    categoriesSeeded++
+  }
+  console.log(`✅ Category seeding finished. Synchronized ${categoriesSeeded} default categories.`)
+
+  // 2. Check and seed Super Admin
+  console.log("🔒 Seed Step 2/2: Checking global administrator accounts...")
   const existingSuperAdmin = await prisma.user.findFirst({
     where: { role: "SUPER_ADMIN" },
   })
 
   if (existingSuperAdmin) {
     console.log(`⏩ Seed Skipped: A SUPER_ADMIN account already exists (${existingSuperAdmin.email}).`)
+    console.log("🏁 Database seeding completed successfully.")
     return
   }
 
   console.log("🔒 No active SUPER_ADMIN found. Initializing global system infrastructure and accounts...")
 
-  // 1. Prepare data BEFORE transaction to save precious milliseconds
+  // Prepare user details prior to transaction block
   const hashedPassword = await hashPassword(adminPassword)
   let userCustomId = ""
   let createdEmail = ""
   let createdFullName = ""
 
-  // 2. Pure Database Transaction Execution
+  // Pure Database Transaction Execution
   await prisma.$transaction(async (tx) => {
     // A. Ensure the GLOBAL-SYSTEM Facility entry exists to satisfy database constraints
     const facility = await tx.facility.upsert({
@@ -110,7 +134,7 @@ async function main() {
       "System Administration Portal"
     )
     
-    console.log("📧 Success: Notification parameters routed to target mailbox successfully.")
+    console.log("📧 Success: Notification parameters routed to mailbox successfully.")
   } catch (mailError) {
     console.error("⚠️ Mailer Notice: Database record saved, but onboarding email dispatch failed:", mailError)
   }

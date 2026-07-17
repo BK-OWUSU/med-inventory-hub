@@ -16,7 +16,7 @@ export const useDrugCategoryStore = create<DrugCategoryStore>((set) => ({
     fetchCategories: async () => {
         try {
             set({ loading: true });
-            const response = await apiClient.get("/drugs/categories");
+            const response = await apiClient.get("/pharmsync/drugs/categories");
             set({
                 categories: response.data.data?.categories as DrugCategoryWithCount[],
                 loading: false

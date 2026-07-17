@@ -216,7 +216,7 @@ export default function TableMain<TData, TValue>({columns, data, searchKey, plac
                     variant={showColumnFilters ? "default" : "outline"} 
                     size="sm"
                     onClick={() => setShowColumnFilters(!showColumnFilters)}
-                    className="flex items-center p-4 gap-2"
+                    className={`flex items-center p-4 gap-2 ${showColumnFilters ? `bg-green-800 hover:bg-green-700` : ""}`}
                 >
                     <ListFilter className="h-4 w-4" />
                 {showColumnFilters ? "Hide Filters" : "Filters"}

@@ -1,7 +1,7 @@
 // proxy.ts (Place in your Root or /src directory)
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
-import { verifyAppTokenEdge } from "@/lib/auths/auths-functions";
+import { verifyAppTokenEdge } from "@/lib/auths/auths-functions.edge";
 import { All_ROUTE_LIST } from "./lib/constants/nav-Def";
 
 const APP_COOKIE_NAME = "med_inv_hub_token_";

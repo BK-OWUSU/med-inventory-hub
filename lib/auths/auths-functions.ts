@@ -146,7 +146,7 @@ export async function updateSessionPayload(updates: Partial<JwtPayload>): Promis
       httpOnly: true,
       sameSite: "lax",
       secure: process.env.NODE_ENV === "production",
-      maxAge: 30 * 60,
+      maxAge: 24 * 60 * 60, // 1 day (86,400 seconds)
       path: "/",
     });
 
@@ -165,7 +165,7 @@ export function setAppSessionCookie(response: NextResponse, payload: JwtPayload)
     httpOnly: true,
     sameSite: "lax",
     secure: process.env.NODE_ENV === "production",
-    maxAge: 30 * 60, // 30 minutes
+    maxAge: 24 * 60 * 60, 
     path: "/", // Ensures access across all sibling nested api/page layers
   });
 }
@@ -177,7 +177,7 @@ export function setEmailVerificationSessionCookie(response: NextResponse, payloa
     httpOnly: true,
     sameSite: "lax",
     secure: process.env.NODE_ENV === "production",
-    maxAge: 10 * 60, // 30 minutes
+    maxAge: 10 * 60, // 10 minutes
     path: "/", // Ensures access across all sibling nested api/page layers
   });
 }

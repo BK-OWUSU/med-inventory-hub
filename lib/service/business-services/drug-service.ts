@@ -2,9 +2,10 @@ import { prisma } from "@/lib/database/dbConnection";
 import { drugFormSchema, DrugFormValues, updateDrugFormSchema, UpdateDrugFormValues } from "@/types/schemas/drug.schema";
 import { AppResponse } from "@/types/types/app.type";
 import { generateNextCustomId } from "@/lib/utils";
-import { AuditAction, AuditEntity, DosageForm } from "@/generated/prisma/enums";
+import { AuditAction, AuditEntity, DosageForm, NotificationType, UserRole } from "@/generated/prisma/enums";
 import { Drug, Prisma } from "@/generated/prisma/client";
-import { DrugListResponse } from "@/types/types/drugs.types";
+import { NotificationService } from "./notification.service";
+
 
 
 // Explicit interface for intermediate structural processing
@@ -74,6 +75,12 @@ export class DrugService {
         } as AppResponse;
       }
 
+      const recipientIds = await NotificationService.getRecipientIdsByRoles(facilityId, [
+        UserRole.ADMIN,
+        UserRole.PHARMACIST,
+        UserRole.STAFF,
+        UserRole.VIEWER,
+      ], userId);
       // 3. Run creation transaction block to isolate custom sequential ID generation 
       const newDrug = await prisma.$transaction(async (tx) => {
         
@@ -143,6 +150,24 @@ export class DrugService {
             },
           },
         });
+
+
+        if (recipientIds.length === 0) {
+            console.warn(`⚠️ Notification Triggered, but no recipients found Facility: ${facilityId}`);
+            // Optional: You could fallback to a 'SYSTEM' user or log this to a monitoring tool
+          } else {   
+            await NotificationService.createNotificationInTx(
+              tx,
+              facilityId,
+              "New Drug Catalog Entry",
+              `New item added: ${drug.name} (${drug.strength || 'N/A'}). It has been initialized in your facility inventory.`,
+               NotificationType.INVENTORY, 
+               recipientIds
+            );
+          }
+
+
+        // --- TRANSACTIONAL NOTIFICATION ---
 
         return drug;
       });
@@ -246,6 +271,13 @@ export class DrugService {
         }
       }
 
+             const recipientIds = await NotificationService.getRecipientIdsByRoles(facilityId, [
+                UserRole.ADMIN,
+                UserRole.PHARMACIST,
+                UserRole.STAFF,
+                UserRole.VIEWER,
+            ], userId);
+
       // 4. Execute atomic database records updates
       const updatedDrug = await prisma.$transaction(async (tx) => {
         
@@ -346,6 +378,24 @@ export class DrugService {
             },
           },
         });
+
+
+        if (recipientIds.length === 0) {
+            console.warn(`⚠️ Notification Triggered, but no recipients found Facility: ${facilityId}`);
+            // Optional: You could fallback to a 'SYSTEM' user or log this to a monitoring tool
+          } else {            
+            // --- TRANSACTIONAL NOTIFICATION ---
+            await NotificationService.createNotificationInTx(
+              tx,
+              facilityId,
+              "Drug Specification Updated",
+              `The profile for "${drug.name}" has been updated. Please verify any changes to min stock levels or manufacturer info.`,
+              NotificationType.INVENTORY,
+              recipientIds
+            );
+          }
+
+
 
         return finalDrugPayload;
       });
@@ -525,6 +575,13 @@ export class DrugService {
         } as AppResponse;
       }
 
+       const recipientIds = await NotificationService.getRecipientIdsByRoles(facilityId, [
+        UserRole.ADMIN,
+        UserRole.PHARMACIST,
+        UserRole.STAFF,
+        UserRole.VIEWER,
+      ], userId);
+
       // 4. Execute atomic transaction block: Apply state mutation flags and write historical logs
       const archivedDrug = await prisma.$transaction(async (tx) => {
         // Step A: Mark the main drug specification record as inactive
@@ -558,6 +615,21 @@ export class DrugService {
             },
           },
         });
+
+        if (recipientIds.length === 0) {
+            console.warn(`⚠️ Notification Triggered, but no recipients found Facility: ${facilityId}`);
+            // Optional: You could fallback to a 'SYSTEM' user or log this to a monitoring tool
+          } else {            
+            // --- TRANSACTIONAL NOTIFICATION ---
+            await NotificationService.createNotificationInTx(
+              tx,
+              facilityId,
+              "Drug Registry Archive",
+              `The pharmaceutical asset "${updated.name}" has been deactivated and removed from active inventory.`,
+              NotificationType.INVENTORY,
+              recipientIds
+            );
+          }
 
         return updated;
       });
@@ -646,6 +718,12 @@ export class DrugService {
         } as AppResponse;
       }
 
+             const recipientIds = await NotificationService.getRecipientIdsByRoles(facilityId, [
+              UserRole.ADMIN,
+              UserRole.PHARMACIST,
+              UserRole.STAFF,
+              UserRole.VIEWER,
+            ], userId);
       // 4. Execute atomic transaction block: Reactivate drug, reactivate inventories, and write audit metrics
       const restoredDrug = await prisma.$transaction(async (tx) => {
         // Step A: Mark the main drug specification record as active
@@ -679,6 +757,21 @@ export class DrugService {
             },
           },
         });
+
+        if (recipientIds.length === 0) {
+            console.warn(`⚠️ Notification Triggered, but no recipients found Facility: ${facilityId}`);
+            // Optional: You could fallback to a 'SYSTEM' user or log this to a monitoring tool
+          } else {            
+            // --- TRANSACTIONAL NOTIFICATION ---
+            await NotificationService.createNotificationInTx(
+              tx,
+              facilityId,
+              "Drug Registry Restoration",
+              `The pharmaceutical asset "${updated.name}" has been restored to active status and is now available for inventory operations.`,
+              NotificationType.INVENTORY,
+              recipientIds
+            );
+          }
 
         return updated;
       });
@@ -817,6 +910,13 @@ export class DrugService {
         } as AppResponse;
       }
 
+      const recipientIds = await NotificationService.getRecipientIdsByRoles(facilityId, [
+        UserRole.ADMIN,
+        UserRole.PHARMACIST,
+        UserRole.STAFF,
+        UserRole.VIEWER,
+      ], userId);
+
       // 3. Phase Three: Execute atomic transaction block for writing rows cleanly
       const transactionResult = await prisma.$transaction(async (tx) => {
         const insertedDrugs: Drug[] = [];
@@ -876,6 +976,28 @@ export class DrugService {
             },
           },
         });
+
+
+        if (recipientIds.length === 0) {
+            console.warn(`⚠️ Notification Triggered, but no recipients found Facility: ${facilityId}`);
+            // Optional: You could fallback to a 'SYSTEM' user or log this to a monitoring tool
+          } else {            
+            if (insertedDrugs.length > 0) {
+              const failureNote = failedRows.length > 0 
+                ? ` Note: ${failedRows.length} rows were skipped due to validation or conflict errors.` 
+                : "";
+              await NotificationService.createNotificationInTx(
+                tx,
+                facilityId,
+                "Bulk Import Completed",
+                `Successfully imported ${insertedDrugs.length} new pharmaceutical assets into the registry.${failureNote}`,
+                NotificationType.INVENTORY,
+                recipientIds
+              );
+            }
+          }
+
+
 
         return insertedDrugs;
       });

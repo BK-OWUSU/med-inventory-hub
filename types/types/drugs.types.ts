@@ -38,13 +38,15 @@ export type DrugCategoryListResponse = {
         select: {
           drugs: true;
         };
-      };
+      };   
     };
   }>[];
 };
 
 // Reusable single drug category type helper inferred from the array payload
 export type DrugCategoryWithCount = DrugCategoryListResponse["categories"][number];
+
+
 /**
  * Complete UI Dashboard State Type
  * Maps cleanly to the top metric summary items: Total | Active | Inactive | Total Drugs

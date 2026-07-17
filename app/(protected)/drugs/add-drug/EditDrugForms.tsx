@@ -45,10 +45,9 @@ interface EditDrugFormProps {
   drug: DrugWithCategory;
   categories: DrugCategoryDropdownOption[]; // Narrowed down strictly to id and name
   onSuccess?: () => void;
-  onAddCategoryClick?: () => void; 
 }
 
-export default function EditDrugForm({ drug, categories, onSuccess, onAddCategoryClick }: EditDrugFormProps) {
+export default function EditDrugForm({ drug, categories, onSuccess}: EditDrugFormProps) {
   const { fetchDrugs } = useDrugStore()
   const [isPending, startTransition] = React.useTransition()
 
@@ -183,15 +182,6 @@ export default function EditDrugForm({ drug, categories, onSuccess, onAddCategor
                     </Select>
                   )}
                 />
-                <Button 
-                  type="button" 
-                  onClick={onAddCategoryClick} 
-                  variant="outline" 
-                  size="icon" 
-                  className="h-9 w-9 border-slate-200 shrink-0 text-slate-600 rounded-lg hover:bg-slate-50"
-                >
-                  <Plus className="h-4 w-4" />
-                </Button>
               </div>
               {errors.categoryId && <p className="text-xs text-rose-500 mt-1">{errors.categoryId.message}</p>}
             </div>

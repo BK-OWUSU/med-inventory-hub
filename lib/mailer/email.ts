@@ -5,6 +5,11 @@ const transporter = nodemailer.createTransport({
     auth: {
         user: process.env.EMAIL_USER,
         pass: process.env.EMAIL_PASS
+    },
+    tls: {
+        // This bypasses the certificate verification that is causing the error
+        //*** MUST BE REMOVED DURING DEPLOYMENT */
+        rejectUnauthorized: false
     }
 });
 
@@ -20,7 +25,7 @@ export async function sendTempPasswordEmail(
     await transporter.sendMail({
         from: process.env.EMAIL_FROM,
         to: email,
-        subject: "Welcome to PharmaInHub - Your Access Details",
+        subject: "Welcome to PharmSync - Your Access Details",
         html: `
             <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; max-width: 550px; margin: 40px auto; padding: 32px; background-color: #ffffff; border: 1px solid #e5e7eb; border-radius: 12px; color: #1f2937; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);">
                 

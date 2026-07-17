@@ -1,0 +1,131 @@
+"use client"
+
+import * as React from "react"
+import { LucideProps } from "lucide-react"
+import {
+  Bell,
+  CheckCircle2,
+  CircleOff,
+  BellRing,
+  Inbox
+} from "lucide-react"
+
+import { Button } from "@/components/ui/button"
+import { Card, CardContent } from "@/components/ui/card"
+import TableMain from "@/components/custom/table/TableMain"
+import { notificationColumns, NotificationTableMeta } from "@/components/columnDef/notificationColumnDef"
+import { useNotificationStore } from "@/store/notificationStore"
+import { NotificationListResponse } from "@/types/types/notification.types"
+import { markNotificationAsReadAction, markAllNotificationsAsReadAction } from "@/lib/actions/notification.action"
+import { toast } from "sonner"
+
+export default function NotificationsPage() {
+  const { fetchNotifications, isLoading, notifications = [] } = useNotificationStore()
+  const [selectedNotification, setSelectedNotification] = React.useState<NotificationListResponse["notifications"][number] | null>(null)
+
+  const metrics = React.useMemo(() => {
+    const total = notifications.length
+    const unread = notifications.filter(n => !n.isRead).length
+    const read = notifications.filter(n => n.isRead).length
+    const unreadPercentage = total > 0 ? Math.round((unread / total) * 100) : 0
+
+    return { total, unread, read, unreadPercentage }
+  }, [notifications])
+
+  React.useEffect(() => {
+    fetchNotifications()
+  }, [fetchNotifications])
+
+  const handleMarkAsRead = async (notification: NotificationListResponse["notifications"][number]) => {
+    const res = await markNotificationAsReadAction(notification.id)
+    if (res.success) {
+      toast.success(res.message || "Notification marked as read")
+      fetchNotifications()
+    } else {
+      toast.error(res.error || "Failed to mark notification as read")
+    }
+  }
+
+  const handleMarkAllAsRead = async () => {
+    const res = await markAllNotificationsAsReadAction()
+    if (res.success) {
+      toast.success(res.message || "All notifications marked as read")
+      fetchNotifications()
+    } else {
+      toast.error(res.error || "Failed to mark all notifications as read")
+    }
+  }
+
+  return (
+    <div className="w-full space-y-6 p-6 lg:p-8 bg-slate-50/30 min-h-screen font-sans">
+
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div className="space-y-1">
+          <h1 className="text-2xl font-bold tracking-tight text-slate-900">Notifications</h1>
+          <p className="text-sm text-slate-500 font-normal">
+            View and manage system notifications for your facility.
+          </p>
+        </div>
+
+        <Button
+          onClick={handleMarkAllAsRead}
+          disabled={metrics.unread === 0}
+          className="h-9 gap-1.5 px-4 text-xs font-semibold bg-emerald-800 hover:bg-emerald-700 text-white shadow-xs rounded-lg transition-colors duration-200"
+        >
+          <CheckCircle2 className="h-4 w-4 stroke-[2.5]" /> Mark all as read
+        </Button>
+      </div>
+
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 w-full">
+        <MetricCard title="Total" value={metrics.total.toString()} subtext="All notifications" icon={BellRing} />
+        <MetricCard title="Unread" value={metrics.unread.toString()} subtext={`${metrics.unreadPercentage}% of total`} icon={Bell} />
+        <MetricCard title="Read" value={metrics.read.toString()} subtext="Already viewed" icon={CheckCircle2} />
+        <MetricCard title="Inbox" value={metrics.total.toString()} subtext="Facility notifications" icon={Inbox} />
+      </div>
+
+      <div className="bg-white rounded-2xl border border-slate-200/70 shadow-xs p-4">
+        <TableMain
+          columns={notificationColumns}
+          data={notifications}
+          loading={isLoading}
+          searchKey=""
+          tableFilterButtonVisible={false}
+          columnVisibilityFilter={false}
+          placeholder="Notification list..."
+          meta={{
+              onMarkAsRead(notification) {
+                 handleMarkAsRead(notification)
+             },
+             onDelete(notification) {
+               toast.info("Delete feature coming soon")
+             }
+          } as NotificationTableMeta}
+        />
+      </div>
+    </div>
+  )
+}
+
+export interface MetricCardType {
+  title: string;
+  value: string;
+  icon: React.ComponentType<LucideProps>;
+  subtext?: string;
+}
+
+function MetricCard({ title, value, subtext, icon:Icon }: MetricCardType) {
+  return (
+    <Card className="bg-white border border-slate-100 shadow-xs rounded-xl">
+      <CardContent className="p-4 space-y-2">
+        <div className="flex items-center gap-2 text-slate-500">
+           <Icon className="h-4 w-4" />
+           <span className="text-xs font-medium">{title}</span>
+        </div>
+        <div>
+          <h3 className="text-2xl font-bold text-slate-900">{value}</h3>
+          <p className="text-[11px] text-slate-400 font-normal">{subtext}</p>
+        </div>
+      </CardContent>
+    </Card>
+  )
+}

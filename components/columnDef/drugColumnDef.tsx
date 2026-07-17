@@ -2,7 +2,7 @@
 
 import { ColumnDef } from "@tanstack/react-table";
 import { DrugWithCategory } from "@/types/types/drugs.types";
-import { MoreHorizontal, Eye, Edit2, Trash2, Pill, HelpCircle } from "lucide-react";
+import { MoreHorizontal, Eye, Edit2, Trash2, Pill } from "lucide-react";
 import { 
   DropdownMenu, 
   DropdownMenuContent, 
@@ -31,20 +31,19 @@ const formatDate = (dateInput: Date | string) => {
   }).format(date);
 };
 
-// 1. Declare the Table Meta interface for drugs (added currentFacilityId to meta context)
 export interface DrugTableMeta {
-  currentFacilityId?: string; // 👈 Allows the column to identify the local branch vs peer branches
+  currentFacilityId?: string;
   onViewDrug?: (drug: DrugWithCategory) => void;
   onEditDrug?: (drug: DrugWithCategory) => void;
   onDeleteDrug?: (drug: DrugWithCategory) => void;
-  onRequestTransfer?: (drugId: string, sourceFacilityId: string, sourceFacilityName: string) => void; // 👈 Optional trigger for transfer
+  onRequestTransfer?: (drugId: string, sourceFacilityId: string, sourceFacilityName: string) => void;
 }
 
-// 2. Export the static columns array configured with meta callbacks
 export const drugsColumns: ColumnDef<DrugWithCategory>[] = [
   {
     accessorKey: "name",
     header: "Drug Name",
+    meta: { filterVariant: "text" },
     cell: ({ row }) => {
       const drug = row.original;
       return (
@@ -60,6 +59,7 @@ export const drugsColumns: ColumnDef<DrugWithCategory>[] = [
   {
     accessorKey: "genericName",
     header: "Generic Name",
+    meta: { filterVariant: "text" },
     cell: ({ row }) => (
       <span className="text-slate-500">{row.original.genericName || "—"}</span>
     ),
@@ -67,6 +67,7 @@ export const drugsColumns: ColumnDef<DrugWithCategory>[] = [
   {
     accessorKey: "strength",
     header: "Strength",
+    meta: { filterVariant: "text" },
     cell: ({ row }) => (
       <span className="text-slate-600 font-medium">{row.original.strength || "—"}</span>
     ),
@@ -74,13 +75,15 @@ export const drugsColumns: ColumnDef<DrugWithCategory>[] = [
   {
     accessorKey: "dosageForm",
     header: "Dosage Form",
+    meta: { filterVariant: "text" },
     cell: ({ row }) => (
       <span className="text-slate-500">{row.original.dosageForm || "—"}</span>
     ),
   },
   {
-    accessorKey: "category",
+    accessorKey: "category.name",
     header: "Category",
+    meta: { filterVariant: "text" },
     cell: ({ row }) => {
       const categoryName = row.original.category?.name;
       return categoryName ? (
@@ -95,72 +98,56 @@ export const drugsColumns: ColumnDef<DrugWithCategory>[] = [
   {
     accessorKey: "stockStatus",
     header: "Stock Status",
+    meta: { 
+      filterVariant: "select",
+      options: [
+        { label: "In Stock", value: "in-stock" },
+        { label: "Low Stock", value: "low-stock" },
+        { label: "Out of Stock", value: "out-of-stock" }
+      ]
+    },
     cell: ({ row, table }) => {
       const drug = row.original;
       const meta = table.options.meta as DrugTableMeta | undefined;
       const localFacilityId = meta?.currentFacilityId;
-
-      // Safe arrays fallback
       const inventories = drug.inventories || [];
-
-      // A. Local stock info
       const localStock = inventories.find((inv) => inv.facilityId === localFacilityId);
       const localQty = localStock?.availableQuantity ?? 0;
       const localMin = localStock?.minStockLevel ?? 20;
 
-      // B. Peer Stock Info (Excluding active local facility)
       const peerStocks = inventories.filter(
         (inv) => inv.facilityId !== localFacilityId && inv.availableQuantity > 0
       );
       const totalPeerQty = peerStocks.reduce((acc, curr) => acc + curr.availableQuantity, 0);
 
-      // Determine warning badge states
       let badgeStyle = "bg-emerald-50 text-emerald-700 border-emerald-200";
       let statusLabel = "In Stock";
-
-      if (localQty === 0) {
-        badgeStyle = "bg-rose-50 text-rose-700 border-rose-200";
-        statusLabel = "Out of Stock";
-      } else if (localQty <= localMin) {
-        badgeStyle = "bg-amber-50 text-amber-700 border-amber-200";
-        statusLabel = "Low Stock";
-      }
+      if (localQty === 0) { badgeStyle = "bg-rose-50 text-rose-700 border-rose-200"; statusLabel = "Out of Stock"; } 
+      else if (localQty <= localMin) { badgeStyle = "bg-amber-50 text-amber-700 border-amber-200"; statusLabel = "Low Stock"; }
 
       return (
         <div className="flex items-center gap-2">
-          {/* Local Facility Status Badge */}
           <Badge variant="outline" className={`${badgeStyle} px-2 py-0.5 font-semibold`}>
             {statusLabel} ({localQty})
           </Badge>
-
-          {/* Inter-Facility Availability Indicator */}
           {totalPeerQty > 0 && (
             <TooltipProvider>
               <Tooltip delayDuration={200}>
                 <TooltipTrigger asChild>
                   <button className="flex items-center justify-center p-1 rounded-full hover:bg-slate-100 text-indigo-600 transition-colors">
                     <Badge variant="outline" className="bg-indigo-50 text-indigo-700 border-indigo-200 text-[10px] py-0.5 px-1.5 font-bold cursor-pointer">
-                      Peer Stock: {totalPeerQty}
+                      Peer: {totalPeerQty}
                     </Badge>
                   </button>
                 </TooltipTrigger>
-                <TooltipContent align="start" className="p-3 w-64 border bg-white shadow-lg text-slate-800 rounded-md">
-                  <p className="font-semibold text-xs border-b pb-1.5 text-slate-900 mb-1.5">
-                    Stock Available at Other Branches
-                  </p>
-                  <div className="space-y-1 text-xs">
-                    {peerStocks.map((p) => (
-                      <div key={p.id} className="flex justify-between items-center text-slate-700">
-                        <span>{p.facility?.name || "Other Clinic"}</span>
-                        <span className="font-bold text-slate-900">{p.availableQuantity} units</span>
-                      </div>
-                    ))}
-                  </div>
-                  {meta?.onRequestTransfer && (
-                    <p className="text-[10px] text-indigo-500 mt-2 font-medium italic">
-                      💡 Click actions menu to request transfer.
-                    </p>
-                  )}
+                <TooltipContent className="p-3 w-64 border bg-white shadow-lg text-slate-800 rounded-md">
+                   <p className="font-semibold text-xs border-b pb-1.5 text-slate-900 mb-1.5">Other Branches</p>
+                   {peerStocks.map((p) => (
+                     <div key={p.id} className="flex justify-between text-xs text-slate-700">
+                       <span>{p.facility?.name}</span>
+                       <span className="font-bold text-slate-900">{p.availableQuantity}</span>
+                     </div>
+                   ))}
                 </TooltipContent>
               </Tooltip>
             </TooltipProvider>
@@ -170,29 +157,34 @@ export const drugsColumns: ColumnDef<DrugWithCategory>[] = [
     },
   },
   {
-    accessorKey: "unit",
-    header: "Unit",
-    cell: ({ row }) => <span className="text-slate-500">{row.original.unit}</span>,
-  },
-  {
     accessorKey: "isControlled",
     header: "Controlled",
+    meta: { 
+      filterVariant: "select",
+      options: [
+        { label: "Controlled", value: "true" },
+        { label: "Regular", value: "false" }
+      ]
+    },
     cell: ({ row }) => {
       const isControlled = row.original.isControlled;
       return isControlled ? (
-        <Badge variant="outline" className="bg-orange-50 text-orange-700 border-orange-200 font-medium px-2.5 py-0.5 rounded-md">
-          Controlled
-        </Badge>
+        <Badge variant="outline" className="bg-orange-50 text-orange-700 border-orange-200 font-medium px-2.5 py-0.5 rounded-md">Controlled</Badge>
       ) : (
-        <Badge variant="outline" className="bg-slate-50 text-slate-600 border-slate-200 font-medium px-2.5 py-0.5 rounded-md">
-          Regular
-        </Badge>
+        <Badge variant="outline" className="bg-slate-50 text-slate-600 border-slate-200 font-medium px-2.5 py-0.5 rounded-md">Regular</Badge>
       );
     },
   },
   {
     accessorKey: "isActive",
     header: "Status",
+    meta: { 
+      filterVariant: "select",
+      options: [
+        { label: "Active", value: "true" },
+        { label: "Inactive", value: "false" }
+      ]
+    },
     cell: ({ row }) => {
       const isActive = row.original.isActive;
       return (
@@ -208,19 +200,23 @@ export const drugsColumns: ColumnDef<DrugWithCategory>[] = [
   {
     accessorKey: "createdAt",
     header: "Created Date",
+    meta: { filterVariant: "date" },
     cell: ({ row }) => (
       <span className="text-slate-400">{formatDate(row.original.createdAt)}</span>
     ),
   },
   {
     id: "actions",
+    enableHiding: false,
+    enableSorting: false,
+    enableResizing: false,
+    enableColumnFilter: false,
     header: "Actions",
     cell: ({ row, table }) => {
       const drug = row.original;
       const meta = table.options.meta as DrugTableMeta | undefined;
       const localFacilityId = meta?.currentFacilityId;
 
-      // Extract peer stocks that can fulfill a transfer request
       const peerStocks = (drug.inventories || []).filter(
         (inv) => inv.facilityId !== localFacilityId && inv.availableQuantity > 0
       );
@@ -251,7 +247,6 @@ export const drugsColumns: ColumnDef<DrugWithCategory>[] = [
               Edit
             </DropdownMenuItem>
 
-            {/* Submenu triggers or custom action links if peer stocks exist */}
             {peerStocks.length > 0 && meta?.onRequestTransfer && (
               <>
                 <DropdownMenuSeparator />

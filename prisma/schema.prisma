@@ -20,6 +20,8 @@ model Facility {
   id            String       @id @default(cuid())
   customId      String       @unique
   name          String
+  imageUrl      String? 
+  fileKey       String?
   type          FacilityType
   location      String
   address       String?
@@ -61,7 +63,6 @@ model User {
   approvedOrders     Order[]         @relation("ApprovedBy")
   performedMovements StockMovement[]
   auditLogs          AuditLog[]
-  notifications      Notification[]
 
   createdAt       DateTime         @default(now())
   updatedAt       DateTime         @updatedAt
@@ -72,6 +73,7 @@ model User {
   @@index([facilityId])
   @@index([role])
   @@map("users")
+  notificationRecipients NotificationRecipient[]
 }
 
 model UserSessionLog {
@@ -126,7 +128,7 @@ model Drug {
   isControlled Boolean     @default(false)
   categoryId   String?
   isActive     Boolean     @default(true)
-  notes        String?   @db.Text
+  notes        String?     @db.Text
 
   category DrugCategory? @relation(fields: [categoryId], references: [id])
 
@@ -143,13 +145,13 @@ model Drug {
 }
 
 model DrugCategory {
-  id        String   @id @default(cuid())
-  name      String   @unique
-  key       String   @unique
-  isActive  Boolean  @default(true)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  drugs     Drug[]
+  id              String   @id @default(cuid())
+  name            String   @unique
+  description     String?
+  isActive        Boolean  @default(true)
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  drugs           Drug[]
   @@index([name])
   @@map("drugcategory")
 }
@@ -269,24 +271,46 @@ model StockMovement {
   @@map("stock_movements")
 }
 
+
+
+
 model Notification {
-  id String @id @default(cuid())
+  id         String @id @default(cuid())
 
   facilityId String
-  userId     String?
+  facility   Facility @relation(fields: [facilityId], references: [id])
 
-  title   String
-  message String
+  title      String
+  message    String
+  type       NotificationType
 
-  isRead Boolean @default(false)
+  createdAt  DateTime @default(now())
 
-  createdAt DateTime @default(now())
-  facility  Facility @relation(fields: [facilityId], references: [id], onDelete: Cascade)
-  users     User[]
+  recipients NotificationRecipient[]
+}
 
-  @@index([userId])
-  @@index([isRead])
-  @@map("notifications")
+model NotificationRecipient {
+  id             String @id @default(cuid())
+
+  notificationId String
+  notification   Notification @relation(fields: [notificationId], references: [id], onDelete: Cascade)
+
+  userId         String
+  user           User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  isRead         Boolean @default(false)
+  readAt         DateTime?
+
+  @@unique([notificationId, userId])
+}
+
+enum NotificationType {
+  ORDER
+  INVENTORY
+  EXPIRY
+  USER
+  FACILITY
+  SYSTEM
 }
 
 model AuditLog {
@@ -384,7 +408,10 @@ enum AuditAction {
   INVENTORY_UPDATED
   INVENTORY_CREATED
   USER_CREATED
+  USER_UPDATED
   FACILITY_CREATED
+  FACILITY_UPDATED
+  FACILITY_VERIFIED
   PASSWORD_RESET
 }
 

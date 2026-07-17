@@ -21,6 +21,18 @@ export const SessionReason = {
 export type SessionReason = (typeof SessionReason)[keyof typeof SessionReason]
 
 
+export const NotificationType = {
+  ORDER: 'ORDER',
+  INVENTORY: 'INVENTORY',
+  EXPIRY: 'EXPIRY',
+  USER: 'USER',
+  FACILITY: 'FACILITY',
+  SYSTEM: 'SYSTEM'
+} as const
+
+export type NotificationType = (typeof NotificationType)[keyof typeof NotificationType]
+
+
 export const Unit = {
   BOX: 'BOX',
   BOTTLE: 'BOTTLE',
@@ -114,7 +126,10 @@ export const AuditAction = {
   INVENTORY_UPDATED: 'INVENTORY_UPDATED',
   INVENTORY_CREATED: 'INVENTORY_CREATED',
   USER_CREATED: 'USER_CREATED',
+  USER_UPDATED: 'USER_UPDATED',
   FACILITY_CREATED: 'FACILITY_CREATED',
+  FACILITY_UPDATED: 'FACILITY_UPDATED',
+  FACILITY_VERIFIED: 'FACILITY_VERIFIED',
   PASSWORD_RESET: 'PASSWORD_RESET'
 } as const
 

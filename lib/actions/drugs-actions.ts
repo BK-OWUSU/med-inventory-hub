@@ -24,7 +24,7 @@ export async function createDrugAction(payload: DrugFormValues) {
     const response = await DrugService.createDrug(payload, userId, facilityId || "", ipAddress)
 
     if (response.success) {       
-        revalidatePath(`/drugs/drug-list`, 'layout');
+        revalidatePath(`/drugs/drug-category`, 'layout');
         return {message: response.message, success:response.success, data: response.data};
     }else {
         return {error: response.error, success: response.success};
@@ -110,7 +110,7 @@ export async function bulkCreateDrugAction(payload: DrugFormValues[]) {
     if(!session || typeof session === "string") {
         return { success: false, error: "Unauthorized session"} as AppResponse;
     }
-    
+
     const { ipAddress } = await getRequestMeta();
     // We get the current user's details from the session
     const { userId, facilityId } = session;

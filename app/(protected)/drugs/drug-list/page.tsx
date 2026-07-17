@@ -234,12 +234,13 @@ export default function DrugManagementPage() {
       </div>
 
       {/* 3. Central Table Container */}
-      <div className="bg-white rounded-2xl border border-slate-200/70 shadow-xs overflow-hidden p-4">
+      <div className="bg-white rounded-2xl border border-slate-200/70 shadow-xs p-4">
         <TableMain
           columns={drugsColumns}
           data={drugs}
           loading={loading}
-          searchKey="name" // changed from "fullName" to "name" to match the prisma model property
+          tableFilterButtonVisible = {true}
+          searchKey="name"
           columnVisibilityFilter={true}
           placeholder="Search by medicine name..."
           meta={{

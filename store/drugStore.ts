@@ -16,7 +16,7 @@ export const useDrugStore = create<DrugStore>((set) => ({
     fetchDrugs: async () => {
         try {
             set({ loading: true });
-            const response = await apiClient.get("/medhub/drugs");
+            const response = await apiClient.get("/pharmsync/drugs");
             set({
                 drugs: (response.data.data?.drugs as DrugWithCategory[]) || [],
                 loading: false

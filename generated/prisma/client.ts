@@ -92,6 +92,11 @@ export type StockMovement = Prisma.StockMovementModel
  */
 export type Notification = Prisma.NotificationModel
 /**
+ * Model NotificationRecipient
+ * 
+ */
+export type NotificationRecipient = Prisma.NotificationRecipientModel
+/**
  * Model AuditLog
  * 
  */

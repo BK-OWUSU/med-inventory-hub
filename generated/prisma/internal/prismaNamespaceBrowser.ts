@@ -61,6 +61,7 @@ export const ModelName = {
   OrderItem: 'OrderItem',
   StockMovement: 'StockMovement',
   Notification: 'Notification',
+  NotificationRecipient: 'NotificationRecipient',
   AuditLog: 'AuditLog',
   Sequence: 'Sequence'
 } as const
@@ -85,6 +86,8 @@ export const FacilityScalarFieldEnum = {
   id: 'id',
   customId: 'customId',
   name: 'name',
+  imageUrl: 'imageUrl',
+  fileKey: 'fileKey',
   type: 'type',
   location: 'location',
   address: 'address',
@@ -159,7 +162,7 @@ export type DrugScalarFieldEnum = (typeof DrugScalarFieldEnum)[keyof typeof Drug
 export const DrugCategoryScalarFieldEnum = {
   id: 'id',
   name: 'name',
-  key: 'key',
+  description: 'description',
   isActive: 'isActive',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
@@ -247,14 +250,24 @@ export type StockMovementScalarFieldEnum = (typeof StockMovementScalarFieldEnum)
 export const NotificationScalarFieldEnum = {
   id: 'id',
   facilityId: 'facilityId',
-  userId: 'userId',
   title: 'title',
   message: 'message',
-  isRead: 'isRead',
+  type: 'type',
   createdAt: 'createdAt'
 } as const
 
 export type NotificationScalarFieldEnum = (typeof NotificationScalarFieldEnum)[keyof typeof NotificationScalarFieldEnum]
+
+
+export const NotificationRecipientScalarFieldEnum = {
+  id: 'id',
+  notificationId: 'notificationId',
+  userId: 'userId',
+  isRead: 'isRead',
+  readAt: 'readAt'
+} as const
+
+export type NotificationRecipientScalarFieldEnum = (typeof NotificationRecipientScalarFieldEnum)[keyof typeof NotificationRecipientScalarFieldEnum]
 
 
 export const AuditLogScalarFieldEnum = {

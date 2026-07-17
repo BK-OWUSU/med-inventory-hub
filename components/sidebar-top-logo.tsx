@@ -23,7 +23,7 @@ export function TopSideBarLogo({
           className="w-12 h-12 object-contain" // Forces exact CSS dimensions via Tailwind
         />
         <p className="text-white text-xl font-bold tracking-wide">
-          MedInHub
+          PharmSync
         </p>
       </div>
       </SidebarMenuItem>

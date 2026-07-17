@@ -27,7 +27,7 @@ export type AggregateDrugCategory = {
 export type DrugCategoryMinAggregateOutputType = {
   id: string | null
   name: string | null
-  key: string | null
+  description: string | null
   isActive: boolean | null
   createdAt: Date | null
   updatedAt: Date | null
@@ -36,7 +36,7 @@ export type DrugCategoryMinAggregateOutputType = {
 export type DrugCategoryMaxAggregateOutputType = {
   id: string | null
   name: string | null
-  key: string | null
+  description: string | null
   isActive: boolean | null
   createdAt: Date | null
   updatedAt: Date | null
@@ -45,7 +45,7 @@ export type DrugCategoryMaxAggregateOutputType = {
 export type DrugCategoryCountAggregateOutputType = {
   id: number
   name: number
-  key: number
+  description: number
   isActive: number
   createdAt: number
   updatedAt: number
@@ -56,7 +56,7 @@ export type DrugCategoryCountAggregateOutputType = {
 export type DrugCategoryMinAggregateInputType = {
   id?: true
   name?: true
-  key?: true
+  description?: true
   isActive?: true
   createdAt?: true
   updatedAt?: true
@@ -65,7 +65,7 @@ export type DrugCategoryMinAggregateInputType = {
 export type DrugCategoryMaxAggregateInputType = {
   id?: true
   name?: true
-  key?: true
+  description?: true
   isActive?: true
   createdAt?: true
   updatedAt?: true
@@ -74,7 +74,7 @@ export type DrugCategoryMaxAggregateInputType = {
 export type DrugCategoryCountAggregateInputType = {
   id?: true
   name?: true
-  key?: true
+  description?: true
   isActive?: true
   createdAt?: true
   updatedAt?: true
@@ -156,7 +156,7 @@ export type DrugCategoryGroupByArgs<ExtArgs extends runtime.Types.Extensions.Int
 export type DrugCategoryGroupByOutputType = {
   id: string
   name: string
-  key: string
+  description: string | null
   isActive: boolean
   createdAt: Date
   updatedAt: Date
@@ -186,7 +186,7 @@ export type DrugCategoryWhereInput = {
   NOT?: Prisma.DrugCategoryWhereInput | Prisma.DrugCategoryWhereInput[]
   id?: Prisma.StringFilter<"DrugCategory"> | string
   name?: Prisma.StringFilter<"DrugCategory"> | string
-  key?: Prisma.StringFilter<"DrugCategory"> | string
+  description?: Prisma.StringNullableFilter<"DrugCategory"> | string | null
   isActive?: Prisma.BoolFilter<"DrugCategory"> | boolean
   createdAt?: Prisma.DateTimeFilter<"DrugCategory"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"DrugCategory"> | Date | string
@@ -196,7 +196,7 @@ export type DrugCategoryWhereInput = {
 export type DrugCategoryOrderByWithRelationInput = {
   id?: Prisma.SortOrder
   name?: Prisma.SortOrder
-  key?: Prisma.SortOrder
+  description?: Prisma.SortOrderInput | Prisma.SortOrder
   isActive?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
@@ -206,20 +206,20 @@ export type DrugCategoryOrderByWithRelationInput = {
 export type DrugCategoryWhereUniqueInput = Prisma.AtLeast<{
   id?: string
   name?: string
-  key?: string
   AND?: Prisma.DrugCategoryWhereInput | Prisma.DrugCategoryWhereInput[]
   OR?: Prisma.DrugCategoryWhereInput[]
   NOT?: Prisma.DrugCategoryWhereInput | Prisma.DrugCategoryWhereInput[]
+  description?: Prisma.StringNullableFilter<"DrugCategory"> | string | null
   isActive?: Prisma.BoolFilter<"DrugCategory"> | boolean
   createdAt?: Prisma.DateTimeFilter<"DrugCategory"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"DrugCategory"> | Date | string
   drugs?: Prisma.DrugListRelationFilter
-}, "id" | "name" | "key">
+}, "id" | "name">
 
 export type DrugCategoryOrderByWithAggregationInput = {
   id?: Prisma.SortOrder
   name?: Prisma.SortOrder
-  key?: Prisma.SortOrder
+  description?: Prisma.SortOrderInput | Prisma.SortOrder
   isActive?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
@@ -234,7 +234,7 @@ export type DrugCategoryScalarWhereWithAggregatesInput = {
   NOT?: Prisma.DrugCategoryScalarWhereWithAggregatesInput | Prisma.DrugCategoryScalarWhereWithAggregatesInput[]
   id?: Prisma.StringWithAggregatesFilter<"DrugCategory"> | string
   name?: Prisma.StringWithAggregatesFilter<"DrugCategory"> | string
-  key?: Prisma.StringWithAggregatesFilter<"DrugCategory"> | string
+  description?: Prisma.StringNullableWithAggregatesFilter<"DrugCategory"> | string | null
   isActive?: Prisma.BoolWithAggregatesFilter<"DrugCategory"> | boolean
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"DrugCategory"> | Date | string
   updatedAt?: Prisma.DateTimeWithAggregatesFilter<"DrugCategory"> | Date | string
@@ -243,7 +243,7 @@ export type DrugCategoryScalarWhereWithAggregatesInput = {
 export type DrugCategoryCreateInput = {
   id?: string
   name: string
-  key: string
+  description?: string | null
   isActive?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -253,7 +253,7 @@ export type DrugCategoryCreateInput = {
 export type DrugCategoryUncheckedCreateInput = {
   id?: string
   name: string
-  key: string
+  description?: string | null
   isActive?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -263,7 +263,7 @@ export type DrugCategoryUncheckedCreateInput = {
 export type DrugCategoryUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
-  key?: Prisma.StringFieldUpdateOperationsInput | string
+  description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -273,7 +273,7 @@ export type DrugCategoryUpdateInput = {
 export type DrugCategoryUncheckedUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
-  key?: Prisma.StringFieldUpdateOperationsInput | string
+  description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -283,7 +283,7 @@ export type DrugCategoryUncheckedUpdateInput = {
 export type DrugCategoryCreateManyInput = {
   id?: string
   name: string
-  key: string
+  description?: string | null
   isActive?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -292,7 +292,7 @@ export type DrugCategoryCreateManyInput = {
 export type DrugCategoryUpdateManyMutationInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
-  key?: Prisma.StringFieldUpdateOperationsInput | string
+  description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -301,7 +301,7 @@ export type DrugCategoryUpdateManyMutationInput = {
 export type DrugCategoryUncheckedUpdateManyInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
-  key?: Prisma.StringFieldUpdateOperationsInput | string
+  description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -315,7 +315,7 @@ export type DrugCategoryNullableScalarRelationFilter = {
 export type DrugCategoryCountOrderByAggregateInput = {
   id?: Prisma.SortOrder
   name?: Prisma.SortOrder
-  key?: Prisma.SortOrder
+  description?: Prisma.SortOrder
   isActive?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
@@ -324,7 +324,7 @@ export type DrugCategoryCountOrderByAggregateInput = {
 export type DrugCategoryMaxOrderByAggregateInput = {
   id?: Prisma.SortOrder
   name?: Prisma.SortOrder
-  key?: Prisma.SortOrder
+  description?: Prisma.SortOrder
   isActive?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
@@ -333,7 +333,7 @@ export type DrugCategoryMaxOrderByAggregateInput = {
 export type DrugCategoryMinOrderByAggregateInput = {
   id?: Prisma.SortOrder
   name?: Prisma.SortOrder
-  key?: Prisma.SortOrder
+  description?: Prisma.SortOrder
   isActive?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
@@ -358,7 +358,7 @@ export type DrugCategoryUpdateOneWithoutDrugsNestedInput = {
 export type DrugCategoryCreateWithoutDrugsInput = {
   id?: string
   name: string
-  key: string
+  description?: string | null
   isActive?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -367,7 +367,7 @@ export type DrugCategoryCreateWithoutDrugsInput = {
 export type DrugCategoryUncheckedCreateWithoutDrugsInput = {
   id?: string
   name: string
-  key: string
+  description?: string | null
   isActive?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -392,7 +392,7 @@ export type DrugCategoryUpdateToOneWithWhereWithoutDrugsInput = {
 export type DrugCategoryUpdateWithoutDrugsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
-  key?: Prisma.StringFieldUpdateOperationsInput | string
+  description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -401,7 +401,7 @@ export type DrugCategoryUpdateWithoutDrugsInput = {
 export type DrugCategoryUncheckedUpdateWithoutDrugsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
-  key?: Prisma.StringFieldUpdateOperationsInput | string
+  description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -441,7 +441,7 @@ export type DrugCategoryCountOutputTypeCountDrugsArgs<ExtArgs extends runtime.Ty
 export type DrugCategorySelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
   name?: boolean
-  key?: boolean
+  description?: boolean
   isActive?: boolean
   createdAt?: boolean
   updatedAt?: boolean
@@ -452,7 +452,7 @@ export type DrugCategorySelect<ExtArgs extends runtime.Types.Extensions.Internal
 export type DrugCategorySelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
   name?: boolean
-  key?: boolean
+  description?: boolean
   isActive?: boolean
   createdAt?: boolean
   updatedAt?: boolean
@@ -461,7 +461,7 @@ export type DrugCategorySelectCreateManyAndReturn<ExtArgs extends runtime.Types.
 export type DrugCategorySelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
   name?: boolean
-  key?: boolean
+  description?: boolean
   isActive?: boolean
   createdAt?: boolean
   updatedAt?: boolean
@@ -470,13 +470,13 @@ export type DrugCategorySelectUpdateManyAndReturn<ExtArgs extends runtime.Types.
 export type DrugCategorySelectScalar = {
   id?: boolean
   name?: boolean
-  key?: boolean
+  description?: boolean
   isActive?: boolean
   createdAt?: boolean
   updatedAt?: boolean
 }
 
-export type DrugCategoryOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "name" | "key" | "isActive" | "createdAt" | "updatedAt", ExtArgs["result"]["drugCategory"]>
+export type DrugCategoryOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "name" | "description" | "isActive" | "createdAt" | "updatedAt", ExtArgs["result"]["drugCategory"]>
 export type DrugCategoryInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   drugs?: boolean | Prisma.DrugCategory$drugsArgs<ExtArgs>
   _count?: boolean | Prisma.DrugCategoryCountOutputTypeDefaultArgs<ExtArgs>
@@ -492,7 +492,7 @@ export type $DrugCategoryPayload<ExtArgs extends runtime.Types.Extensions.Intern
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
     name: string
-    key: string
+    description: string | null
     isActive: boolean
     createdAt: Date
     updatedAt: Date
@@ -922,7 +922,7 @@ export interface Prisma__DrugCategoryClient<T, Null = never, ExtArgs extends run
 export interface DrugCategoryFieldRefs {
   readonly id: Prisma.FieldRef<"DrugCategory", 'String'>
   readonly name: Prisma.FieldRef<"DrugCategory", 'String'>
-  readonly key: Prisma.FieldRef<"DrugCategory", 'String'>
+  readonly description: Prisma.FieldRef<"DrugCategory", 'String'>
   readonly isActive: Prisma.FieldRef<"DrugCategory", 'Boolean'>
   readonly createdAt: Prisma.FieldRef<"DrugCategory", 'DateTime'>
   readonly updatedAt: Prisma.FieldRef<"DrugCategory", 'DateTime'>

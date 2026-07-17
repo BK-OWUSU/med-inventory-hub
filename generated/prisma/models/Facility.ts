@@ -28,6 +28,8 @@ export type FacilityMinAggregateOutputType = {
   id: string | null
   customId: string | null
   name: string | null
+  imageUrl: string | null
+  fileKey: string | null
   type: $Enums.FacilityType | null
   location: string | null
   address: string | null
@@ -44,6 +46,8 @@ export type FacilityMaxAggregateOutputType = {
   id: string | null
   customId: string | null
   name: string | null
+  imageUrl: string | null
+  fileKey: string | null
   type: $Enums.FacilityType | null
   location: string | null
   address: string | null
@@ -60,6 +64,8 @@ export type FacilityCountAggregateOutputType = {
   id: number
   customId: number
   name: number
+  imageUrl: number
+  fileKey: number
   type: number
   location: number
   address: number
@@ -78,6 +84,8 @@ export type FacilityMinAggregateInputType = {
   id?: true
   customId?: true
   name?: true
+  imageUrl?: true
+  fileKey?: true
   type?: true
   location?: true
   address?: true
@@ -94,6 +102,8 @@ export type FacilityMaxAggregateInputType = {
   id?: true
   customId?: true
   name?: true
+  imageUrl?: true
+  fileKey?: true
   type?: true
   location?: true
   address?: true
@@ -110,6 +120,8 @@ export type FacilityCountAggregateInputType = {
   id?: true
   customId?: true
   name?: true
+  imageUrl?: true
+  fileKey?: true
   type?: true
   location?: true
   address?: true
@@ -199,6 +211,8 @@ export type FacilityGroupByOutputType = {
   id: string
   customId: string
   name: string
+  imageUrl: string | null
+  fileKey: string | null
   type: $Enums.FacilityType
   location: string
   address: string | null
@@ -236,6 +250,8 @@ export type FacilityWhereInput = {
   id?: Prisma.StringFilter<"Facility"> | string
   customId?: Prisma.StringFilter<"Facility"> | string
   name?: Prisma.StringFilter<"Facility"> | string
+  imageUrl?: Prisma.StringNullableFilter<"Facility"> | string | null
+  fileKey?: Prisma.StringNullableFilter<"Facility"> | string | null
   type?: Prisma.EnumFacilityTypeFilter<"Facility"> | $Enums.FacilityType
   location?: Prisma.StringFilter<"Facility"> | string
   address?: Prisma.StringNullableFilter<"Facility"> | string | null
@@ -259,6 +275,8 @@ export type FacilityOrderByWithRelationInput = {
   id?: Prisma.SortOrder
   customId?: Prisma.SortOrder
   name?: Prisma.SortOrder
+  imageUrl?: Prisma.SortOrderInput | Prisma.SortOrder
+  fileKey?: Prisma.SortOrderInput | Prisma.SortOrder
   type?: Prisma.SortOrder
   location?: Prisma.SortOrder
   address?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -286,6 +304,8 @@ export type FacilityWhereUniqueInput = Prisma.AtLeast<{
   OR?: Prisma.FacilityWhereInput[]
   NOT?: Prisma.FacilityWhereInput | Prisma.FacilityWhereInput[]
   name?: Prisma.StringFilter<"Facility"> | string
+  imageUrl?: Prisma.StringNullableFilter<"Facility"> | string | null
+  fileKey?: Prisma.StringNullableFilter<"Facility"> | string | null
   type?: Prisma.EnumFacilityTypeFilter<"Facility"> | $Enums.FacilityType
   location?: Prisma.StringFilter<"Facility"> | string
   address?: Prisma.StringNullableFilter<"Facility"> | string | null
@@ -308,6 +328,8 @@ export type FacilityOrderByWithAggregationInput = {
   id?: Prisma.SortOrder
   customId?: Prisma.SortOrder
   name?: Prisma.SortOrder
+  imageUrl?: Prisma.SortOrderInput | Prisma.SortOrder
+  fileKey?: Prisma.SortOrderInput | Prisma.SortOrder
   type?: Prisma.SortOrder
   location?: Prisma.SortOrder
   address?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -330,6 +352,8 @@ export type FacilityScalarWhereWithAggregatesInput = {
   id?: Prisma.StringWithAggregatesFilter<"Facility"> | string
   customId?: Prisma.StringWithAggregatesFilter<"Facility"> | string
   name?: Prisma.StringWithAggregatesFilter<"Facility"> | string
+  imageUrl?: Prisma.StringNullableWithAggregatesFilter<"Facility"> | string | null
+  fileKey?: Prisma.StringNullableWithAggregatesFilter<"Facility"> | string | null
   type?: Prisma.EnumFacilityTypeWithAggregatesFilter<"Facility"> | $Enums.FacilityType
   location?: Prisma.StringWithAggregatesFilter<"Facility"> | string
   address?: Prisma.StringNullableWithAggregatesFilter<"Facility"> | string | null
@@ -346,6 +370,8 @@ export type FacilityCreateInput = {
   id?: string
   customId: string
   name: string
+  imageUrl?: string | null
+  fileKey?: string | null
   type: $Enums.FacilityType
   location: string
   address?: string | null
@@ -369,6 +395,8 @@ export type FacilityUncheckedCreateInput = {
   id?: string
   customId: string
   name: string
+  imageUrl?: string | null
+  fileKey?: string | null
   type: $Enums.FacilityType
   location: string
   address?: string | null
@@ -392,6 +420,8 @@ export type FacilityUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   customId?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
+  imageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  fileKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   type?: Prisma.EnumFacilityTypeFieldUpdateOperationsInput | $Enums.FacilityType
   location?: Prisma.StringFieldUpdateOperationsInput | string
   address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -415,6 +445,8 @@ export type FacilityUncheckedUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   customId?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
+  imageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  fileKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   type?: Prisma.EnumFacilityTypeFieldUpdateOperationsInput | $Enums.FacilityType
   location?: Prisma.StringFieldUpdateOperationsInput | string
   address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -438,6 +470,8 @@ export type FacilityCreateManyInput = {
   id?: string
   customId: string
   name: string
+  imageUrl?: string | null
+  fileKey?: string | null
   type: $Enums.FacilityType
   location: string
   address?: string | null
@@ -454,6 +488,8 @@ export type FacilityUpdateManyMutationInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   customId?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
+  imageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  fileKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   type?: Prisma.EnumFacilityTypeFieldUpdateOperationsInput | $Enums.FacilityType
   location?: Prisma.StringFieldUpdateOperationsInput | string
   address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -470,6 +506,8 @@ export type FacilityUncheckedUpdateManyInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   customId?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
+  imageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  fileKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   type?: Prisma.EnumFacilityTypeFieldUpdateOperationsInput | $Enums.FacilityType
   location?: Prisma.StringFieldUpdateOperationsInput | string
   address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -486,6 +524,8 @@ export type FacilityCountOrderByAggregateInput = {
   id?: Prisma.SortOrder
   customId?: Prisma.SortOrder
   name?: Prisma.SortOrder
+  imageUrl?: Prisma.SortOrder
+  fileKey?: Prisma.SortOrder
   type?: Prisma.SortOrder
   location?: Prisma.SortOrder
   address?: Prisma.SortOrder
@@ -502,6 +542,8 @@ export type FacilityMaxOrderByAggregateInput = {
   id?: Prisma.SortOrder
   customId?: Prisma.SortOrder
   name?: Prisma.SortOrder
+  imageUrl?: Prisma.SortOrder
+  fileKey?: Prisma.SortOrder
   type?: Prisma.SortOrder
   location?: Prisma.SortOrder
   address?: Prisma.SortOrder
@@ -518,6 +560,8 @@ export type FacilityMinOrderByAggregateInput = {
   id?: Prisma.SortOrder
   customId?: Prisma.SortOrder
   name?: Prisma.SortOrder
+  imageUrl?: Prisma.SortOrder
+  fileKey?: Prisma.SortOrder
   type?: Prisma.SortOrder
   location?: Prisma.SortOrder
   address?: Prisma.SortOrder
@@ -544,12 +588,12 @@ export type StringFieldUpdateOperationsInput = {
   set?: string
 }
 
-export type EnumFacilityTypeFieldUpdateOperationsInput = {
-  set?: $Enums.FacilityType
-}
-
 export type NullableStringFieldUpdateOperationsInput = {
   set?: string | null
+}
+
+export type EnumFacilityTypeFieldUpdateOperationsInput = {
+  set?: $Enums.FacilityType
 }
 
 export type BoolFieldUpdateOperationsInput = {
@@ -668,6 +712,8 @@ export type FacilityCreateWithoutUsersInput = {
   id?: string
   customId: string
   name: string
+  imageUrl?: string | null
+  fileKey?: string | null
   type: $Enums.FacilityType
   location: string
   address?: string | null
@@ -690,6 +736,8 @@ export type FacilityUncheckedCreateWithoutUsersInput = {
   id?: string
   customId: string
   name: string
+  imageUrl?: string | null
+  fileKey?: string | null
   type: $Enums.FacilityType
   location: string
   address?: string | null
@@ -728,6 +776,8 @@ export type FacilityUpdateWithoutUsersInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   customId?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
+  imageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  fileKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   type?: Prisma.EnumFacilityTypeFieldUpdateOperationsInput | $Enums.FacilityType
   location?: Prisma.StringFieldUpdateOperationsInput | string
   address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -750,6 +800,8 @@ export type FacilityUncheckedUpdateWithoutUsersInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   customId?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
+  imageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  fileKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   type?: Prisma.EnumFacilityTypeFieldUpdateOperationsInput | $Enums.FacilityType
   location?: Prisma.StringFieldUpdateOperationsInput | string
   address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -772,6 +824,8 @@ export type FacilityCreateWithoutUserSessionLogsInput = {
   id?: string
   customId: string
   name: string
+  imageUrl?: string | null
+  fileKey?: string | null
   type: $Enums.FacilityType
   location: string
   address?: string | null
@@ -794,6 +848,8 @@ export type FacilityUncheckedCreateWithoutUserSessionLogsInput = {
   id?: string
   customId: string
   name: string
+  imageUrl?: string | null
+  fileKey?: string | null
   type: $Enums.FacilityType
   location: string
   address?: string | null
@@ -832,6 +888,8 @@ export type FacilityUpdateWithoutUserSessionLogsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   customId?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
+  imageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  fileKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   type?: Prisma.EnumFacilityTypeFieldUpdateOperationsInput | $Enums.FacilityType
   location?: Prisma.StringFieldUpdateOperationsInput | string
   address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -854,6 +912,8 @@ export type FacilityUncheckedUpdateWithoutUserSessionLogsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   customId?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
+  imageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  fileKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   type?: Prisma.EnumFacilityTypeFieldUpdateOperationsInput | $Enums.FacilityType
   location?: Prisma.StringFieldUpdateOperationsInput | string
   address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -876,6 +936,8 @@ export type FacilityCreateWithoutInventoriesInput = {
   id?: string
   customId: string
   name: string
+  imageUrl?: string | null
+  fileKey?: string | null
   type: $Enums.FacilityType
   location: string
   address?: string | null
@@ -898,6 +960,8 @@ export type FacilityUncheckedCreateWithoutInventoriesInput = {
   id?: string
   customId: string
   name: string
+  imageUrl?: string | null
+  fileKey?: string | null
   type: $Enums.FacilityType
   location: string
   address?: string | null
@@ -936,6 +1000,8 @@ export type FacilityUpdateWithoutInventoriesInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   customId?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
+  imageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  fileKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   type?: Prisma.EnumFacilityTypeFieldUpdateOperationsInput | $Enums.FacilityType
   location?: Prisma.StringFieldUpdateOperationsInput | string
   address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -958,6 +1024,8 @@ export type FacilityUncheckedUpdateWithoutInventoriesInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   customId?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
+  imageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  fileKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   type?: Prisma.EnumFacilityTypeFieldUpdateOperationsInput | $Enums.FacilityType
   location?: Prisma.StringFieldUpdateOperationsInput | string
   address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -980,6 +1048,8 @@ export type FacilityCreateWithoutOutgoingOrdersInput = {
   id?: string
   customId: string
   name: string
+  imageUrl?: string | null
+  fileKey?: string | null
   type: $Enums.FacilityType
   location: string
   address?: string | null
@@ -1002,6 +1072,8 @@ export type FacilityUncheckedCreateWithoutOutgoingOrdersInput = {
   id?: string
   customId: string
   name: string
+  imageUrl?: string | null
+  fileKey?: string | null
   type: $Enums.FacilityType
   location: string
   address?: string | null
@@ -1029,6 +1101,8 @@ export type FacilityCreateWithoutIncomingOrdersInput = {
   id?: string
   customId: string
   name: string
+  imageUrl?: string | null
+  fileKey?: string | null
   type: $Enums.FacilityType
   location: string
   address?: string | null
@@ -1051,6 +1125,8 @@ export type FacilityUncheckedCreateWithoutIncomingOrdersInput = {
   id?: string
   customId: string
   name: string
+  imageUrl?: string | null
+  fileKey?: string | null
   type: $Enums.FacilityType
   location: string
   address?: string | null
@@ -1089,6 +1165,8 @@ export type FacilityUpdateWithoutOutgoingOrdersInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   customId?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
+  imageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  fileKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   type?: Prisma.EnumFacilityTypeFieldUpdateOperationsInput | $Enums.FacilityType
   location?: Prisma.StringFieldUpdateOperationsInput | string
   address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1111,6 +1189,8 @@ export type FacilityUncheckedUpdateWithoutOutgoingOrdersInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   customId?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
+  imageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  fileKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   type?: Prisma.EnumFacilityTypeFieldUpdateOperationsInput | $Enums.FacilityType
   location?: Prisma.StringFieldUpdateOperationsInput | string
   address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1144,6 +1224,8 @@ export type FacilityUpdateWithoutIncomingOrdersInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   customId?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
+  imageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  fileKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   type?: Prisma.EnumFacilityTypeFieldUpdateOperationsInput | $Enums.FacilityType
   location?: Prisma.StringFieldUpdateOperationsInput | string
   address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1166,6 +1248,8 @@ export type FacilityUncheckedUpdateWithoutIncomingOrdersInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   customId?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
+  imageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  fileKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   type?: Prisma.EnumFacilityTypeFieldUpdateOperationsInput | $Enums.FacilityType
   location?: Prisma.StringFieldUpdateOperationsInput | string
   address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1188,6 +1272,8 @@ export type FacilityCreateWithoutNotificationsInput = {
   id?: string
   customId: string
   name: string
+  imageUrl?: string | null
+  fileKey?: string | null
   type: $Enums.FacilityType
   location: string
   address?: string | null
@@ -1210,6 +1296,8 @@ export type FacilityUncheckedCreateWithoutNotificationsInput = {
   id?: string
   customId: string
   name: string
+  imageUrl?: string | null
+  fileKey?: string | null
   type: $Enums.FacilityType
   location: string
   address?: string | null
@@ -1248,6 +1336,8 @@ export type FacilityUpdateWithoutNotificationsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   customId?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
+  imageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  fileKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   type?: Prisma.EnumFacilityTypeFieldUpdateOperationsInput | $Enums.FacilityType
   location?: Prisma.StringFieldUpdateOperationsInput | string
   address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1270,6 +1360,8 @@ export type FacilityUncheckedUpdateWithoutNotificationsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   customId?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
+  imageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  fileKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   type?: Prisma.EnumFacilityTypeFieldUpdateOperationsInput | $Enums.FacilityType
   location?: Prisma.StringFieldUpdateOperationsInput | string
   address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1292,6 +1384,8 @@ export type FacilityCreateWithoutAuditLogsInput = {
   id?: string
   customId: string
   name: string
+  imageUrl?: string | null
+  fileKey?: string | null
   type: $Enums.FacilityType
   location: string
   address?: string | null
@@ -1314,6 +1408,8 @@ export type FacilityUncheckedCreateWithoutAuditLogsInput = {
   id?: string
   customId: string
   name: string
+  imageUrl?: string | null
+  fileKey?: string | null
   type: $Enums.FacilityType
   location: string
   address?: string | null
@@ -1352,6 +1448,8 @@ export type FacilityUpdateWithoutAuditLogsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   customId?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
+  imageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  fileKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   type?: Prisma.EnumFacilityTypeFieldUpdateOperationsInput | $Enums.FacilityType
   location?: Prisma.StringFieldUpdateOperationsInput | string
   address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1374,6 +1472,8 @@ export type FacilityUncheckedUpdateWithoutAuditLogsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   customId?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
+  imageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  fileKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   type?: Prisma.EnumFacilityTypeFieldUpdateOperationsInput | $Enums.FacilityType
   location?: Prisma.StringFieldUpdateOperationsInput | string
   address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1481,6 +1581,8 @@ export type FacilitySelect<ExtArgs extends runtime.Types.Extensions.InternalArgs
   id?: boolean
   customId?: boolean
   name?: boolean
+  imageUrl?: boolean
+  fileKey?: boolean
   type?: boolean
   location?: boolean
   address?: boolean
@@ -1505,6 +1607,8 @@ export type FacilitySelectCreateManyAndReturn<ExtArgs extends runtime.Types.Exte
   id?: boolean
   customId?: boolean
   name?: boolean
+  imageUrl?: boolean
+  fileKey?: boolean
   type?: boolean
   location?: boolean
   address?: boolean
@@ -1521,6 +1625,8 @@ export type FacilitySelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Exte
   id?: boolean
   customId?: boolean
   name?: boolean
+  imageUrl?: boolean
+  fileKey?: boolean
   type?: boolean
   location?: boolean
   address?: boolean
@@ -1537,6 +1643,8 @@ export type FacilitySelectScalar = {
   id?: boolean
   customId?: boolean
   name?: boolean
+  imageUrl?: boolean
+  fileKey?: boolean
   type?: boolean
   location?: boolean
   address?: boolean
@@ -1549,7 +1657,7 @@ export type FacilitySelectScalar = {
   updatedAt?: boolean
 }
 
-export type FacilityOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "customId" | "name" | "type" | "location" | "address" | "phone" | "email" | "licenseNumber" | "isVerified" | "isActive" | "createdAt" | "updatedAt", ExtArgs["result"]["facility"]>
+export type FacilityOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "customId" | "name" | "imageUrl" | "fileKey" | "type" | "location" | "address" | "phone" | "email" | "licenseNumber" | "isVerified" | "isActive" | "createdAt" | "updatedAt", ExtArgs["result"]["facility"]>
 export type FacilityInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   users?: boolean | Prisma.Facility$usersArgs<ExtArgs>
   inventories?: boolean | Prisma.Facility$inventoriesArgs<ExtArgs>
@@ -1578,6 +1686,8 @@ export type $FacilityPayload<ExtArgs extends runtime.Types.Extensions.InternalAr
     id: string
     customId: string
     name: string
+    imageUrl: string | null
+    fileKey: string | null
     type: $Enums.FacilityType
     location: string
     address: string | null
@@ -2021,6 +2131,8 @@ export interface FacilityFieldRefs {
   readonly id: Prisma.FieldRef<"Facility", 'String'>
   readonly customId: Prisma.FieldRef<"Facility", 'String'>
   readonly name: Prisma.FieldRef<"Facility", 'String'>
+  readonly imageUrl: Prisma.FieldRef<"Facility", 'String'>
+  readonly fileKey: Prisma.FieldRef<"Facility", 'String'>
   readonly type: Prisma.FieldRef<"Facility", 'FacilityType'>
   readonly location: Prisma.FieldRef<"Facility", 'String'>
   readonly address: Prisma.FieldRef<"Facility", 'String'>

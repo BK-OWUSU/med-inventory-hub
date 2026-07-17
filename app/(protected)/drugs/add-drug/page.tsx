@@ -37,19 +37,23 @@ import { useRouter } from "next/navigation"
 import { toast } from "sonner"
 import { createDrugAction } from "@/lib/actions/drugs-actions"
 import { useDrugStore } from "@/store/drugStore"
-import { DRUG_CATEGORIES } from "@/lib/constants/categories"
+import { useDrugCategoryStore } from "@/store/drugCategory"
 
 
 export default function AddNewDrugPage() {
   const {fetchDrugs} = useDrugStore();
+  const {fetchCategories, categories} = useDrugCategoryStore()
+
   const router = useRouter();
   const drugListPath = "/drugs/drug-list";
   const handleCancel = () => {
     router.push(drugListPath)
   }
-
   const [isPending, startTransition] = React.useTransition();
-  const MOCK_CATEGORIES = DRUG_CATEGORIES
+
+  React.useEffect(()=>{
+    fetchCategories();
+  },[fetchCategories])
 
   const form = useForm<DrugFormValues>({
     resolver: zodResolver(drugFormSchema),
@@ -178,8 +182,8 @@ export default function AddNewDrugPage() {
                             <SelectValue placeholder="Select category" />
                           </SelectTrigger>
                           <SelectContent className="rounded-lg">
-                            {MOCK_CATEGORIES.map((cat) => (
-                              <SelectItem key={cat.key} value={cat.key} className="text-sm">{cat.name}</SelectItem>
+                            {categories.map((cat, kx) => (
+                              <SelectItem key={kx} value={cat.id} className="text-sm">{cat.name}</SelectItem>
                             ))}
                           </SelectContent>
                         </Select>

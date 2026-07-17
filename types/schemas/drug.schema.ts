@@ -53,7 +53,7 @@ export const drugCategorySchema = z.object({
     .min(2, { message: "Category name must be at least 2 characters long." })
     .max(50, { message: "Category name cannot exceed 50 characters." })
     .trim(),
-  key: z.string().min(2, "Drug name must be at least 2 characters long"),  
+  description: z.string().max(500, "Description cannot exceed 500 characters").optional().or(z.literal("")),  
   isActive: z.boolean().default(true),
 })
 
