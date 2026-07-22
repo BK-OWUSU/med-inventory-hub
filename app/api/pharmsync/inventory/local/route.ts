@@ -25,6 +25,7 @@ export async function GET(request: NextRequest) {
     const limit = parseInt(searchParams.get("limit") || "20", 10);
 
     // 4. Pass everything to your service
+
     const response = await InventoryService.getLocalInventory(facilityId || "", {
       search,
       drugId,

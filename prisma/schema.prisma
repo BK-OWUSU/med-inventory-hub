@@ -30,6 +30,7 @@ model Facility {
   licenseNumber String?      @unique
   isVerified    Boolean      @default(false)
   isActive      Boolean      @default(true)
+  
 
   users          User[]
   inventories    Inventory[]
@@ -39,6 +40,10 @@ model Facility {
 
   createdAt       DateTime         @default(now())
   updatedAt       DateTime         @updatedAt
+  isDeleted       Boolean   @default(false)
+  isDeletedAt     DateTime?
+  deletedBy       String?
+
   userSessionLogs UserSessionLog[]
   notifications   Notification[]
 
@@ -67,6 +72,9 @@ model User {
   createdAt       DateTime         @default(now())
   updatedAt       DateTime         @updatedAt
   lastLoginAt     DateTime?
+    isDeleted     Boolean   @default(false)
+  isDeletedAt     DateTime?
+  deletedBy       String?  
 
   userSessionLogs UserSessionLog[]
 
@@ -95,6 +103,7 @@ model UserSessionLog {
   userAgent String?
 
   createdAt DateTime @default(now())
+  
 
   user     User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   facility Facility @relation(fields: [facilityId], references: [id], onDelete: Cascade)
@@ -130,6 +139,10 @@ model Drug {
   isActive     Boolean     @default(true)
   notes        String?     @db.Text
 
+  isDeleted       Boolean   @default(false)
+  isDeletedAt     DateTime?
+  deletedBy       String?  
+
   category DrugCategory? @relation(fields: [categoryId], references: [id])
 
   inventories Inventory[]
@@ -151,20 +164,24 @@ model DrugCategory {
   isActive        Boolean  @default(true)
   createdAt       DateTime @default(now())
   updatedAt       DateTime @updatedAt
+  isDeleted       Boolean   @default(false)
+  isDeletedAt     DateTime?
+  deletedBy       String?  
   drugs           Drug[]
+
   @@index([name])
   @@map("drugcategory")
 }
 
 model Inventory {
-  id String @id @default(cuid())
+  id String         @id @default(cuid())
 
-  facilityId String
-  facility   Facility @relation(fields: [facilityId], references: [id], onDelete: Cascade)
+  facilityId        String
+  facility          Facility @relation(fields: [facilityId], references: [id], onDelete: Cascade)
 
-  drugId       String
-  drug         Drug    @relation(fields: [drugId], references: [id], onDelete: Cascade)
-  manufacturer String?
+  drugId            String
+  drug              Drug    @relation(fields: [drugId], references: [id], onDelete: Cascade)
+  manufacturer      String?
 
   availableQuantity Int       @default(0)
   unitPrice         Decimal?
@@ -174,9 +191,12 @@ model Inventory {
   expiryDate        DateTime?
   lastUpdated       DateTime  @updatedAt
   createdAt         DateTime  @default(now())
-  isActive          Boolean @default(true)
-
-  movements StockMovement[]
+  isActive          Boolean   @default(true)
+  isDeleted         Boolean   @default(false)
+  isDeletedAt       DateTime?
+  deletedBy         String?  
+  
+  movements         StockMovement[]
 
   @@unique([facilityId, drugId, batchNumber])
   @@index([facilityId])
@@ -224,9 +244,9 @@ model Order {
 }
 
 model OrderItem {
-  id      String @id @default(cuid())
-  orderId String
-  order   Order  @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  id        String @id @default(cuid())
+  orderId   String
+  order     Order  @relation(fields: [orderId], references: [id], onDelete: Cascade)
 
   drugId     String
   drugName   String
@@ -246,32 +266,55 @@ model OrderItem {
   @@map("order_items")
 }
 
+enum OrderStatus {
+  PENDING
+  APPROVED
+  PARTIALLY_FULFILLED
+  SHIPPED
+  RECEIVED
+  DELIVERED
+  COMPLETED
+  REJECTED
+  CANCELLED
+}
+
+
 // ==================== LOGGING MODELS ====================
 
 model StockMovement {
-  id          String    @id @default(cuid())
-  customId    String    @unique
-  inventoryId String
-  inventory   Inventory @relation(fields: [inventoryId], references: [id])
-  referenceNo String?
+  id                String    @id @default(cuid())
+  customId          String    @unique
+  inventoryId       String
+  inventory         Inventory @relation(fields: [inventoryId], references: [id])
+  referenceNo       String?
 
-  orderItemId String?
-  orderItem   OrderItem? @relation(fields: [orderItemId], references: [id])
+  orderItemId       String?
+  orderItem         OrderItem? @relation(fields: [orderItemId], references: [id])
 
-  type          StockMovementType
-  quantity      Int
-  notes         String?
-  performedById String
-  performedBy   User              @relation(fields: [performedById], references: [id])
+  type              StockMovementType
+  quantity          Int
+  previousQuantity  Int                @default(0)
+  newQuantity       Int                @default(0)
+  notes             String?
+  reason            MovementReason?
+  performedById     String
+  performedBy       User              @relation(fields: [performedById], references: [id])
 
- performedAt DateTime @default(now())
+  performedAt       DateTime @default(now())
 
   @@index([inventoryId])
   @@index([performedById])
   @@map("stock_movements")
 }
 
-
+enum MovementReason  {
+  DAMAGED 
+  EXPIRED 
+  THEFT 
+  AUDIT_RECONCILIATION
+  DISPENSED
+  TRANSFER
+}
 
 
 model Notification {
@@ -344,6 +387,7 @@ enum Unit {
   AMPOULE
   PACK
   PIECE
+  OTHER
 }
 
 enum DosageForm {
@@ -373,20 +417,11 @@ enum FacilityType {
   SYSTEM_GLOBAL
 }
 
-enum OrderStatus {
-  PENDING
-  APPROVED
-  PARTIALLY_FULFILLED
-  SHIPPED
-  RECEIVED
-  DELIVERED
-  REJECTED
-  CANCELLED
-}
 
 enum OrderType {
   REQUEST
   SUPPLY
+  EMERGENCY
 }
 
 enum StockMovementType {
@@ -409,6 +444,8 @@ enum AuditAction {
   INVENTORY_CREATED
   USER_CREATED
   USER_UPDATED
+  DRUG_CREATED
+  DRUG_UPDATED
   FACILITY_CREATED
   FACILITY_UPDATED
   FACILITY_VERIFIED

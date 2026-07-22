@@ -16,7 +16,7 @@ import DrugCategoryFormComponent from "./DrugCategoryForm"
 import { useDrugCategoryStore } from "@/store/drugCategory"
 import React from "react"
 import TableMain from "@/components/custom/table/TableMain"
-import { drugCategoryColumns, DrugCategoryTableMeta } from "@/components/columnDef/drugCategoryColumnDef"
+import { drugCategoryColumns, DrugCategoryTableMeta } from "@/components/columnDef/drugs/drugCategoryColumnDef"
 import { DrugCategoryWithCount } from "@/types/types/drugs.types"
 
 export default function DrugCategoriesPage() {

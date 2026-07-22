@@ -34,6 +34,7 @@ import { DrugWithCategory } from "@/types/types/drugs.types"
 import { toast } from "sonner"
 import { updateDrugAction } from "@/lib/actions/drugs-actions"
 import { useDrugStore } from "@/store/drugStore"
+import { Switch } from "@/components/ui/switch"
 
 // Define the exact narrow type representing only name and id
 export type DrugCategoryDropdownOption = {
@@ -51,9 +52,6 @@ export default function EditDrugForm({ drug, categories, onSuccess}: EditDrugFor
   const { fetchDrugs } = useDrugStore()
   const [isPending, startTransition] = React.useTransition()
 
- // 1. Extract the primary inventory record safely
-  const primaryInventory = drug.inventories?.[0]
-
   const form = useForm<UpdateDrugFormValues>({
     resolver: zodResolver(updateDrugFormSchema),
     defaultValues: {
@@ -65,11 +63,7 @@ export default function EditDrugForm({ drug, categories, onSuccess}: EditDrugFor
       dosageForm: (drug.dosageForm as DosageForm) || undefined,
       isControlled: drug.isControlled ?? false,
       description: drug.description || "",
-      notes: drug.notes || "",
-      
-      // 2. Read these directly from the extracted primary inventory record
-      minStockLevel: primaryInventory?.minStockLevel ?? 20,
-      manufacturer: primaryInventory?.manufacturer || "",
+      isActive: drug.isActive
     },
   })
 
@@ -77,10 +71,10 @@ export default function EditDrugForm({ drug, categories, onSuccess}: EditDrugFor
 
   const watchedFields = useWatch({
     control,
-    name: ["name", "strength", "dosageForm", "unit", "description", "notes"],
+    name: ["name", "strength", "dosageForm", "unit", "description", ],
   })
 
-  const [watchName, watchStrength, watchDosageForm, watchUnit, watchDescription, watchNotes] = watchedFields
+  const [watchName, watchStrength, watchDosageForm, watchUnit, watchDescription] = watchedFields
 
   function onSubmit(data: UpdateDrugFormValues) {
     startTransition(() => {      
@@ -265,11 +259,19 @@ export default function EditDrugForm({ drug, categories, onSuccess}: EditDrugFor
                     className="flex gap-6 pt-0.5"
                   >
                     <div className="flex items-center space-x-2">
-                      <RadioGroupItem value="yes" id="edit-controlled-yes" className="text-emerald-800 border-slate-300 focus-visible:ring-emerald-600" />
+                      <RadioGroupItem 
+                        value="yes" 
+                        id="edit-controlled-yes" 
+                        className="text-emerald-600 border-slate-300 focus-visible:ring-emerald-600 data-[state=checked]:border-emerald-600" 
+                      />
                       <Label htmlFor="edit-controlled-yes" className="text-sm text-slate-700 font-normal cursor-pointer">Yes</Label>
                     </div>
                     <div className="flex items-center space-x-2">
-                      <RadioGroupItem value="no" id="edit-controlled-no" className="text-emerald-800 border-slate-300 focus-visible:ring-emerald-600" />
+                      <RadioGroupItem 
+                        value="no" 
+                        id="edit-controlled-no" 
+                        className="text-emerald-600 border-slate-300 focus-visible:ring-emerald-600 data-[state=checked]:border-emerald-600" 
+                      />
                       <Label htmlFor="edit-controlled-no" className="text-sm text-slate-700 font-normal cursor-pointer">No</Label>
                     </div>
                   </RadioGroup>
@@ -305,49 +307,20 @@ export default function EditDrugForm({ drug, categories, onSuccess}: EditDrugFor
             </div>
             <h3 className="text-sm font-bold text-slate-900">Additional Specifications</h3>
           </div>
-
-          <div className="grid grid-cols-1 gap-4">
-            <div className="grid grid-cols-2 gap-3">
-              {/* Minimum Stock Level */}
-              <div className="space-y-1.5">
-                <Label htmlFor="minStockLevel" className="text-xs font-semibold text-slate-700">Min. Stock Alert</Label>
-                <Input 
-                  id="minStockLevel"
-                  type="number" 
-                  {...register("minStockLevel", { valueAsNumber: true })} 
-                  className="h-9 text-sm focus-visible:ring-emerald-600 focus-visible:border-emerald-600" 
+          
+          <div className="flex items-center justify-between pt-2">
+            <span className="text-sm font-medium text-slate-600">Active Status</span>
+            <Controller
+              control={control}
+              name="isActive"
+              render={({ field: switchField }) => (
+                <Switch 
+                  checked={switchField.value} 
+                  onCheckedChange={switchField.onChange}
+                  className="data-[state=checked]:bg-emerald-600" 
                 />
-                {errors.minStockLevel && <p className="text-xs text-rose-500 mt-1">{errors.minStockLevel.message}</p>}
-              </div>
-
-              {/* Preferred Manufacturer */}
-              <div className="space-y-1.5">
-                <Label htmlFor="manufacturer" className="text-xs font-semibold text-slate-700">Manufacturer</Label>
-                <Input 
-                  id="manufacturer"
-                  placeholder="e.g. Pfizer, GSK" 
-                  {...register("manufacturer")} 
-                  className="h-9 text-sm focus-visible:ring-emerald-600 focus-visible:border-emerald-600" 
-                />
-                {errors.manufacturer && <p className="text-xs text-rose-500 mt-1">{errors.manufacturer.message}</p>}
-              </div>
-            </div>
-
-            {/* Notes */}
-            <div className="space-y-1.5 relative">
-              <Label htmlFor="notes" className="text-xs font-semibold text-slate-700">Internal Formulary Notes</Label>
-              <Textarea 
-                id="notes"
-                placeholder="Add special management instructions..." 
-                className="min-h-20 resize-none text-sm border-slate-200 focus-visible:ring-emerald-600 focus-visible:border-emerald-600 rounded-lg pb-6"
-                maxLength={300}
-                {...register("notes")}
-              />
-              <div className="absolute right-2.5 bottom-2 text-[10px] text-slate-400 font-mono">
-                {(watchNotes || "").length} / 300
-              </div>
-              {errors.notes && <p className="text-xs text-rose-500 mt-1">{errors.notes.message}</p>}
-            </div>
+              )}
+            />
           </div>
         </CardContent>
       </Card>

@@ -28,6 +28,8 @@ export interface MovementFilters {
   endDate?: Date;
   limit?: number;
   page?: number;
+  drugId?: string;
+  performedBy?: string; 
 }
 
 export interface StockMovementsSummary {

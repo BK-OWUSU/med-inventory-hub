@@ -11,10 +11,27 @@ export async function markNotificationAsReadAction(id: string) {
     return { success: false, error: "Unauthorized session" } as AppResponse;
   }
 
-  const { ipAddress, userAgent } = await getRequestMeta();
-  const { userId, facilityId } = session;
+  const { userId } = session;
 
-  const response = await NotificationService.markAsRead(id, userId, facilityId || "", ipAddress, userAgent)
+  const response = await NotificationService.markAsRead(id, userId)
+
+  if (response.success) {
+    revalidatePath(`/notification`, "layout");
+    return { message: response.message, success: response.success, data: response.data };
+  } else {
+    return { error: response.error, success: response.success };
+  }
+}
+
+export async function markNotificationAsUnReadAction(id: string) {
+  const session = await getAppSession();
+  if (!session || typeof session === "string") {
+    return { success: false, error: "Unauthorized session" } as AppResponse;
+  }
+
+  const { userId } = session;
+
+  const response = await NotificationService.markAsUnRead(id, userId)
 
   if (response.success) {
     revalidatePath(`/notification`, "layout");
@@ -25,15 +42,15 @@ export async function markNotificationAsReadAction(id: string) {
 }
 
 export async function markAllNotificationsAsReadAction() {
+
   const session = await getAppSession();
   if (!session || typeof session === "string") {
     return { success: false, error: "Unauthorized session" } as AppResponse;
   }
 
-  const { ipAddress, userAgent } = await getRequestMeta();
   const { userId, facilityId } = session;
 
-  const response = await NotificationService.markAllAsRead(userId, facilityId || "", ipAddress, userAgent)
+  const response = await NotificationService.markAllAsRead(userId, facilityId || "")
 
   if (response.success) {
     revalidatePath(`/notification`, "layout");

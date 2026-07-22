@@ -478,6 +478,7 @@ export class FacilityService {
             { customId: { contains: filters.search, mode: 'insensitive' } },
           ],
         }),
+        ...({isDeleted: false }),
         ...(filters?.type && { type: filters.type }),
         ...(filters?.isActive !== undefined && { isActive: filters.isActive }),
         ...(filters?.isVerified !== undefined && { isVerified: filters.isVerified }),

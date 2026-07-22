@@ -20,8 +20,6 @@ export async function GET(request: NextRequest) {
     const isActiveStr = searchParams.get("isActive");
     const isActive = isActiveStr !== null ? isActiveStr === "true" : undefined;
     
-    const needsPasswordChangeStr = searchParams.get("needsPasswordChange");
-    const needsPasswordChange = needsPasswordChangeStr !== null ? needsPasswordChangeStr === "true" : undefined;
     
     const pageVal = searchParams.get("page");
     const limitVal = searchParams.get("limit");
@@ -34,7 +32,6 @@ export async function GET(request: NextRequest) {
       role,
       isActive,
       facilityId,
-      needsPasswordChange,
       page: page && page > 0 ? page : undefined,
       limit: limit && limit > 0 ? limit : undefined,
     });

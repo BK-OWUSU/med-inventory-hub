@@ -29,7 +29,35 @@ export type DrugWithCategory = DrugListResponse["drugs"][number];
 
 
 
-//DRUGS TYPES:
+export type DrugLists = {
+  drugs: Prisma.DrugGetPayload<{
+    include: {
+      category: {
+        select: {
+          id: true;
+          name: true;
+        };
+      };
+    };
+  }>[];
+};
+
+export type DrugList = DrugLists["drugs"][number];
+
+export enum DosageForm {
+  TABLET = "TABLET",
+  CAPSULE = "CAPSULE",
+  SYRUP = "SYRUP",
+  VIAL = "VIAL",
+  INJECTION = "INJECTION",
+  CREAM = "CREAM",
+  DROPS = "DROPS",
+  SUSPENSION = "SUSPENSION",
+  OINTMENT = "OINTMENT",
+}
+
+
+//DRUGS CATEGORY TYPES:
 
 export type DrugCategoryListResponse = {
   categories: Prisma.DrugCategoryGetPayload<{

@@ -1,111 +1,59 @@
 "use client"
-import { useEffect, useRef } from "react"
-import {Breadcrumb,BreadcrumbItem,BreadcrumbLink,BreadcrumbList,BreadcrumbPage,BreadcrumbSeparator,} from "@/components/ui/breadcrumb"
+
+import { useEffect } from "react"
+import { usePathname, useRouter } from "next/navigation"
+import { Breadcrumb, BreadcrumbItem, BreadcrumbList, BreadcrumbPage, BreadcrumbSeparator } from "@/components/ui/breadcrumb"
 import { Separator } from "@/components/ui/separator"
-import {SidebarInset,SidebarProvider,SidebarTrigger} from "@/components/ui/sidebar"
-import { useRouter, usePathname } from "next/navigation"
-import { toast, Toaster } from "sonner"
+import { SidebarInset, SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar"
 import { AppSidebar } from "@/components/app-sidebar"
 import { AuthGuard } from "@/securityContext/AuthGuard"
-
-
+import { useNotificationStore } from "@/store/notificationStore"
+import { NotificationBell } from "@/components/notifications/NotificationBell"
+import { NavbarUser } from "@/components/NavbarUser"
 
 export default function MainLayout({ children }: { children: React.ReactNode }) {
+  const { notifications } = useNotificationStore();
   const pathname = usePathname();
-  const router = useRouter();
-  console.log(pathname)
-  console.log(pathname)
 
 
-  const isResetPasswordPage = pathname.endsWith("/forgot-password");
 
-  // Dynamic Page Title logic
-  // const title = pathname.split("/")[2]
-  // const pageTitle = title.includes("_") 
-  //   ? title.split("_").map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(" ") 
-  //   : title.charAt(0).toUpperCase() + title.slice(1);
+  // Generate a clean, scannable page title derived from the current URL path
+  const currentPathSegment = pathname.split("/").pop() || "Dashboard";
+  const formattedPageTitle = currentPathSegment.charAt(0).toUpperCase() + currentPathSegment.slice(1);
 
-//   // 1. HYDRATION: Fetch user only if NOT on reset-password page
-//   useEffect(() => {
-//     if (!user && !isResetPasswordPage) {
-//       fetchUser();
-//     }
-//   }, [user, fetchUser, isResetPasswordPage]);
-
-//   // 2. TENANT PROTECTION: Ensure user belongs to this slug
-//   useEffect(() => {
-//     if (!loading && user && slug && currentSlug !== slug && !isResetPasswordPage) {
-//       if (user.role.access.includes("dashboard")){
-//         console.log(user.role.access)
-//         router.push(`/${currentSlug}/dashboard`);
-//       }else {
-//         console.log(user.role.access)
-//         const access = user.role.access;
-//         router.push(`/${currentSlug}/${access[0]}`)
-//       }
-//     }
-//   }, [user, loading, slug, currentSlug, router, isResetPasswordPage]);
-
-  // 3. LOADING GUARD: Bypass for reset-password page
-  // We don't show the "Syncing" spinner if the user is here to reset their password
-//   if (!isResetPasswordPage && (loading || !user)) {
-//     return (
-//       <div className="flex h-screen w-full items-center justify-center bg-background">
-//         <div className="flex flex-col items-center gap-2">
-//           <div className="animate-spin rounded-full h-5 w-5 border-t-2 border-b-2 border-blue-900"></div>
-//           <p className="animate-pulse text-2xl text-muted-foreground italic">Syncing your workspace...</p>
-//         </div>
-//       </div>
-//     );
-//   }
-
-  // 4. CLEAN LAYOUT FOR RESET PASSWORD
-  // Since they don't have a POS token yet, they shouldn't see the sidebar/header
-  if (isResetPasswordPage) {
-    return (
-      <main className="min-h-screen bg-background">
-        {children}
-        <Toaster position="top-right" richColors />
-      </main>
-    );
-  }
-
-  // 5. STANDARD DASHBOARD LAYOUT
   return (
-     <SidebarProvider>
-      <AppSidebar/>
-      <SidebarInset>
-        <header className="flex bg-transparent z-10  backdrop-blur-md sticky top-0  border-b p-2 h-16 shrink-0 items-center gap-2 transition-[width,height] justify-between ease-linear group-has-data-[collapsible=icon]/sidebar-wrapper:h-12">
-          <div className="flex items-center gap-2 px-4">
-            <SidebarTrigger className="-ml-1" />
-            <Separator
-              orientation="vertical"
-              className="mr-2 data-[orientation=vertical]:h-4"
-            />
-            <Breadcrumb>
-              <BreadcrumbList>
-                <BreadcrumbItem className="hidden md:block">
-                 {/* <BreadcrumbLink href={`/${slug}/${user?.currentShop?.shopSlug || ""}/dashboard`}>multiPOS</BreadcrumbLink> */}
-                </BreadcrumbItem>
-                <BreadcrumbSeparator className="hidden md:block" />
-                <BreadcrumbItem>
-                  <BreadcrumbPage>{"pageTitle"}</BreadcrumbPage>
-                </BreadcrumbItem>
-              </BreadcrumbList>
-            </Breadcrumb>
-          </div>
-           {/* Top Right NavBar Section */}
-           <div className="flex items-center gap-6">
-            {/* <NavbarNotifications />
-            <NavbarUser /> */}
-          </div>
-        </header>
-         <main className="flex flex-1 flex-col gap-4 p-4">
-             <AuthGuard>
-              {children}
-             </AuthGuard>
-         </main>
-      </SidebarInset>
-    </SidebarProvider>
+    <AuthGuard>
+      <SidebarProvider>
+        <AppSidebar />
+        <SidebarInset>
+          <header className="flex bg-transparent z-10 backdrop-blur-md sticky top-0 border-b p-2 h-16 shrink-0 items-center gap-2 transition-[width,height] justify-between ease-linear group-has-data-[collapsible=icon]/sidebar-wrapper:h-12">
+            <div className="flex items-center gap-2 px-4">
+              <SidebarTrigger className="-ml-1" />
+              <Separator orientation="vertical" className="mr-2 data-[orientation=vertical]:h-4" />
+              <Breadcrumb>
+                <BreadcrumbList>
+                  <BreadcrumbItem className="hidden md:block">
+                    <span className="text-slate-400 font-medium">multiPOS</span>
+                  </BreadcrumbItem>
+                  <BreadcrumbSeparator className="hidden md:block" />
+                  <BreadcrumbItem>
+                    <BreadcrumbPage className="capitalize">{formattedPageTitle}</BreadcrumbPage>
+                  </BreadcrumbItem>
+                </BreadcrumbList>
+              </Breadcrumb>
+            </div>
+            
+            <div className="flex items-center gap-6 px-4">
+              <NotificationBell notifications={notifications} />
+              <NavbarUser />
+            </div>
+          </header>
+          
+          <main className="flex flex-1 flex-col gap-4 p-4">
+            {children}
+          </main>
+        </SidebarInset>
+      </SidebarProvider>
+    </AuthGuard>
   );
 }

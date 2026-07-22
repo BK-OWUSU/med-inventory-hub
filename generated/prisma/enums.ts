@@ -21,6 +21,33 @@ export const SessionReason = {
 export type SessionReason = (typeof SessionReason)[keyof typeof SessionReason]
 
 
+export const OrderStatus = {
+  PENDING: 'PENDING',
+  APPROVED: 'APPROVED',
+  PARTIALLY_FULFILLED: 'PARTIALLY_FULFILLED',
+  SHIPPED: 'SHIPPED',
+  RECEIVED: 'RECEIVED',
+  DELIVERED: 'DELIVERED',
+  COMPLETED: 'COMPLETED',
+  REJECTED: 'REJECTED',
+  CANCELLED: 'CANCELLED'
+} as const
+
+export type OrderStatus = (typeof OrderStatus)[keyof typeof OrderStatus]
+
+
+export const MovementReason = {
+  DAMAGED: 'DAMAGED',
+  EXPIRED: 'EXPIRED',
+  THEFT: 'THEFT',
+  AUDIT_RECONCILIATION: 'AUDIT_RECONCILIATION',
+  DISPENSED: 'DISPENSED',
+  TRANSFER: 'TRANSFER'
+} as const
+
+export type MovementReason = (typeof MovementReason)[keyof typeof MovementReason]
+
+
 export const NotificationType = {
   ORDER: 'ORDER',
   INVENTORY: 'INVENTORY',
@@ -40,7 +67,8 @@ export const Unit = {
   TUBE: 'TUBE',
   AMPOULE: 'AMPOULE',
   PACK: 'PACK',
-  PIECE: 'PIECE'
+  PIECE: 'PIECE',
+  OTHER: 'OTHER'
 } as const
 
 export type Unit = (typeof Unit)[keyof typeof Unit]
@@ -82,23 +110,10 @@ export const FacilityType = {
 export type FacilityType = (typeof FacilityType)[keyof typeof FacilityType]
 
 
-export const OrderStatus = {
-  PENDING: 'PENDING',
-  APPROVED: 'APPROVED',
-  PARTIALLY_FULFILLED: 'PARTIALLY_FULFILLED',
-  SHIPPED: 'SHIPPED',
-  RECEIVED: 'RECEIVED',
-  DELIVERED: 'DELIVERED',
-  REJECTED: 'REJECTED',
-  CANCELLED: 'CANCELLED'
-} as const
-
-export type OrderStatus = (typeof OrderStatus)[keyof typeof OrderStatus]
-
-
 export const OrderType = {
   REQUEST: 'REQUEST',
-  SUPPLY: 'SUPPLY'
+  SUPPLY: 'SUPPLY',
+  EMERGENCY: 'EMERGENCY'
 } as const
 
 export type OrderType = (typeof OrderType)[keyof typeof OrderType]
@@ -127,6 +142,8 @@ export const AuditAction = {
   INVENTORY_CREATED: 'INVENTORY_CREATED',
   USER_CREATED: 'USER_CREATED',
   USER_UPDATED: 'USER_UPDATED',
+  DRUG_CREATED: 'DRUG_CREATED',
+  DRUG_UPDATED: 'DRUG_UPDATED',
   FACILITY_CREATED: 'FACILITY_CREATED',
   FACILITY_UPDATED: 'FACILITY_UPDATED',
   FACILITY_VERIFIED: 'FACILITY_VERIFIED',

@@ -67,10 +67,10 @@ export const navConfig: NavGroup[] = [
     routeBase: "orders",
     icon: ClipboardList,
     items: [
-      { title: "All Orders", accessKey: "all-orders", icon: ClipboardList },
+      { title: "Browse Available Stock", accessKey: "browse-stock", icon: PackagePlus },
       { title: "Incoming Orders", accessKey: "incoming-orders", icon: ArrowRightLeft },
       { title: "Outgoing Orders", accessKey: "outgoing-orders", icon: ArrowRightLeft },
-      { title: "Create Order", accessKey: "create-order", icon: PackagePlus },
+      { title: "All Orders", accessKey: "all-orders", icon: ClipboardList },
     ],
   },
 

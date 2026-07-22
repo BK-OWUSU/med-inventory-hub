@@ -1,10 +1,10 @@
-import { AuditAction, AuditEntity, NotificationType, Prisma, StockMovementType, UserRole } from "@/generated/prisma/client";
+import { AuditAction, AuditEntity, MovementReason, NotificationType, Prisma, StockMovementType, UserRole } from "@/generated/prisma/client";
 import { prisma } from "@/lib/database/dbConnection";
 import { generateNextCustomId } from "@/lib/utils";
-import { addInventorySchema, AddInventoryInput, UpdateStockInput, updateStockSchema } from "@/types/schemas/inventory.schema";
+import { addDrugInventoryBatchSchema, AddDrugInventoryBatchInput,UpdateDrugInventoryBatchInput, updateDrugInventoryBatchSchema, stockAdjustmentSchema, StockAdjustmentInput } from "@/types/schemas/inventory.schema";
 import { AppResponse } from "@/types/types/app.type";
-import { GlobalInventoryFilters, GlobalInventoryResponse, InventorySummary, LocalInventoryFilters, LocalInventoryResponse, PaginationMeta, StockAdjustmentInput } from "@/types/types/inventory.type";
-import { ExecuteAdjustmentInput, MovementFilters, StockMovementsSummary } from "@/types/types/stock-movement-adjusment.type";
+import { GlobalInventoryFilters, GlobalInventoryResponse, InventorySummary, LocalInventoryFilters, LocalInventoryResponse, PaginationMeta, StockAdjustmentRow, StockMovementPayload } from "@/types/types/inventory.type";
+import { MovementFilters, StockMovementsSummary } from "@/types/types/stock-movement-adjusment.type";
 import { NotificationService } from "./notification.service";
 
 export class InventoryService {
@@ -17,15 +17,15 @@ export class InventoryService {
    * @param facilityId The scope identifier extracted from the user's JWT session
    * @param ipAddress Optional IP trace
    */
- static async createInventory(
-  payload: AddInventoryInput,
+ static async createDrugBatch(
+  payload: AddDrugInventoryBatchInput,
   userId: string,
   facilityId: string,
   ipAddress?: string
 ): Promise<AppResponse> {
   try {
     // 1. Structural runtime validation check using Zod
-    const validation = addInventorySchema.safeParse(payload);
+    const validation = addDrugInventoryBatchSchema.safeParse(payload);
     if (!validation.success) {
       return {
         success: false,
@@ -80,8 +80,8 @@ export class InventoryService {
       const movementCustomId = await generateNextCustomId({
         tx,
         facilityId: facilityId, 
-        sequenceType: "MOV",
-        prefix: "MOV",
+        sequenceType: "STOCK_MOVEMENT",
+        prefix: "MV",
       });
 
       const inventory = await tx.inventory.create({
@@ -163,96 +163,49 @@ export class InventoryService {
     } as AppResponse;
   }
 }
- /**
-   * Adjusts stock levels for an existing inventory batch.
-   * Calculates new available quantities based on movement type, enforces safety minimums 
-   * (no negative stock), records the StockMovement, and logs an Audit trace.
-   * * @param payload Structurally parsed data conforming to UpdateStockInput
-   * @param userId The ID of the authenticated user performing this movement
+
+
+/**
+   * Updates an existing drug batch inventory entry.
+   * Performs scope checks, updates the record, and documents the event in the AuditLog.
+   * 
+   * @param inventoryId The ID of the inventory record to update
+   * @param payload Structurally parsed data conforming to UpdateDrugInventoryBatchInput
+   * @param userId The ID of the authenticated user
    * @param facilityId The scope identifier extracted from the user's JWT session
    * @param ipAddress Optional IP trace
    */
-  static async updateStock(
-    payload: UpdateStockInput,
+  static async updateDrugInventoryBatch(
+    inventoryId: string,
+    payload: UpdateDrugInventoryBatchInput,
     userId: string,
     facilityId: string,
     ipAddress?: string
   ): Promise<AppResponse> {
     try {
       // 1. Structural runtime validation check using Zod
-      const validation = updateStockSchema.safeParse(payload);
+      const validation = updateDrugInventoryBatchSchema.safeParse(payload);
       if (!validation.success) {
         return {
           success: false,
           status: 400,
-          error: validation.error.errors[0]?.message || "Invalid stock update payload.",
+          error: validation.error.errors[0]?.message || "Invalid update payload.",
         } as AppResponse;
       }
 
-      const { inventoryId, type, quantity, notes } = validation.data;
+      const validatedData = validation.data;
 
-      // 2. Fetch the existing inventory record and check multi-tenant scope
-      const existingInventory = await prisma.inventory.findFirst({
+      // 2. Ensure inventory exists and belongs to the current facility (Security Constraint)
+      const existingInventory = await prisma.inventory.findUnique({
         where: { id: inventoryId },
-        include: {
-          drug: {
-            select: {
-              name: true,
-              strength: true,
-            },
-          },
-        },
+        include: { drug: true },
       });
 
-      if (!existingInventory) {
+      if (!existingInventory || existingInventory.facilityId !== facilityId) {
         return {
           success: false,
           status: 404,
-          error: "Inventory batch record not found.",
-        } as AppResponse;
-      }
-
-      // Security Check: Verify that the inventory batch belongs to the logged-in user's facility
-      if (existingInventory.facilityId !== facilityId) {
-        return {
-          success: false,
-          status: 403,
-          error: "Unauthorized. You do not have permission to modify inventory at another facility.",
-        } as AppResponse;
-      }
-
-      // 3. Determine mathematical direction based on StockMovementType
-      let isAddition = false;
-
-      switch (type) {
-        case StockMovementType.IN:
-        case StockMovementType.RETURN:
-          isAddition = true;
-          break;
-        case StockMovementType.OUT:
-        case StockMovementType.EXPIRY:
-        case StockMovementType.TRANSFER: // Assuming manual transfer-out of stock
-        case StockMovementType.ADJUSTMENT: // Defaulting manual adjustment to subtraction (shrinkage/breakage)
-          isAddition = false;
-          break;
-        default:
-          return {
-            success: false,
-            status: 400,
-            error: `Unsupported stock movement type: ${type}`,
-          } as AppResponse;
-      }
-
-      // Calculate the theoretical new total
-      const currentQty = existingInventory.availableQuantity;
-      const newQty = isAddition ? currentQty + quantity : currentQty - quantity;
-
-      // Enforce physical bounds: Stock cannot drop below zero
-      if (newQty < 0) {
-        return {
-          success: false,
-          status: 400,
-          error: `Insufficient stock. Attempting to withdraw ${quantity} units, but only ${currentQty} units are available.`,
+          error: "Inventory record not found in this facility.",
         } as AppResponse;
       }
 
@@ -262,128 +215,267 @@ export class InventoryService {
         UserRole.STAFF,
         UserRole.VIEWER,
       ], userId);
-      // 4. Execute atomic transaction for state changes
-      const updatedInventory = await prisma.$transaction(async (tx) => {
-        // A. Generate Custom Movement ID inside the transaction
-        const movementCustomId = await generateNextCustomId({
-          tx,
-          facilityId,
-          sequenceType: "STOCK_MOVEMENT",
-          prefix: "MV",
-        });
 
-        // B. Update the inventory level
-        const inventory = await tx.inventory.update({
+      // 3. Run database transaction
+      const result = await prisma.$transaction(async (tx) => {
+        const updatedInventory = await tx.inventory.update({
           where: { id: inventoryId },
           data: {
-            availableQuantity: newQty,
+            manufacturer: validatedData.manufacturer?.trim() || existingInventory.manufacturer,
+            unitPrice: validatedData.unitPrice !== undefined ? new Prisma.Decimal(validatedData.unitPrice) : existingInventory.unitPrice,
+            minStockLevel: validatedData.minStockLevel,
+            expiryDate: validatedData.expiryDate,
+            isActive: validatedData.isActive,
           },
           include: {
-            drug: {
-              select: {
-                id: true,
-                name: true,
-                strength: true,
-                dosageForm: true,
-                unit: true,
-              },
-            },
+            drug: { select: { id: true, name: true, strength: true, dosageForm: true } },
           },
         });
 
-        // C. Log the transaction to StockMovements ledger
-        await tx.stockMovement.create({
-          data: {
-            customId: movementCustomId,
-            inventoryId: inventory.id,
-            type,
-            quantity,
-            referenceNo: inventory.batchNumber,
-            notes: notes?.trim() || `Manual ${type} adjustment recorded.`,
-            performedById: userId,
-          },
-        });
-
-        // D. Create trace in System Audit Log
+        // Audit Log entry
         await tx.auditLog.create({
           data: {
             userId,
             facilityId,
             action: AuditAction.INVENTORY_UPDATED,
             entityType: AuditEntity.INVENTORY,
-            entityId: inventory.id,
+            entityId: inventoryId,
             ipAddress: ipAddress || null,
             details: {
-              message: "Stock level modified via movement transaction.",
-              drugName: `${inventory.drug.name} ${inventory.drug.strength || ""}`,
-              batchNumber: inventory.batchNumber,
-              movementType: type,
-              movementQuantity: quantity,
-              previousQuantity: currentQty,
-              newQuantity: newQty,
-              notes,
+              message: "Inventory batch details updated.",
+              drugName: `${updatedInventory.drug.name} ${updatedInventory.drug.strength || ""}`,
+              batchNumber: updatedInventory.batchNumber,
+              changes: {
+                manufacturer: validatedData.manufacturer,
+                unitPrice: validatedData.unitPrice,
+                expiryDate: validatedData.expiryDate,
+              },
             },
           },
         });
 
-        if (recipientIds.length === 0) {
-            console.warn(`⚠️ Notification Triggered, but no recipients found Facility: ${facilityId}`);
-            // Optional: You could fallback to a 'SYSTEM' user or log this to a monitoring tool
-          } else {
-            // ---TRANSACTIONAL NOTIFICATIONS ---
-            // 1. Notify the specific movement
+        // Notifications
+        if (recipientIds.length > 0) {
+          if (updatedInventory.availableQuantity <= updatedInventory.minStockLevel) {
             await NotificationService.createNotificationInTx(
               tx,
               facilityId,
-              `Stock ${type.charAt(0) + type.slice(1).toLowerCase()} Processed`,
-              `Movement recorded: ${type} for ${inventory.drug.name} (${inventory.batchNumber}). New Balance: ${newQty}`,
+              "Low Stock Alert",
+              `Low stock: ${updatedInventory.drug.name} (${updatedInventory.batchNumber}) is now below the updated minimum level (${updatedInventory.availableQuantity} available).`,
               NotificationType.INVENTORY,
               recipientIds
-            );            
+            );
           }
+        }
 
-
-          // 2. Alert if stock is low
-          if (newQty <= inventory.minStockLevel) {
-            if (recipientIds.length === 0) {
-              console.warn(`⚠️ Notification Triggered, but no recipients found Facility: ${facilityId}`);
-              // Optional: You could fallback to a 'SYSTEM' user or log this to a monitoring tool
-            } else {
-              await NotificationService.createNotificationInTx(
-                tx,
-                facilityId,
-                "Low Stock Warning",
-                `Warning: ${inventory.drug.name} (${inventory.batchNumber}) is at or below minimum stock level (${newQty} remaining).`,
-                NotificationType.INVENTORY,
-                recipientIds
-              );
-            }
-          }
-
-
-
-        return inventory;
+        return updatedInventory;
       });
 
       return {
         success: true,
         status: 200,
-        message: `Successfully processed ${type} movement of ${quantity} units for ${updatedInventory.drug.name}.`,
-        data: updatedInventory,
+        message: `Inventory batch "${result.batchNumber}" for ${result.drug.name} updated successfully.`,
+        data: result,
       } as AppResponse;
 
     } catch (error) {
-      console.error("🚨 Critical System Level Update-Stock Service Error:", error);
+      console.error("🚨 Critical System Level Update-Inventory Service Error:", error);
       return {
         success: false,
         status: 500,
-        error: "Internal failure occurred while recording stock movement and updating ledger.",
+        error: "Internal failure occurred while updating inventory.",
       } as AppResponse;
     }
   }
 
-  
 
+  /**
+   * Deactivates an inventory batch and notifies relevant staff.
+   */
+  static async deactivateInventory(
+    inventoryId: string,
+    userId: string,
+    facilityId: string,
+    ipAddress?: string,
+    userAgent?: string
+  ): Promise<AppResponse> {
+    try {
+      // 1. Verify existence and facility ownership
+      const inventory = await prisma.inventory.findUnique({
+        where: { id: inventoryId },
+        include: { drug: { select: { name: true, strength: true } } },
+      });
+
+      if (!inventory || inventory.facilityId !== facilityId) {
+        return {
+          success: false,
+          status: 404,
+          error: "Inventory record not found or access denied.",
+        } as AppResponse;
+      }
+
+      if (!inventory.isActive) {
+        return {
+          success: false,
+          status: 400,
+          error: "Inventory batch is already deactivated.",
+        } as AppResponse;
+      }
+
+      // 2. Fetch recipients for notification
+      const recipientIds = await NotificationService.getRecipientIdsByRoles(facilityId, [
+        UserRole.ADMIN,
+        UserRole.PHARMACIST,
+        UserRole.STAFF,
+        UserRole.VIEWER,
+      ], userId);
+
+      // 3. Run transaction
+      const result = await prisma.$transaction(async (tx) => {
+        // Update the status
+        const deactivatedInventory = await tx.inventory.update({
+          where: { id: inventoryId },
+          data: { isActive: false },
+        });
+
+        // Audit Log entry
+        await tx.auditLog.create({
+          data: {
+            userId,
+            facilityId,
+            action: AuditAction.INVENTORY_UPDATED, // Or a specific DEACTIVATED action if your Enum has it
+            entityType: AuditEntity.INVENTORY,
+            userAgent: userAgent,
+            entityId: inventoryId,
+            ipAddress: ipAddress || null,
+            details: {
+              message: "Inventory batch deactivated.",
+              drugName: `${inventory.drug.name} ${inventory.drug.strength || ""}`,
+              batchNumber: inventory.batchNumber,
+            },
+          },
+        });
+
+        // Trigger Notification
+        if (recipientIds.length > 0) {
+          await NotificationService.createNotificationInTx(
+            tx,
+            facilityId,
+            "Inventory Batch Deactivated",
+            `Batch (${inventory.batchNumber}) of ${inventory.drug.name} has been deactivated.`,
+            NotificationType.INVENTORY,
+            recipientIds
+          );
+        }
+
+        return deactivatedInventory;
+      });
+
+      return {
+        success: true,
+        status: 200,
+        message: `Inventory batch "${result.batchNumber}" has been deactivated and team notified.`,
+        data: result,
+      } as AppResponse;
+
+    } catch (error) {
+      console.error("🚨 Critical Error in deactivateInventory Service:", error);
+      return {
+        success: false,
+        status: 500,
+        error: "Internal failure occurred while deactivating inventory.",
+      } as AppResponse;
+    }
+  }
+
+
+  /**
+   * Fetches detailed information for a single inventory batch,
+   * including the linked drug information and recent stock movements.
+   * 
+   * @param inventoryId The unique ID of the inventory batch
+   * @param facilityId The facility scope for security verification
+   */
+  static async getInventoryBatchDetails(
+    inventoryId: string,
+    facilityId: string
+  ): Promise<AppResponse> {
+    try {
+      // Fetch batch with nested drug and recent movements
+      const inventory = await prisma.inventory.findUnique({
+        where: { id: inventoryId },
+        include: {
+          drug: {
+            select: {
+              id: true,
+              name: true,
+              strength: true,
+              dosageForm: true,
+              unit: true,
+              genericName: true,
+              isControlled: true,
+            },
+          },
+          movements: {
+            take: 10, // Get only the 10 most recent movements
+            orderBy: { performedAt: "desc" },
+            include: {
+              performedBy: { select: { fullName: true } },
+            },
+          },
+        },
+      });
+
+      // Security Check: Ensure the inventory belongs to the requested facility
+      if (!inventory) {
+        return {
+          success: false,
+          status: 404,
+          error: "Inventory batch not found.",
+        } as AppResponse;
+      }
+
+      if (inventory.facilityId !== facilityId) {
+        return {
+          success: false,
+          status: 403,
+          error: "Unauthorized access to this inventory batch.",
+        } as AppResponse;
+      }
+
+      // Destructure for the specific return format you requested
+      const responseData = {
+        inventory: {
+          id: inventory.id,
+          batchNumber: inventory.batchNumber,
+          availableQuantity: inventory.availableQuantity,
+          unitPrice: inventory.unitPrice,
+          minStockLevel: inventory.minStockLevel,
+          expiryDate: inventory.expiryDate,
+          receivedDate: inventory.receivedDate,
+          manufacturer: inventory.manufacturer,
+        },
+        drug: inventory.drug,
+        recentMovements: inventory.movements,
+      };
+
+      return {
+        success: true,
+        status: 200,
+        message: "Inventory batch details retrieved successfully.",
+        data: responseData,
+      } as AppResponse;
+
+    } catch (error) {
+      console.error("🚨 Error in getInventoryBatchDetails Service:", error);
+      return {
+        success: false,
+        status: 500,
+        error: "Failed to load inventory batch details.",
+      } as AppResponse;
+    }
+  }
+  
  /**
    * Fetches local facility inventory.
    * Concurrently runs fetch and count queries, populating AppResponse.meta with pagination metadata.
@@ -403,7 +495,7 @@ export class InventoryService {
 
       const whereClause: Prisma.InventoryWhereInput = {
         facilityId,
-        isActive: true,
+        isDeleted: false,
         ...(filters?.drugId ? { drugId: filters.drugId } : {}),
         
         ...(cleanSearch && cleanSearch !== ""
@@ -495,6 +587,7 @@ export class InventoryService {
 
   /**
    * Fetches global active inventory across external facilities.
+   * used in Orders/ market place
    * Concurrently runs fetch and count queries, populating AppResponse.meta with pagination metadata.
    */
   static async getGlobalInventory(
@@ -512,7 +605,7 @@ export class InventoryService {
       // Clean, single-declaration where clause
       const whereClause: Prisma.InventoryWhereInput = {
         facilityId: { not: currentFacilityId },
-        isActive: true,
+        isDeleted: false,
         availableQuantity: { gt: 0 },
 
         // 1. Direct foreign key check (avoids nesting if we just have the ID)
@@ -549,6 +642,13 @@ export class InventoryService {
                 id: true,
                 name: true,
                 dosageForm: true,
+                unit: true,
+                strength: true,
+                _count: {
+                  select: {
+                    inventories: true
+                  },
+                },
               },
             },
             facility: {
@@ -556,6 +656,7 @@ export class InventoryService {
                 id: true,
                 name: true,
                 type: true,
+                location: true
               },
             },
           },
@@ -603,287 +704,472 @@ export class InventoryService {
     }
   }
 
-/* 
- *GET STOCK MOVEMENTS 
-*/
-  static async getStockMovements(
-      facilityId: string,
-      filters?: MovementFilters
-    ): Promise<AppResponse> {
-      try {
-        const cleanSearch = filters?.search?.trim();
-        const limit = filters?.limit;
-        const page = filters?.page;
-        const skip = limit && page && page > 0 ? (page - 1) * limit : undefined;
-        const take = limit && limit > 0 ? limit : undefined;
-  
-        const whereClause: Prisma.StockMovementWhereInput = {
-          inventory: { facilityId },
-          ...(filters?.type ? { type: filters.type } : {}),
-          ...(filters?.startDate || filters?.endDate
-            ? {
-                performedAt: {
-                  ...(filters.startDate ? { gte: filters.startDate } : {}),
-                  ...(filters.endDate ? { lte: filters.endDate } : {}),
-                },
-              }
-            : {}),
-          ...(cleanSearch && cleanSearch !== ""
-            ? {
-                OR: [
-                  { referenceNo: { contains: cleanSearch, mode: "insensitive" } },
-                  { customId: { contains: cleanSearch, mode: "insensitive" } },
-                  {
-                    inventory: {
-                      OR: [
-                        { batchNumber: { contains: cleanSearch, mode: "insensitive" } },
-                        { drug: { name: { contains: cleanSearch, mode: "insensitive" } } },
-                      ],
-                    },
-                  },
-                ],
-              }
-            : {}),
-        };
-  
-        const [movements, totalMatchingCount, aggregates] = await Promise.all([
-          prisma.stockMovement.findMany({
-            where: whereClause,
+static async getStockMovementDetails(
+    movementId: string,
+    facilityId: string
+  ): Promise<AppResponse> {
+    try {
+      const movement = await prisma.stockMovement.findUnique({
+        where: { id: movementId },
+        include: {
+          inventory: {
             include: {
-              inventory: {
-                include: {
-                  drug: {
-                    select: { name: true, strength: true, dosageForm: true, unit: true },
-                  },
-                },
-              },
-              performedBy: { select: { fullName: true } }, // Matches User model 'fullName'
-            },
-            orderBy: { performedAt: "desc" },
-            ...(take !== undefined ? { take } : {}),
-            ...(skip !== undefined ? { skip } : {}),
-          }),
-          prisma.stockMovement.count({ where: whereClause }),
-          prisma.stockMovement.groupBy({
-            by: ["type"],
-            where: { inventory: { facilityId }, ...whereClause },
-            _sum: { quantity: true },
-            _count: { id: true },
-          }),
-        ]);
-  
-        let totalIn = 0;
-        let totalOut = 0;
-        let adjustmentsCount = 0;
-        let expiryLossCount = 0;
-  
-        aggregates.forEach((group) => {
-          const sum = Math.abs(group._sum.quantity ?? 0);
-          const count = group._count.id ?? 0;
-  
-          if (group.type === "IN" || group.type === "RETURN") {
-            totalIn += sum;
-          } else if (group.type === "OUT" || group.type === "TRANSFER") {
-            totalOut += sum;
-          } else if (group.type === "ADJUSTMENT") {
-            adjustmentsCount += count;
-          } else if (group.type === "EXPIRY") { // Aligned directly with your schema enum
-            expiryLossCount += count;
-          }
-        });
-  
-        const summary: StockMovementsSummary = {
-          totalIn,
-          totalOut,
-          adjustmentsCount,
-          expiryLossCount,
-          netMovement: totalIn - totalOut,
-        };
-  
-        const resolvedLimit = take ?? totalMatchingCount;
-        const resolvedPage = page ?? 1;
-        const totalPages = resolvedLimit > 0 ? Math.ceil(totalMatchingCount / resolvedLimit) : 1;
-  
-        const paginationMeta: PaginationMeta = {
-          total: totalMatchingCount,
-          page: resolvedPage,
-          limit: resolvedLimit,
-          totalPages,
-          hasNextPage: resolvedPage < totalPages,
-          hasPrevPage: resolvedPage > 1,
-        };
-  
-        return {
-          success: true,
-          status: 200,
-          message: "Stock movement ledger loaded successfully.",
-          data: { movements, summary },
-          meta: paginationMeta,
-        } as AppResponse;
-  
-      } catch (error) {
-        console.error("🚨 Error in getStockMovements Service:", error);
+              drug: { select: { name: true, strength: true, dosageForm: true, unit: true } }
+            }
+          },
+          orderItem: {
+            include: {
+              order: true 
+            }
+          },
+          performedBy: { select: { fullName: true, id: true } }
+        },
+      });
+
+      // Security: Ensure the movement belongs to the facility
+      if (!movement || movement.inventory.facilityId !== facilityId) {
         return {
           success: false,
-          status: 500,
-          error: "Failed to load stock movement records.",
+          status: 404,
+          error: "Movement record not found or access denied.",
         } as AppResponse;
       }
+
+      const movementData = {
+          movement: {
+            id: movement.id,
+            customId: movement.customId, // Added for UI display
+            type: movement.type,
+            quantity: movement.quantity,
+            notes: movement.notes,
+            referenceNo: movement.referenceNo,
+            performedAt: movement.performedAt,
+          },
+          inventory: {
+            ...movement.inventory,
+            unitPrice: movement.inventory.unitPrice ? movement.inventory.unitPrice.toNumber() : null,
+          },
+          order: movement.orderItem?.order ? {
+            ...movement.orderItem.order,
+            totalValue: movement.orderItem.order.totalValue ? movement.orderItem.order.totalValue.toNumber() : null,
+          } : null,
+          performedBy: movement.performedBy,
+        } as StockMovementPayload
+
+      return {
+        success: true,
+        status: 200,
+        message: "Movement details retrieved successfully.",
+        data: movementData
+      } as AppResponse;
+
+    } catch (error) {
+      console.error("🚨 Error in getStockMovementDetails:", error);
+      return {
+        success: false,
+        status: 500,
+        error: "Failed to load movement details.",
+      } as AppResponse;
+    }
+  }
+
+  /* 
+ * GET STOCK MOVEMENTS 
+ */
+static async getStockMovements(
+  facilityId: string,
+  filters?: MovementFilters
+): Promise<AppResponse> {
+  try {
+    const cleanSearch = filters?.search?.trim();
+    const limit = filters?.limit;
+    const page = filters?.page;
+    const skip = limit && page && page > 0 ? (page - 1) * limit : undefined;
+    const take = limit && limit > 0 ? limit : undefined;
+
+    // Updated whereClause with drugId and performedById filters
+    const whereClause: Prisma.StockMovementWhereInput = {
+      inventory: { 
+        facilityId,
+        ...(filters?.drugId ? { drugId: filters.drugId } : {}) 
+      },
+      ...(filters?.type ? { type: filters.type } : {}),
+      ...(filters?.performedBy ? { performedById: filters.performedBy } : {}),
+      ...(filters?.startDate || filters?.endDate
+        ? {
+            performedAt: {
+              ...(filters.startDate ? { gte: filters.startDate } : {}),
+              ...(filters.endDate ? { lte: filters.endDate } : {}),
+            },
+          }
+        : {}),
+      ...(cleanSearch && cleanSearch !== ""
+        ? {
+            OR: [
+              { referenceNo: { contains: cleanSearch, mode: "insensitive" } },
+              { customId: { contains: cleanSearch, mode: "insensitive" } },
+              {
+                inventory: {
+                  OR: [
+                    { batchNumber: { contains: cleanSearch, mode: "insensitive" } },
+                    { drug: { name: { contains: cleanSearch, mode: "insensitive" } } },
+                  ],
+                },
+              },
+            ],
+          }
+        : {}),
+    };
+
+    const [movements, totalMatchingCount, aggregates] = await Promise.all([
+      prisma.stockMovement.findMany({
+        where: whereClause,
+        include: {
+          inventory: {
+            include: {
+              drug: {
+                select: { name: true, strength: true, dosageForm: true, unit: true },
+              },
+            },
+          },
+          performedBy: { select: { fullName: true } },
+        },
+        orderBy: { performedAt: "desc" },
+        ...(take !== undefined ? { take } : {}),
+        ...(skip !== undefined ? { skip } : {}),
+      }),
+      prisma.stockMovement.count({ where: whereClause }),
+      prisma.stockMovement.groupBy({
+        by: ["type"],
+        where: { inventory: { facilityId }, ...whereClause },
+        _sum: { quantity: true },
+        _count: { id: true },
+      }),
+    ]);
+
+    let totalIn = 0;
+    let totalOut = 0;
+    let adjustmentsCount = 0;
+    let expiryLossCount = 0;
+
+    aggregates.forEach((group) => {
+      const sum = Math.abs(group._sum.quantity ?? 0);
+      const count = group._count.id ?? 0;
+
+      if (group.type === "IN" || group.type === "RETURN") {
+        totalIn += sum;
+      } else if (group.type === "OUT" || group.type === "TRANSFER") {
+        totalOut += sum;
+      } else if (group.type === "ADJUSTMENT") {
+        adjustmentsCount += count;
+      } else if (group.type === "EXPIRY") {
+        expiryLossCount += count;
+      }
+    });
+
+    const summary: StockMovementsSummary = {
+      totalIn,
+      totalOut,
+      adjustmentsCount,
+      expiryLossCount,
+      netMovement: totalIn - totalOut,
+    };
+
+    const resolvedLimit = take ?? totalMatchingCount;
+    const resolvedPage = page ?? 1;
+    const totalPages = resolvedLimit > 0 ? Math.ceil(totalMatchingCount / resolvedLimit) : 1;
+
+    const paginationMeta: PaginationMeta = {
+      total: totalMatchingCount,
+      page: resolvedPage,
+      limit: resolvedLimit,
+      totalPages,
+      hasNextPage: resolvedPage < totalPages,
+      hasPrevPage: resolvedPage > 1,
+    };
+
+    return {
+      success: true,
+      status: 200,
+      message: "Stock movement ledger loaded successfully.",
+      data: { movements, summary },
+      meta: paginationMeta,
+    } as AppResponse;
+
+  } catch (error) {
+    console.error("🚨 Error in getStockMovements Service:", error);
+    return {
+      success: false,
+      status: 500,
+      error: "Failed to load stock movement records.",
+    } as AppResponse;
+  }
 }
 
 /**
- * Safe transaction to edit stock levels, generate sequential customIds, 
- * register the stock movement, and create a system audit log.
- */
-static async executeStockAdjustment(
-    input: ExecuteAdjustmentInput, 
+   * B. Create Adjustment (Refactored to Unified Service)
+   * Delegates logic to processStockMovement to ensure consistent logging,
+   * audit trails, and automatic notification triggering.
+   */
+  static async createAdjustment(
+    payload: StockAdjustmentInput,
     userId: string,
-    facilityId: string, 
-    ipAddress: string, 
-    userAgent:string
-    ): Promise<AppResponse> {
+    facilityId: string,
+    ipAddress?: string,
+    userAgent?: string
+  ): Promise<AppResponse> {
+    return await this.processStockMovement(
+      {
+        ...payload,
+        type: payload.type || StockMovementType.ADJUSTMENT, 
+      },
+      userId,
+      facilityId,
+      ipAddress,
+      userAgent
+    );
+  }
 
+/**
+ * Unified service method to handle all stock interactions.
+ * Handles both "Delta" movements (IN/OUT/TRANSFER) and "Absolute" adjustments.
+ */
+static async processStockMovement(
+    input: StockAdjustmentInput,
+    userId: string,
+    facilityId: string,
+    ipAddress?: string,
+    userAgent?: string,
+    prismaTx?: Prisma.TransactionClient // Optional: accepts external tx or creates one
+  ): Promise<AppResponse> {
+    try {
+      const validatedData = stockAdjustmentSchema.parse(input);
+
+      // 1. Prepare recipients outside the transaction (read-only)
       const recipientIds = await NotificationService.getRecipientIdsByRoles(facilityId, [
         UserRole.ADMIN,
         UserRole.PHARMACIST,
         UserRole.STAFF,
         UserRole.VIEWER,
       ], userId);
-  try {
-    const transactionResult = await prisma.$transaction(async (tx) => {
-      // 1. Find the parent inventory profile with drug details included
-      const item = await tx.inventory.findUnique({
-        where: { id: input.inventoryId },
-        include: {
-          drug: {
-            select: { name: true, strength: true },
+
+      // Encapsulate the core transactional logic inside a helper function
+      const executeStockMovement = async (tx: Prisma.TransactionClient) => {
+        // 2. Fetch current state
+        const item = await tx.inventory.findUnique({
+          where: { id: validatedData.inventoryId },
+          include: { drug: { select: { name: true, strength: true } } }
+        });
+
+        if (!item || item.facilityId !== facilityId) {
+          throw new Error("Inventory record not found or unauthorized.");
+        }
+
+        // Capture previous quantity before modification
+        const previousQuantity = item.availableQuantity;
+
+        // 3. Determine the Delta and Final Qty
+        let finalQuantity: number;
+        let quantityToRecord: number;
+
+        if (validatedData.newQuantity !== undefined) {
+          finalQuantity = validatedData.newQuantity;
+          quantityToRecord = validatedData.newQuantity - previousQuantity;
+        } else if (validatedData.quantityChange !== undefined) {
+          finalQuantity = previousQuantity + validatedData.quantityChange;
+          quantityToRecord = validatedData.quantityChange;
+        } else {
+          throw new Error("Must provide either newQuantity or quantityChange.");
+        }
+
+        if (finalQuantity < 0) throw new Error("Resulting stock cannot be negative.");
+
+        // 4. Update Inventory
+        const updatedInventory = await tx.inventory.update({
+          where: { id: validatedData.inventoryId },
+          data: { availableQuantity: finalQuantity },
+          include: { drug: { select: { name: true } } }
+        });
+
+       // 5. Log Movement with immutable snapshot quantities
+        const customId = await generateNextCustomId({ tx, facilityId, sequenceType: "STOCK_MOVEMENT", prefix: "MV" });
+        const movement = await tx.stockMovement.create({
+          data: {
+            customId,
+            inventoryId: validatedData.inventoryId,
+            orderItemId: validatedData.orderItemId || null,
+            type: validatedData.type,
+            quantity: quantityToRecord,
+            previousQuantity: previousQuantity,
+            newQuantity: finalQuantity,
+            referenceNo: validatedData.referenceNo || item.batchNumber || "N/A",
+            notes: validatedData.notes || `Manual ${validatedData.type} adjustment.`,
+            reason: validatedData.reason,
+            performedById: userId,
           },
-        },
-      });
-
-      if (!item || item.facilityId !== facilityId) {
-        throw new Error("Inventory target profile not found or facility mismatched.");
-      }
-
-      // 2. Adjust balance safely
-      const newQuantity = item.availableQuantity + input.quantityChange;
-      if (newQuantity < 0) {
-        throw new Error("Cannot complete operation: requested quantity would result in negative stock.");
-      }
-
-      // 3. Generate sequential movement Custom ID using the sequence manager
-      const customId = await generateNextCustomId({
-        tx,
-        facilityId: facilityId, 
-        sequenceType: "STOCK_MOVEMENT",
-        prefix: "MV",
-      });
-
-      // 4. Update core inventory level
-      const updatedInventory = await tx.inventory.update({
-        where: { id: input.inventoryId },
-        data: { availableQuantity: newQuantity },
-        include: { drug: { select: { name: true } } },
-      });
-
-      // 5. Append physical stock movement record
-      const movement = await tx.stockMovement.create({
-        data: {
-          customId,
-          inventoryId: input.inventoryId,
-          type: input.type,
-          quantity: input.quantityChange,
-          referenceNo: input.referenceNo,
-          notes: input.notes,
-          performedById: userId,
-        },
-      });
-
-      // 6. Append System Audit Log entry
-      await tx.auditLog.create({
-        data: {
-          userId: userId,
-          facilityId: facilityId,
-          action: AuditAction.INVENTORY_UPDATED,
-          entityType: AuditEntity.INVENTORY,
-          entityId: item.id,
-          ipAddress: ipAddress || null,
-          userAgent: userAgent || null,
-          details: {
-            message: "Stock level modified via manual inventory action.",
-            drugName: `${item.drug.name} ${item.drug.strength || ""}`.trim(),
-            batchNumber: item.batchNumber || "N/A",
-            movementCustomId: customId,
-            movementType: input.type,
-            movementQuantity: input.quantityChange,
-            previousQuantity: item.availableQuantity,
-            newQuantity: newQuantity,
-            notes: input.notes || null,
+        });
+        // 6. Audit Log
+        await tx.auditLog.create({
+          data: {
+            userId, facilityId,
+            action: AuditAction.INVENTORY_UPDATED,
+            entityType: AuditEntity.INVENTORY,
+            entityId: item.id,
+            ipAddress, userAgent,
+            details: {
+              message: "Stock modified.",
+              drugName: `${item.drug.name} ${item.drug.strength || ""}`.trim(),
+              batchNumber: item.batchNumber || "N/A",
+              movementType: validatedData.type,
+              previousQuantity,
+              quantityChanged: quantityToRecord,
+              newQuantity: finalQuantity
+            },
           },
-        },
-      });
+        });
 
-      // --- TRANSACTIONAL NOTIFICATIONS ---
-
-      if (recipientIds.length === 0) {
-            console.warn(`⚠️ Notification Triggered, but no recipients found Facility: ${facilityId}`);
-            // Optional: You could fallback to a 'SYSTEM' user or log this to a monitoring tool
-          } else {
-            
-            // A. Notify that the adjustment was performed
-            await NotificationService.createNotificationInTx(
-              tx,
-              facilityId,
-              "Stock Adjustment Processed",
-              `Adjustment for ${item.drug.name} (${item.batchNumber || 'No Batch'}): ${input.quantityChange > 0 ? '+' : ''}${input.quantityChange} units. New Balance: ${newQuantity}.`,
-              NotificationType.INVENTORY,
-              recipientIds
-            );
-          }
-
-
-          
-          // B. Trigger Low Stock alert if necessary
-          if (newQuantity <= item.minStockLevel) {
+        // 7. Integrated Notifications
         if (recipientIds.length === 0) {
-            console.warn(`⚠️ Notification Triggered, but no recipients found Facility: ${facilityId}`);
-            // Optional: You could fallback to a 'SYSTEM' user or log this to a monitoring tool
-          } else {
-            
+          console.warn(`⚠️ Notification Triggered, but no recipients found Facility: ${facilityId}`);
+        } else {
+          await NotificationService.createNotificationInTx(
+            tx,
+            facilityId,
+            `Stock ${validatedData.type.charAt(0) + validatedData.type.slice(1).toLowerCase()} Processed`,
+            `Movement recorded: ${validatedData.type} for ${item.drug.name} (${item.batchNumber || 'No Batch'}). New Balance: ${finalQuantity}`,
+            NotificationType.INVENTORY,
+            recipientIds
+          );
+
+          if (finalQuantity <= item.minStockLevel) {
             await NotificationService.createNotificationInTx(
               tx,
               facilityId,
               "Low Stock Warning",
-              `Alert: ${item.drug.name} (${item.batchNumber || 'No Batch'}) is at or below minimum stock level (${newQuantity} remaining).`,
+              `Warning: ${item.drug.name} (${item.batchNumber || 'No Batch'}) is at or below minimum stock level (${finalQuantity} remaining).`,
               NotificationType.INVENTORY,
               recipientIds
             );
           }
+        }
+
+        return { updatedInventory, movement };
+      };
+
+      // Execute either within the provided external transaction or start a new one
+      let result;
+      if (prismaTx) {
+        result = await executeStockMovement(prismaTx);
+      } else {
+        result = await prisma.$transaction(async (tx) => {
+          return await executeStockMovement(tx);
+        });
       }
 
-      return { updatedInventory, movement };
+      return { success: true, status: 200, message: "Transaction processed successfully.", data: result };
+    } catch (error: unknown) {
+      console.error("🚨 Error in processStockMovement:", error);
+      // If it's part of an external transaction, rethrow so the parent transaction rolls back
+      if (prismaTx) throw error;
+      return { success: false, status: 400, error: (error as Error).message || "Failed to process stock movement." };
+    }
+  }
+
+
+/**
+ * Fetches a paginated list of stock adjustments.
+ */
+static async getAdjustments(
+  facilityId: string,
+  filters?: {
+    drugId?: string;
+    user?: string;
+    reason?: MovementReason;
+    startDate?: Date;
+    endDate?: Date;
+    page?: number;
+    limit?: number;
+  }
+): Promise<AppResponse> {
+  try {
+    const page = filters?.page || 1;
+    const limit = filters?.limit || 10;
+    const skip = (page - 1) * limit;
+
+    const whereClause: Prisma.StockMovementWhereInput = {
+      type: StockMovementType.ADJUSTMENT,
+      inventory: {
+        facilityId,
+        ...(filters?.drugId ? { drugId: filters.drugId } : {}),
+      },
+      ...(filters?.user ? { performedById: filters.user } : {}),
+      ...(filters?.reason ? { reason: filters.reason } : {}),
+      ...(filters?.startDate || filters?.endDate ? {
+        performedAt: {
+          ...(filters.startDate ? { gte: filters.startDate } : {}),
+          ...(filters.endDate ? { lte: filters.endDate } : {}),
+        },
+      } : {}),
+    };
+
+    const [adjustments, total] = await Promise.all([
+      prisma.stockMovement.findMany({
+        where: whereClause,
+        include: {
+          inventory: { 
+            include: { 
+              drug: { select: { name: true, strength: true, unit: true } } 
+            } 
+          },
+          performedBy: { select: { fullName: true, role: true } },
+        },
+        orderBy: { performedAt: "desc" },
+        take: limit,
+        skip: skip,
+      }),
+      prisma.stockMovement.count({ where: whereClause }),
+    ]);
+
+    const data: StockAdjustmentRow[] = adjustments.map((adj) => {
+      const oldQty = adj.previousQuantity ?? 0;
+      const newQty = adj.newQuantity ?? 0;
+      const diff = adj.quantity ?? (newQty - oldQty);
+      
+      const drugFullName = `${adj.inventory.drug.name} ${adj.inventory.drug.strength || ""}`.trim();
+      const batch = adj.inventory.batchNumber || "N/A";
+
+      return {
+        id: adj.id,
+        customId: adj.customId,
+        dateTime: adj.performedAt,
+        drugName: drugFullName,
+        batchNumber: batch,
+        inventoryName: adj.inventory.manufacturer 
+          ? `${drugFullName} — ${adj.inventory.manufacturer}` 
+          : drugFullName,
+        inventoryBatch: batch,
+        oldQuantity: oldQty,
+        newQuantity: newQty,
+        difference: diff,
+        reason: adj.reason ? adj.reason.replace(/_/g, " ") : "N/A",
+        reference: adj.referenceNo || "N/A",
+        performedBy: adj.performedBy.fullName,
+        role: adj.performedBy.role,
+      };
     });
 
     return {
       success: true,
-      status: 201,
-      message: `Successfully updated stock levels for ${transactionResult.updatedInventory.drug.name}.`,
-      data: transactionResult,
+      status: 200,
+      data,
+      meta: { total, page, limit, totalPages: Math.ceil(total / limit) },
     } as AppResponse;
-
-  } catch (error: unknown) {
-    console.error("🚨 Inventory mutation rolled back safely:", error);
-    return {
-      success: false,
-      status: 400,
-      error: (error as Error).message || "Failed to process stock adjustment safely.",
-    } as AppResponse;
+  } catch (error) {
+    console.error("🚨 Error in getAdjustments:", error);
+    return { success: false, status: 500, error: "Failed to load adjustments." } as AppResponse;
   }
 }
-
-
-
-
+  
 //===================================================  
   /**
  * Fetches high-level summary statistics for a facility's dashboard widgets.
@@ -895,7 +1181,7 @@ static async getInventorySummary(facilityId: string): Promise<AppResponse> {
     // Perform database count queries concurrently
     const [totalItems, lowStockItems, expiringSoonItems, outOfStockItems] = await Promise.all([
       prisma.inventory.count({
-        where: { facilityId, isActive: true }
+        where: { facilityId, isActive: true,isDeleted: false}
       }),
       prisma.inventory.count({
         where: {

@@ -37,6 +37,9 @@ export type DrugMinAggregateOutputType = {
   categoryId: string | null
   isActive: boolean | null
   notes: string | null
+  isDeleted: boolean | null
+  isDeletedAt: Date | null
+  deletedBy: string | null
   createdAt: Date | null
   updatedAt: Date | null
 }
@@ -54,6 +57,9 @@ export type DrugMaxAggregateOutputType = {
   categoryId: string | null
   isActive: boolean | null
   notes: string | null
+  isDeleted: boolean | null
+  isDeletedAt: Date | null
+  deletedBy: string | null
   createdAt: Date | null
   updatedAt: Date | null
 }
@@ -71,6 +77,9 @@ export type DrugCountAggregateOutputType = {
   categoryId: number
   isActive: number
   notes: number
+  isDeleted: number
+  isDeletedAt: number
+  deletedBy: number
   createdAt: number
   updatedAt: number
   _all: number
@@ -90,6 +99,9 @@ export type DrugMinAggregateInputType = {
   categoryId?: true
   isActive?: true
   notes?: true
+  isDeleted?: true
+  isDeletedAt?: true
+  deletedBy?: true
   createdAt?: true
   updatedAt?: true
 }
@@ -107,6 +119,9 @@ export type DrugMaxAggregateInputType = {
   categoryId?: true
   isActive?: true
   notes?: true
+  isDeleted?: true
+  isDeletedAt?: true
+  deletedBy?: true
   createdAt?: true
   updatedAt?: true
 }
@@ -124,6 +139,9 @@ export type DrugCountAggregateInputType = {
   categoryId?: true
   isActive?: true
   notes?: true
+  isDeleted?: true
+  isDeletedAt?: true
+  deletedBy?: true
   createdAt?: true
   updatedAt?: true
   _all?: true
@@ -214,6 +232,9 @@ export type DrugGroupByOutputType = {
   categoryId: string | null
   isActive: boolean
   notes: string | null
+  isDeleted: boolean
+  isDeletedAt: Date | null
+  deletedBy: string | null
   createdAt: Date
   updatedAt: Date
   _count: DrugCountAggregateOutputType | null
@@ -252,6 +273,9 @@ export type DrugWhereInput = {
   categoryId?: Prisma.StringNullableFilter<"Drug"> | string | null
   isActive?: Prisma.BoolFilter<"Drug"> | boolean
   notes?: Prisma.StringNullableFilter<"Drug"> | string | null
+  isDeleted?: Prisma.BoolFilter<"Drug"> | boolean
+  isDeletedAt?: Prisma.DateTimeNullableFilter<"Drug"> | Date | string | null
+  deletedBy?: Prisma.StringNullableFilter<"Drug"> | string | null
   createdAt?: Prisma.DateTimeFilter<"Drug"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Drug"> | Date | string
   category?: Prisma.XOR<Prisma.DrugCategoryNullableScalarRelationFilter, Prisma.DrugCategoryWhereInput> | null
@@ -272,6 +296,9 @@ export type DrugOrderByWithRelationInput = {
   categoryId?: Prisma.SortOrderInput | Prisma.SortOrder
   isActive?: Prisma.SortOrder
   notes?: Prisma.SortOrderInput | Prisma.SortOrder
+  isDeleted?: Prisma.SortOrder
+  isDeletedAt?: Prisma.SortOrderInput | Prisma.SortOrder
+  deletedBy?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   category?: Prisma.DrugCategoryOrderByWithRelationInput
@@ -296,6 +323,9 @@ export type DrugWhereUniqueInput = Prisma.AtLeast<{
   categoryId?: Prisma.StringNullableFilter<"Drug"> | string | null
   isActive?: Prisma.BoolFilter<"Drug"> | boolean
   notes?: Prisma.StringNullableFilter<"Drug"> | string | null
+  isDeleted?: Prisma.BoolFilter<"Drug"> | boolean
+  isDeletedAt?: Prisma.DateTimeNullableFilter<"Drug"> | Date | string | null
+  deletedBy?: Prisma.StringNullableFilter<"Drug"> | string | null
   createdAt?: Prisma.DateTimeFilter<"Drug"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Drug"> | Date | string
   category?: Prisma.XOR<Prisma.DrugCategoryNullableScalarRelationFilter, Prisma.DrugCategoryWhereInput> | null
@@ -316,6 +346,9 @@ export type DrugOrderByWithAggregationInput = {
   categoryId?: Prisma.SortOrderInput | Prisma.SortOrder
   isActive?: Prisma.SortOrder
   notes?: Prisma.SortOrderInput | Prisma.SortOrder
+  isDeleted?: Prisma.SortOrder
+  isDeletedAt?: Prisma.SortOrderInput | Prisma.SortOrder
+  deletedBy?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   _count?: Prisma.DrugCountOrderByAggregateInput
@@ -339,6 +372,9 @@ export type DrugScalarWhereWithAggregatesInput = {
   categoryId?: Prisma.StringNullableWithAggregatesFilter<"Drug"> | string | null
   isActive?: Prisma.BoolWithAggregatesFilter<"Drug"> | boolean
   notes?: Prisma.StringNullableWithAggregatesFilter<"Drug"> | string | null
+  isDeleted?: Prisma.BoolWithAggregatesFilter<"Drug"> | boolean
+  isDeletedAt?: Prisma.DateTimeNullableWithAggregatesFilter<"Drug"> | Date | string | null
+  deletedBy?: Prisma.StringNullableWithAggregatesFilter<"Drug"> | string | null
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"Drug"> | Date | string
   updatedAt?: Prisma.DateTimeWithAggregatesFilter<"Drug"> | Date | string
 }
@@ -355,6 +391,9 @@ export type DrugCreateInput = {
   isControlled?: boolean
   isActive?: boolean
   notes?: string | null
+  isDeleted?: boolean
+  isDeletedAt?: Date | string | null
+  deletedBy?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   category?: Prisma.DrugCategoryCreateNestedOneWithoutDrugsInput
@@ -375,6 +414,9 @@ export type DrugUncheckedCreateInput = {
   categoryId?: string | null
   isActive?: boolean
   notes?: string | null
+  isDeleted?: boolean
+  isDeletedAt?: Date | string | null
+  deletedBy?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   inventories?: Prisma.InventoryUncheckedCreateNestedManyWithoutDrugInput
@@ -393,6 +435,9 @@ export type DrugUpdateInput = {
   isControlled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isDeleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isDeletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deletedBy?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   category?: Prisma.DrugCategoryUpdateOneWithoutDrugsNestedInput
@@ -413,6 +458,9 @@ export type DrugUncheckedUpdateInput = {
   categoryId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isDeleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isDeletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deletedBy?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   inventories?: Prisma.InventoryUncheckedUpdateManyWithoutDrugNestedInput
@@ -432,6 +480,9 @@ export type DrugCreateManyInput = {
   categoryId?: string | null
   isActive?: boolean
   notes?: string | null
+  isDeleted?: boolean
+  isDeletedAt?: Date | string | null
+  deletedBy?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -448,6 +499,9 @@ export type DrugUpdateManyMutationInput = {
   isControlled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isDeleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isDeletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deletedBy?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -465,6 +519,9 @@ export type DrugUncheckedUpdateManyInput = {
   categoryId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isDeleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isDeletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deletedBy?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -488,6 +545,9 @@ export type DrugCountOrderByAggregateInput = {
   categoryId?: Prisma.SortOrder
   isActive?: Prisma.SortOrder
   notes?: Prisma.SortOrder
+  isDeleted?: Prisma.SortOrder
+  isDeletedAt?: Prisma.SortOrder
+  deletedBy?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
 }
@@ -505,6 +565,9 @@ export type DrugMaxOrderByAggregateInput = {
   categoryId?: Prisma.SortOrder
   isActive?: Prisma.SortOrder
   notes?: Prisma.SortOrder
+  isDeleted?: Prisma.SortOrder
+  isDeletedAt?: Prisma.SortOrder
+  deletedBy?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
 }
@@ -522,6 +585,9 @@ export type DrugMinOrderByAggregateInput = {
   categoryId?: Prisma.SortOrder
   isActive?: Prisma.SortOrder
   notes?: Prisma.SortOrder
+  isDeleted?: Prisma.SortOrder
+  isDeletedAt?: Prisma.SortOrder
+  deletedBy?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
 }
@@ -631,6 +697,9 @@ export type DrugCreateWithoutCategoryInput = {
   isControlled?: boolean
   isActive?: boolean
   notes?: string | null
+  isDeleted?: boolean
+  isDeletedAt?: Date | string | null
+  deletedBy?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   inventories?: Prisma.InventoryCreateNestedManyWithoutDrugInput
@@ -649,6 +718,9 @@ export type DrugUncheckedCreateWithoutCategoryInput = {
   isControlled?: boolean
   isActive?: boolean
   notes?: string | null
+  isDeleted?: boolean
+  isDeletedAt?: Date | string | null
+  deletedBy?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   inventories?: Prisma.InventoryUncheckedCreateNestedManyWithoutDrugInput
@@ -697,6 +769,9 @@ export type DrugScalarWhereInput = {
   categoryId?: Prisma.StringNullableFilter<"Drug"> | string | null
   isActive?: Prisma.BoolFilter<"Drug"> | boolean
   notes?: Prisma.StringNullableFilter<"Drug"> | string | null
+  isDeleted?: Prisma.BoolFilter<"Drug"> | boolean
+  isDeletedAt?: Prisma.DateTimeNullableFilter<"Drug"> | Date | string | null
+  deletedBy?: Prisma.StringNullableFilter<"Drug"> | string | null
   createdAt?: Prisma.DateTimeFilter<"Drug"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Drug"> | Date | string
 }
@@ -713,6 +788,9 @@ export type DrugCreateWithoutInventoriesInput = {
   isControlled?: boolean
   isActive?: boolean
   notes?: string | null
+  isDeleted?: boolean
+  isDeletedAt?: Date | string | null
+  deletedBy?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   category?: Prisma.DrugCategoryCreateNestedOneWithoutDrugsInput
@@ -732,6 +810,9 @@ export type DrugUncheckedCreateWithoutInventoriesInput = {
   categoryId?: string | null
   isActive?: boolean
   notes?: string | null
+  isDeleted?: boolean
+  isDeletedAt?: Date | string | null
+  deletedBy?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   orderItems?: Prisma.OrderItemUncheckedCreateNestedManyWithoutDrugInput
@@ -765,6 +846,9 @@ export type DrugUpdateWithoutInventoriesInput = {
   isControlled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isDeleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isDeletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deletedBy?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   category?: Prisma.DrugCategoryUpdateOneWithoutDrugsNestedInput
@@ -784,6 +868,9 @@ export type DrugUncheckedUpdateWithoutInventoriesInput = {
   categoryId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isDeleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isDeletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deletedBy?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   orderItems?: Prisma.OrderItemUncheckedUpdateManyWithoutDrugNestedInput
@@ -801,6 +888,9 @@ export type DrugCreateWithoutOrderItemsInput = {
   isControlled?: boolean
   isActive?: boolean
   notes?: string | null
+  isDeleted?: boolean
+  isDeletedAt?: Date | string | null
+  deletedBy?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   category?: Prisma.DrugCategoryCreateNestedOneWithoutDrugsInput
@@ -820,6 +910,9 @@ export type DrugUncheckedCreateWithoutOrderItemsInput = {
   categoryId?: string | null
   isActive?: boolean
   notes?: string | null
+  isDeleted?: boolean
+  isDeletedAt?: Date | string | null
+  deletedBy?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   inventories?: Prisma.InventoryUncheckedCreateNestedManyWithoutDrugInput
@@ -853,6 +946,9 @@ export type DrugUpdateWithoutOrderItemsInput = {
   isControlled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isDeleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isDeletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deletedBy?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   category?: Prisma.DrugCategoryUpdateOneWithoutDrugsNestedInput
@@ -872,6 +968,9 @@ export type DrugUncheckedUpdateWithoutOrderItemsInput = {
   categoryId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isDeleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isDeletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deletedBy?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   inventories?: Prisma.InventoryUncheckedUpdateManyWithoutDrugNestedInput
@@ -889,6 +988,9 @@ export type DrugCreateManyCategoryInput = {
   isControlled?: boolean
   isActive?: boolean
   notes?: string | null
+  isDeleted?: boolean
+  isDeletedAt?: Date | string | null
+  deletedBy?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -905,6 +1007,9 @@ export type DrugUpdateWithoutCategoryInput = {
   isControlled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isDeleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isDeletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deletedBy?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   inventories?: Prisma.InventoryUpdateManyWithoutDrugNestedInput
@@ -923,6 +1028,9 @@ export type DrugUncheckedUpdateWithoutCategoryInput = {
   isControlled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isDeleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isDeletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deletedBy?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   inventories?: Prisma.InventoryUncheckedUpdateManyWithoutDrugNestedInput
@@ -941,6 +1049,9 @@ export type DrugUncheckedUpdateManyWithoutCategoryInput = {
   isControlled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isDeleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isDeletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deletedBy?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -998,6 +1109,9 @@ export type DrugSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = r
   categoryId?: boolean
   isActive?: boolean
   notes?: boolean
+  isDeleted?: boolean
+  isDeletedAt?: boolean
+  deletedBy?: boolean
   createdAt?: boolean
   updatedAt?: boolean
   category?: boolean | Prisma.Drug$categoryArgs<ExtArgs>
@@ -1019,6 +1133,9 @@ export type DrugSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensio
   categoryId?: boolean
   isActive?: boolean
   notes?: boolean
+  isDeleted?: boolean
+  isDeletedAt?: boolean
+  deletedBy?: boolean
   createdAt?: boolean
   updatedAt?: boolean
   category?: boolean | Prisma.Drug$categoryArgs<ExtArgs>
@@ -1037,6 +1154,9 @@ export type DrugSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensio
   categoryId?: boolean
   isActive?: boolean
   notes?: boolean
+  isDeleted?: boolean
+  isDeletedAt?: boolean
+  deletedBy?: boolean
   createdAt?: boolean
   updatedAt?: boolean
   category?: boolean | Prisma.Drug$categoryArgs<ExtArgs>
@@ -1055,11 +1175,14 @@ export type DrugSelectScalar = {
   categoryId?: boolean
   isActive?: boolean
   notes?: boolean
+  isDeleted?: boolean
+  isDeletedAt?: boolean
+  deletedBy?: boolean
   createdAt?: boolean
   updatedAt?: boolean
 }
 
-export type DrugOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "customId" | "name" | "genericName" | "strength" | "unit" | "dosageForm" | "description" | "isControlled" | "categoryId" | "isActive" | "notes" | "createdAt" | "updatedAt", ExtArgs["result"]["drug"]>
+export type DrugOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "customId" | "name" | "genericName" | "strength" | "unit" | "dosageForm" | "description" | "isControlled" | "categoryId" | "isActive" | "notes" | "isDeleted" | "isDeletedAt" | "deletedBy" | "createdAt" | "updatedAt", ExtArgs["result"]["drug"]>
 export type DrugInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   category?: boolean | Prisma.Drug$categoryArgs<ExtArgs>
   inventories?: boolean | Prisma.Drug$inventoriesArgs<ExtArgs>
@@ -1093,6 +1216,9 @@ export type $DrugPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs =
     categoryId: string | null
     isActive: boolean
     notes: string | null
+    isDeleted: boolean
+    isDeletedAt: Date | null
+    deletedBy: string | null
     createdAt: Date
     updatedAt: Date
   }, ExtArgs["result"]["drug"]>
@@ -1533,6 +1659,9 @@ export interface DrugFieldRefs {
   readonly categoryId: Prisma.FieldRef<"Drug", 'String'>
   readonly isActive: Prisma.FieldRef<"Drug", 'Boolean'>
   readonly notes: Prisma.FieldRef<"Drug", 'String'>
+  readonly isDeleted: Prisma.FieldRef<"Drug", 'Boolean'>
+  readonly isDeletedAt: Prisma.FieldRef<"Drug", 'DateTime'>
+  readonly deletedBy: Prisma.FieldRef<"Drug", 'String'>
   readonly createdAt: Prisma.FieldRef<"Drug", 'DateTime'>
   readonly updatedAt: Prisma.FieldRef<"Drug", 'DateTime'>
 }

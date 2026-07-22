@@ -33,7 +33,7 @@ export const useUserStore = create<UserStore>((set) => ({
     try {
       const queryString = filters ? `?${toQueryString(filters)}` : "";
       const response = await apiClient.get(`/pharmsync/users${queryString}`);
-      const usersData = response.data.data as UserListResponse['users'] || []
+      const usersData = response.data.data?.users as UserListResponse['users'] || []
       set({
         users: usersData,
         isLoading: false,

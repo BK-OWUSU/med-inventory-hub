@@ -14,10 +14,6 @@ export const drugFormSchema = z.object({
   dosageForm: z.nativeEnum(DosageForm).optional(),
   isControlled: z.boolean().default(false),
   description: z.string().max(500, "Description cannot exceed 500 characters").optional(),
-  // Additional configuration fields mapped from the optional UI layout section
-  minStockLevel: z.coerce.number().int().min(0).default(20),
-  manufacturer: z.string().optional(),
-  notes: z.string().max(300, "Notes cannot exceed 300 characters").optional(),
   isActive: z.boolean().default(true),
 });
 
@@ -35,11 +31,6 @@ export const updateDrugFormSchema = z.object({
   dosageForm: z.nativeEnum(DosageForm).optional(),
   isControlled: z.boolean().default(false),
   description: z.string().max(500, "Description cannot exceed 500 characters").optional().or(z.literal("")),
-  
-  // Coerces string inputs from HTML form elements to numbers cleanly
-  minStockLevel: z.coerce.number().int().min(0, "Minimum stock level must be at least 0").default(20),
-  manufacturer: z.string().optional().or(z.literal("")),
-  notes: z.string().max(300, "Notes cannot exceed 300 characters").optional().or(z.literal("")),
   isActive: z.boolean().default(true),
 });
 

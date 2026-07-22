@@ -197,7 +197,7 @@ export class UserService {
           fullName: validatedData.fullName.trim(),
           role: validatedData.role,
           phone: validatedData.phone?.trim() || null,
-          facilityId: validatedData.facilityId || null,
+          facilityId: facilityId,
           isActive: validatedData.isActive,
           needsPasswordChange: true,
         },
@@ -249,6 +249,12 @@ export class UserService {
         createdUser.fullName,
         "System Administration Portal"
       );
+      console.log("=========================")
+      console.log("TEM PASSWORD")
+      console.log("=========================")
+      console.log(tempPassword)
+      console.log("=========================")
+      console.log(createdUser)
     } catch (mailError) {
       console.error("⚠️ Mailer Error: User created, but email failed:", mailError);
       // We don't return failure here because the user record IS created successfully.

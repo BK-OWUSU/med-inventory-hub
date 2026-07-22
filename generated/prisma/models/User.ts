@@ -38,6 +38,9 @@ export type UserMinAggregateOutputType = {
   createdAt: Date | null
   updatedAt: Date | null
   lastLoginAt: Date | null
+  isDeleted: boolean | null
+  isDeletedAt: Date | null
+  deletedBy: string | null
 }
 
 export type UserMaxAggregateOutputType = {
@@ -54,6 +57,9 @@ export type UserMaxAggregateOutputType = {
   createdAt: Date | null
   updatedAt: Date | null
   lastLoginAt: Date | null
+  isDeleted: boolean | null
+  isDeletedAt: Date | null
+  deletedBy: string | null
 }
 
 export type UserCountAggregateOutputType = {
@@ -70,6 +76,9 @@ export type UserCountAggregateOutputType = {
   createdAt: number
   updatedAt: number
   lastLoginAt: number
+  isDeleted: number
+  isDeletedAt: number
+  deletedBy: number
   _all: number
 }
 
@@ -88,6 +97,9 @@ export type UserMinAggregateInputType = {
   createdAt?: true
   updatedAt?: true
   lastLoginAt?: true
+  isDeleted?: true
+  isDeletedAt?: true
+  deletedBy?: true
 }
 
 export type UserMaxAggregateInputType = {
@@ -104,6 +116,9 @@ export type UserMaxAggregateInputType = {
   createdAt?: true
   updatedAt?: true
   lastLoginAt?: true
+  isDeleted?: true
+  isDeletedAt?: true
+  deletedBy?: true
 }
 
 export type UserCountAggregateInputType = {
@@ -120,6 +135,9 @@ export type UserCountAggregateInputType = {
   createdAt?: true
   updatedAt?: true
   lastLoginAt?: true
+  isDeleted?: true
+  isDeletedAt?: true
+  deletedBy?: true
   _all?: true
 }
 
@@ -209,6 +227,9 @@ export type UserGroupByOutputType = {
   createdAt: Date
   updatedAt: Date
   lastLoginAt: Date | null
+  isDeleted: boolean
+  isDeletedAt: Date | null
+  deletedBy: string | null
   _count: UserCountAggregateOutputType | null
   _min: UserMinAggregateOutputType | null
   _max: UserMaxAggregateOutputType | null
@@ -246,6 +267,9 @@ export type UserWhereInput = {
   createdAt?: Prisma.DateTimeFilter<"User"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"User"> | Date | string
   lastLoginAt?: Prisma.DateTimeNullableFilter<"User"> | Date | string | null
+  isDeleted?: Prisma.BoolFilter<"User"> | boolean
+  isDeletedAt?: Prisma.DateTimeNullableFilter<"User"> | Date | string | null
+  deletedBy?: Prisma.StringNullableFilter<"User"> | string | null
   facility?: Prisma.XOR<Prisma.FacilityNullableScalarRelationFilter, Prisma.FacilityWhereInput> | null
   requestedOrders?: Prisma.OrderListRelationFilter
   approvedOrders?: Prisma.OrderListRelationFilter
@@ -269,6 +293,9 @@ export type UserOrderByWithRelationInput = {
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   lastLoginAt?: Prisma.SortOrderInput | Prisma.SortOrder
+  isDeleted?: Prisma.SortOrder
+  isDeletedAt?: Prisma.SortOrderInput | Prisma.SortOrder
+  deletedBy?: Prisma.SortOrderInput | Prisma.SortOrder
   facility?: Prisma.FacilityOrderByWithRelationInput
   requestedOrders?: Prisma.OrderOrderByRelationAggregateInput
   approvedOrders?: Prisma.OrderOrderByRelationAggregateInput
@@ -295,6 +322,9 @@ export type UserWhereUniqueInput = Prisma.AtLeast<{
   createdAt?: Prisma.DateTimeFilter<"User"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"User"> | Date | string
   lastLoginAt?: Prisma.DateTimeNullableFilter<"User"> | Date | string | null
+  isDeleted?: Prisma.BoolFilter<"User"> | boolean
+  isDeletedAt?: Prisma.DateTimeNullableFilter<"User"> | Date | string | null
+  deletedBy?: Prisma.StringNullableFilter<"User"> | string | null
   facility?: Prisma.XOR<Prisma.FacilityNullableScalarRelationFilter, Prisma.FacilityWhereInput> | null
   requestedOrders?: Prisma.OrderListRelationFilter
   approvedOrders?: Prisma.OrderListRelationFilter
@@ -318,6 +348,9 @@ export type UserOrderByWithAggregationInput = {
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   lastLoginAt?: Prisma.SortOrderInput | Prisma.SortOrder
+  isDeleted?: Prisma.SortOrder
+  isDeletedAt?: Prisma.SortOrderInput | Prisma.SortOrder
+  deletedBy?: Prisma.SortOrderInput | Prisma.SortOrder
   _count?: Prisma.UserCountOrderByAggregateInput
   _max?: Prisma.UserMaxOrderByAggregateInput
   _min?: Prisma.UserMinOrderByAggregateInput
@@ -340,6 +373,9 @@ export type UserScalarWhereWithAggregatesInput = {
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"User"> | Date | string
   updatedAt?: Prisma.DateTimeWithAggregatesFilter<"User"> | Date | string
   lastLoginAt?: Prisma.DateTimeNullableWithAggregatesFilter<"User"> | Date | string | null
+  isDeleted?: Prisma.BoolWithAggregatesFilter<"User"> | boolean
+  isDeletedAt?: Prisma.DateTimeNullableWithAggregatesFilter<"User"> | Date | string | null
+  deletedBy?: Prisma.StringNullableWithAggregatesFilter<"User"> | string | null
 }
 
 export type UserCreateInput = {
@@ -355,6 +391,9 @@ export type UserCreateInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   lastLoginAt?: Date | string | null
+  isDeleted?: boolean
+  isDeletedAt?: Date | string | null
+  deletedBy?: string | null
   facility?: Prisma.FacilityCreateNestedOneWithoutUsersInput
   requestedOrders?: Prisma.OrderCreateNestedManyWithoutRequestedByInput
   approvedOrders?: Prisma.OrderCreateNestedManyWithoutApprovedByInput
@@ -378,6 +417,9 @@ export type UserUncheckedCreateInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   lastLoginAt?: Date | string | null
+  isDeleted?: boolean
+  isDeletedAt?: Date | string | null
+  deletedBy?: string | null
   requestedOrders?: Prisma.OrderUncheckedCreateNestedManyWithoutRequestedByInput
   approvedOrders?: Prisma.OrderUncheckedCreateNestedManyWithoutApprovedByInput
   performedMovements?: Prisma.StockMovementUncheckedCreateNestedManyWithoutPerformedByInput
@@ -399,6 +441,9 @@ export type UserUpdateInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  isDeleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isDeletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deletedBy?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   facility?: Prisma.FacilityUpdateOneWithoutUsersNestedInput
   requestedOrders?: Prisma.OrderUpdateManyWithoutRequestedByNestedInput
   approvedOrders?: Prisma.OrderUpdateManyWithoutApprovedByNestedInput
@@ -422,6 +467,9 @@ export type UserUncheckedUpdateInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  isDeleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isDeletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deletedBy?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   requestedOrders?: Prisma.OrderUncheckedUpdateManyWithoutRequestedByNestedInput
   approvedOrders?: Prisma.OrderUncheckedUpdateManyWithoutApprovedByNestedInput
   performedMovements?: Prisma.StockMovementUncheckedUpdateManyWithoutPerformedByNestedInput
@@ -444,6 +492,9 @@ export type UserCreateManyInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   lastLoginAt?: Date | string | null
+  isDeleted?: boolean
+  isDeletedAt?: Date | string | null
+  deletedBy?: string | null
 }
 
 export type UserUpdateManyMutationInput = {
@@ -459,6 +510,9 @@ export type UserUpdateManyMutationInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  isDeleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isDeletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deletedBy?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
 }
 
 export type UserUncheckedUpdateManyInput = {
@@ -475,6 +529,9 @@ export type UserUncheckedUpdateManyInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  isDeleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isDeletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deletedBy?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
 }
 
 export type UserListRelationFilter = {
@@ -501,6 +558,9 @@ export type UserCountOrderByAggregateInput = {
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   lastLoginAt?: Prisma.SortOrder
+  isDeleted?: Prisma.SortOrder
+  isDeletedAt?: Prisma.SortOrder
+  deletedBy?: Prisma.SortOrder
 }
 
 export type UserMaxOrderByAggregateInput = {
@@ -517,6 +577,9 @@ export type UserMaxOrderByAggregateInput = {
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   lastLoginAt?: Prisma.SortOrder
+  isDeleted?: Prisma.SortOrder
+  isDeletedAt?: Prisma.SortOrder
+  deletedBy?: Prisma.SortOrder
 }
 
 export type UserMinOrderByAggregateInput = {
@@ -533,6 +596,9 @@ export type UserMinOrderByAggregateInput = {
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   lastLoginAt?: Prisma.SortOrder
+  isDeleted?: Prisma.SortOrder
+  isDeletedAt?: Prisma.SortOrder
+  deletedBy?: Prisma.SortOrder
 }
 
 export type UserScalarRelationFilter = {
@@ -589,10 +655,6 @@ export type UserUncheckedUpdateManyWithoutFacilityNestedInput = {
 
 export type EnumUserRoleFieldUpdateOperationsInput = {
   set?: $Enums.UserRole
-}
-
-export type NullableDateTimeFieldUpdateOperationsInput = {
-  set?: Date | string | null
 }
 
 export type UserCreateNestedOneWithoutUserSessionLogsInput = {
@@ -696,6 +758,9 @@ export type UserCreateWithoutFacilityInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   lastLoginAt?: Date | string | null
+  isDeleted?: boolean
+  isDeletedAt?: Date | string | null
+  deletedBy?: string | null
   requestedOrders?: Prisma.OrderCreateNestedManyWithoutRequestedByInput
   approvedOrders?: Prisma.OrderCreateNestedManyWithoutApprovedByInput
   performedMovements?: Prisma.StockMovementCreateNestedManyWithoutPerformedByInput
@@ -717,6 +782,9 @@ export type UserUncheckedCreateWithoutFacilityInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   lastLoginAt?: Date | string | null
+  isDeleted?: boolean
+  isDeletedAt?: Date | string | null
+  deletedBy?: string | null
   requestedOrders?: Prisma.OrderUncheckedCreateNestedManyWithoutRequestedByInput
   approvedOrders?: Prisma.OrderUncheckedCreateNestedManyWithoutApprovedByInput
   performedMovements?: Prisma.StockMovementUncheckedCreateNestedManyWithoutPerformedByInput
@@ -768,6 +836,9 @@ export type UserScalarWhereInput = {
   createdAt?: Prisma.DateTimeFilter<"User"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"User"> | Date | string
   lastLoginAt?: Prisma.DateTimeNullableFilter<"User"> | Date | string | null
+  isDeleted?: Prisma.BoolFilter<"User"> | boolean
+  isDeletedAt?: Prisma.DateTimeNullableFilter<"User"> | Date | string | null
+  deletedBy?: Prisma.StringNullableFilter<"User"> | string | null
 }
 
 export type UserCreateWithoutUserSessionLogsInput = {
@@ -783,6 +854,9 @@ export type UserCreateWithoutUserSessionLogsInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   lastLoginAt?: Date | string | null
+  isDeleted?: boolean
+  isDeletedAt?: Date | string | null
+  deletedBy?: string | null
   facility?: Prisma.FacilityCreateNestedOneWithoutUsersInput
   requestedOrders?: Prisma.OrderCreateNestedManyWithoutRequestedByInput
   approvedOrders?: Prisma.OrderCreateNestedManyWithoutApprovedByInput
@@ -805,6 +879,9 @@ export type UserUncheckedCreateWithoutUserSessionLogsInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   lastLoginAt?: Date | string | null
+  isDeleted?: boolean
+  isDeletedAt?: Date | string | null
+  deletedBy?: string | null
   requestedOrders?: Prisma.OrderUncheckedCreateNestedManyWithoutRequestedByInput
   approvedOrders?: Prisma.OrderUncheckedCreateNestedManyWithoutApprovedByInput
   performedMovements?: Prisma.StockMovementUncheckedCreateNestedManyWithoutPerformedByInput
@@ -841,6 +918,9 @@ export type UserUpdateWithoutUserSessionLogsInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  isDeleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isDeletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deletedBy?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   facility?: Prisma.FacilityUpdateOneWithoutUsersNestedInput
   requestedOrders?: Prisma.OrderUpdateManyWithoutRequestedByNestedInput
   approvedOrders?: Prisma.OrderUpdateManyWithoutApprovedByNestedInput
@@ -863,6 +943,9 @@ export type UserUncheckedUpdateWithoutUserSessionLogsInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  isDeleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isDeletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deletedBy?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   requestedOrders?: Prisma.OrderUncheckedUpdateManyWithoutRequestedByNestedInput
   approvedOrders?: Prisma.OrderUncheckedUpdateManyWithoutApprovedByNestedInput
   performedMovements?: Prisma.StockMovementUncheckedUpdateManyWithoutPerformedByNestedInput
@@ -883,6 +966,9 @@ export type UserCreateWithoutRequestedOrdersInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   lastLoginAt?: Date | string | null
+  isDeleted?: boolean
+  isDeletedAt?: Date | string | null
+  deletedBy?: string | null
   facility?: Prisma.FacilityCreateNestedOneWithoutUsersInput
   approvedOrders?: Prisma.OrderCreateNestedManyWithoutApprovedByInput
   performedMovements?: Prisma.StockMovementCreateNestedManyWithoutPerformedByInput
@@ -905,6 +991,9 @@ export type UserUncheckedCreateWithoutRequestedOrdersInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   lastLoginAt?: Date | string | null
+  isDeleted?: boolean
+  isDeletedAt?: Date | string | null
+  deletedBy?: string | null
   approvedOrders?: Prisma.OrderUncheckedCreateNestedManyWithoutApprovedByInput
   performedMovements?: Prisma.StockMovementUncheckedCreateNestedManyWithoutPerformedByInput
   auditLogs?: Prisma.AuditLogUncheckedCreateNestedManyWithoutUserInput
@@ -930,6 +1019,9 @@ export type UserCreateWithoutApprovedOrdersInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   lastLoginAt?: Date | string | null
+  isDeleted?: boolean
+  isDeletedAt?: Date | string | null
+  deletedBy?: string | null
   facility?: Prisma.FacilityCreateNestedOneWithoutUsersInput
   requestedOrders?: Prisma.OrderCreateNestedManyWithoutRequestedByInput
   performedMovements?: Prisma.StockMovementCreateNestedManyWithoutPerformedByInput
@@ -952,6 +1044,9 @@ export type UserUncheckedCreateWithoutApprovedOrdersInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   lastLoginAt?: Date | string | null
+  isDeleted?: boolean
+  isDeletedAt?: Date | string | null
+  deletedBy?: string | null
   requestedOrders?: Prisma.OrderUncheckedCreateNestedManyWithoutRequestedByInput
   performedMovements?: Prisma.StockMovementUncheckedCreateNestedManyWithoutPerformedByInput
   auditLogs?: Prisma.AuditLogUncheckedCreateNestedManyWithoutUserInput
@@ -988,6 +1083,9 @@ export type UserUpdateWithoutRequestedOrdersInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  isDeleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isDeletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deletedBy?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   facility?: Prisma.FacilityUpdateOneWithoutUsersNestedInput
   approvedOrders?: Prisma.OrderUpdateManyWithoutApprovedByNestedInput
   performedMovements?: Prisma.StockMovementUpdateManyWithoutPerformedByNestedInput
@@ -1010,6 +1108,9 @@ export type UserUncheckedUpdateWithoutRequestedOrdersInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  isDeleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isDeletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deletedBy?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   approvedOrders?: Prisma.OrderUncheckedUpdateManyWithoutApprovedByNestedInput
   performedMovements?: Prisma.StockMovementUncheckedUpdateManyWithoutPerformedByNestedInput
   auditLogs?: Prisma.AuditLogUncheckedUpdateManyWithoutUserNestedInput
@@ -1041,6 +1142,9 @@ export type UserUpdateWithoutApprovedOrdersInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  isDeleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isDeletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deletedBy?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   facility?: Prisma.FacilityUpdateOneWithoutUsersNestedInput
   requestedOrders?: Prisma.OrderUpdateManyWithoutRequestedByNestedInput
   performedMovements?: Prisma.StockMovementUpdateManyWithoutPerformedByNestedInput
@@ -1063,6 +1167,9 @@ export type UserUncheckedUpdateWithoutApprovedOrdersInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  isDeleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isDeletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deletedBy?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   requestedOrders?: Prisma.OrderUncheckedUpdateManyWithoutRequestedByNestedInput
   performedMovements?: Prisma.StockMovementUncheckedUpdateManyWithoutPerformedByNestedInput
   auditLogs?: Prisma.AuditLogUncheckedUpdateManyWithoutUserNestedInput
@@ -1083,6 +1190,9 @@ export type UserCreateWithoutPerformedMovementsInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   lastLoginAt?: Date | string | null
+  isDeleted?: boolean
+  isDeletedAt?: Date | string | null
+  deletedBy?: string | null
   facility?: Prisma.FacilityCreateNestedOneWithoutUsersInput
   requestedOrders?: Prisma.OrderCreateNestedManyWithoutRequestedByInput
   approvedOrders?: Prisma.OrderCreateNestedManyWithoutApprovedByInput
@@ -1105,6 +1215,9 @@ export type UserUncheckedCreateWithoutPerformedMovementsInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   lastLoginAt?: Date | string | null
+  isDeleted?: boolean
+  isDeletedAt?: Date | string | null
+  deletedBy?: string | null
   requestedOrders?: Prisma.OrderUncheckedCreateNestedManyWithoutRequestedByInput
   approvedOrders?: Prisma.OrderUncheckedCreateNestedManyWithoutApprovedByInput
   auditLogs?: Prisma.AuditLogUncheckedCreateNestedManyWithoutUserInput
@@ -1141,6 +1254,9 @@ export type UserUpdateWithoutPerformedMovementsInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  isDeleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isDeletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deletedBy?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   facility?: Prisma.FacilityUpdateOneWithoutUsersNestedInput
   requestedOrders?: Prisma.OrderUpdateManyWithoutRequestedByNestedInput
   approvedOrders?: Prisma.OrderUpdateManyWithoutApprovedByNestedInput
@@ -1163,6 +1279,9 @@ export type UserUncheckedUpdateWithoutPerformedMovementsInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  isDeleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isDeletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deletedBy?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   requestedOrders?: Prisma.OrderUncheckedUpdateManyWithoutRequestedByNestedInput
   approvedOrders?: Prisma.OrderUncheckedUpdateManyWithoutApprovedByNestedInput
   auditLogs?: Prisma.AuditLogUncheckedUpdateManyWithoutUserNestedInput
@@ -1183,6 +1302,9 @@ export type UserCreateWithoutNotificationRecipientsInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   lastLoginAt?: Date | string | null
+  isDeleted?: boolean
+  isDeletedAt?: Date | string | null
+  deletedBy?: string | null
   facility?: Prisma.FacilityCreateNestedOneWithoutUsersInput
   requestedOrders?: Prisma.OrderCreateNestedManyWithoutRequestedByInput
   approvedOrders?: Prisma.OrderCreateNestedManyWithoutApprovedByInput
@@ -1205,6 +1327,9 @@ export type UserUncheckedCreateWithoutNotificationRecipientsInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   lastLoginAt?: Date | string | null
+  isDeleted?: boolean
+  isDeletedAt?: Date | string | null
+  deletedBy?: string | null
   requestedOrders?: Prisma.OrderUncheckedCreateNestedManyWithoutRequestedByInput
   approvedOrders?: Prisma.OrderUncheckedCreateNestedManyWithoutApprovedByInput
   performedMovements?: Prisma.StockMovementUncheckedCreateNestedManyWithoutPerformedByInput
@@ -1241,6 +1366,9 @@ export type UserUpdateWithoutNotificationRecipientsInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  isDeleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isDeletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deletedBy?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   facility?: Prisma.FacilityUpdateOneWithoutUsersNestedInput
   requestedOrders?: Prisma.OrderUpdateManyWithoutRequestedByNestedInput
   approvedOrders?: Prisma.OrderUpdateManyWithoutApprovedByNestedInput
@@ -1263,6 +1391,9 @@ export type UserUncheckedUpdateWithoutNotificationRecipientsInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  isDeleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isDeletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deletedBy?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   requestedOrders?: Prisma.OrderUncheckedUpdateManyWithoutRequestedByNestedInput
   approvedOrders?: Prisma.OrderUncheckedUpdateManyWithoutApprovedByNestedInput
   performedMovements?: Prisma.StockMovementUncheckedUpdateManyWithoutPerformedByNestedInput
@@ -1283,6 +1414,9 @@ export type UserCreateWithoutAuditLogsInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   lastLoginAt?: Date | string | null
+  isDeleted?: boolean
+  isDeletedAt?: Date | string | null
+  deletedBy?: string | null
   facility?: Prisma.FacilityCreateNestedOneWithoutUsersInput
   requestedOrders?: Prisma.OrderCreateNestedManyWithoutRequestedByInput
   approvedOrders?: Prisma.OrderCreateNestedManyWithoutApprovedByInput
@@ -1305,6 +1439,9 @@ export type UserUncheckedCreateWithoutAuditLogsInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   lastLoginAt?: Date | string | null
+  isDeleted?: boolean
+  isDeletedAt?: Date | string | null
+  deletedBy?: string | null
   requestedOrders?: Prisma.OrderUncheckedCreateNestedManyWithoutRequestedByInput
   approvedOrders?: Prisma.OrderUncheckedCreateNestedManyWithoutApprovedByInput
   performedMovements?: Prisma.StockMovementUncheckedCreateNestedManyWithoutPerformedByInput
@@ -1341,6 +1478,9 @@ export type UserUpdateWithoutAuditLogsInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  isDeleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isDeletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deletedBy?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   facility?: Prisma.FacilityUpdateOneWithoutUsersNestedInput
   requestedOrders?: Prisma.OrderUpdateManyWithoutRequestedByNestedInput
   approvedOrders?: Prisma.OrderUpdateManyWithoutApprovedByNestedInput
@@ -1363,6 +1503,9 @@ export type UserUncheckedUpdateWithoutAuditLogsInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  isDeleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isDeletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deletedBy?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   requestedOrders?: Prisma.OrderUncheckedUpdateManyWithoutRequestedByNestedInput
   approvedOrders?: Prisma.OrderUncheckedUpdateManyWithoutApprovedByNestedInput
   performedMovements?: Prisma.StockMovementUncheckedUpdateManyWithoutPerformedByNestedInput
@@ -1383,6 +1526,9 @@ export type UserCreateManyFacilityInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   lastLoginAt?: Date | string | null
+  isDeleted?: boolean
+  isDeletedAt?: Date | string | null
+  deletedBy?: string | null
 }
 
 export type UserUpdateWithoutFacilityInput = {
@@ -1398,6 +1544,9 @@ export type UserUpdateWithoutFacilityInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  isDeleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isDeletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deletedBy?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   requestedOrders?: Prisma.OrderUpdateManyWithoutRequestedByNestedInput
   approvedOrders?: Prisma.OrderUpdateManyWithoutApprovedByNestedInput
   performedMovements?: Prisma.StockMovementUpdateManyWithoutPerformedByNestedInput
@@ -1419,6 +1568,9 @@ export type UserUncheckedUpdateWithoutFacilityInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  isDeleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isDeletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deletedBy?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   requestedOrders?: Prisma.OrderUncheckedUpdateManyWithoutRequestedByNestedInput
   approvedOrders?: Prisma.OrderUncheckedUpdateManyWithoutApprovedByNestedInput
   performedMovements?: Prisma.StockMovementUncheckedUpdateManyWithoutPerformedByNestedInput
@@ -1440,6 +1592,9 @@ export type UserUncheckedUpdateManyWithoutFacilityInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   lastLoginAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  isDeleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isDeletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deletedBy?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
 }
 
 
@@ -1532,6 +1687,9 @@ export type UserSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = r
   createdAt?: boolean
   updatedAt?: boolean
   lastLoginAt?: boolean
+  isDeleted?: boolean
+  isDeletedAt?: boolean
+  deletedBy?: boolean
   facility?: boolean | Prisma.User$facilityArgs<ExtArgs>
   requestedOrders?: boolean | Prisma.User$requestedOrdersArgs<ExtArgs>
   approvedOrders?: boolean | Prisma.User$approvedOrdersArgs<ExtArgs>
@@ -1556,6 +1714,9 @@ export type UserSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensio
   createdAt?: boolean
   updatedAt?: boolean
   lastLoginAt?: boolean
+  isDeleted?: boolean
+  isDeletedAt?: boolean
+  deletedBy?: boolean
   facility?: boolean | Prisma.User$facilityArgs<ExtArgs>
 }, ExtArgs["result"]["user"]>
 
@@ -1573,6 +1734,9 @@ export type UserSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensio
   createdAt?: boolean
   updatedAt?: boolean
   lastLoginAt?: boolean
+  isDeleted?: boolean
+  isDeletedAt?: boolean
+  deletedBy?: boolean
   facility?: boolean | Prisma.User$facilityArgs<ExtArgs>
 }, ExtArgs["result"]["user"]>
 
@@ -1590,9 +1754,12 @@ export type UserSelectScalar = {
   createdAt?: boolean
   updatedAt?: boolean
   lastLoginAt?: boolean
+  isDeleted?: boolean
+  isDeletedAt?: boolean
+  deletedBy?: boolean
 }
 
-export type UserOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "customId" | "email" | "password" | "fullName" | "role" | "phone" | "facilityId" | "needsPasswordChange" | "isActive" | "createdAt" | "updatedAt" | "lastLoginAt", ExtArgs["result"]["user"]>
+export type UserOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "customId" | "email" | "password" | "fullName" | "role" | "phone" | "facilityId" | "needsPasswordChange" | "isActive" | "createdAt" | "updatedAt" | "lastLoginAt" | "isDeleted" | "isDeletedAt" | "deletedBy", ExtArgs["result"]["user"]>
 export type UserInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   facility?: boolean | Prisma.User$facilityArgs<ExtArgs>
   requestedOrders?: boolean | Prisma.User$requestedOrdersArgs<ExtArgs>
@@ -1635,6 +1802,9 @@ export type $UserPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs =
     createdAt: Date
     updatedAt: Date
     lastLoginAt: Date | null
+    isDeleted: boolean
+    isDeletedAt: Date | null
+    deletedBy: string | null
   }, ExtArgs["result"]["user"]>
   composites: {}
 }
@@ -2078,6 +2248,9 @@ export interface UserFieldRefs {
   readonly createdAt: Prisma.FieldRef<"User", 'DateTime'>
   readonly updatedAt: Prisma.FieldRef<"User", 'DateTime'>
   readonly lastLoginAt: Prisma.FieldRef<"User", 'DateTime'>
+  readonly isDeleted: Prisma.FieldRef<"User", 'Boolean'>
+  readonly isDeletedAt: Prisma.FieldRef<"User", 'DateTime'>
+  readonly deletedBy: Prisma.FieldRef<"User", 'String'>
 }
     
 

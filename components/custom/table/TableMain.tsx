@@ -188,7 +188,7 @@ export default function TableMain<TData, TValue>({columns, data, searchKey, plac
                 position: 'sticky',
                 left: 0,
                 zIndex: 5,
-                backgroundColor: "#162456"
+                backgroundColor: "#172"
              }
         }
         return {};

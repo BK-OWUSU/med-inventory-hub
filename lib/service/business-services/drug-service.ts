@@ -32,6 +32,12 @@ export class DrugService {
    * @param facilityId The ID of the current facility where this inventory stock is localized
    * @param ipAddress Optional IP trace
    */
+
+/**
+   * Creates a new global drug entry in the system registry database.
+   * Note: This registers the drug in the catalog only; inventory 
+   * must be initialized via createDrugBatch.
+   */
   static async createDrug(
     payload: DrugFormValues, 
     userId: string, 
@@ -52,7 +58,6 @@ export class DrugService {
       const validatedData = validation.data;
 
       // 2. Enforce structural duplicate checking based on the compound index
-      // @@unique([name, strength, dosageForm])
       const uniqueTarget = {
         name: validatedData.name.trim(),
         strength: validatedData.strength?.trim() || undefined, 
@@ -81,10 +86,11 @@ export class DrugService {
         UserRole.STAFF,
         UserRole.VIEWER,
       ], userId);
-      // 3. Run creation transaction block to isolate custom sequential ID generation 
+
+      // 3. Run creation transaction block
       const newDrug = await prisma.$transaction(async (tx) => {
         
-        // Generate unique customId sequence string using your utility.
+        // Generate unique customId sequence
         const customDrugId = await generateNextCustomId({
           tx,
           facilityId: facilityId, 
@@ -92,7 +98,7 @@ export class DrugService {
           prefix: "DRG",
         });
 
-        // Create the core drug row along with its initialized localized facility inventory
+        // Create the core drug row ONLY (No nested inventory creation)
         const drug = await tx.drug.create({
           data: {
             customId: customDrugId,
@@ -100,35 +106,18 @@ export class DrugService {
             genericName: validatedData.genericName?.trim() || null,
             strength: uniqueTarget.strength,
             unit: validatedData.unit,
-            notes: validatedData.notes,
             dosageForm: uniqueTarget.dosageForm,
             description: validatedData.description?.trim() || null,
             isControlled: validatedData.isControlled,
             categoryId: validatedData.categoryId?.trim() === "" ? null : validatedData.categoryId,
             isActive: validatedData.isActive,
-            
-            // Nested Relational Write: Create corresponding Facility Inventory Entry
-            inventories: {
-              create: {
-                facilityId: facilityId,
-                manufacturer: validatedData.manufacturer?.trim() || null,
-                minStockLevel: validatedData.minStockLevel ?? 20,
-                availableQuantity: 0, // Freshly registered catalog items start with 0 physical items
-                isActive: true,
-              }
-            }
           },
           include: {
             category: true,
-            inventories: {
-              where: {
-                facilityId: facilityId
-              }
-            }
           }
         });
 
-        // 4. Document transaction write trace parameters natively to system AuditLog
+        // 4. Document Audit Log
         await tx.auditLog.create({
           data: {
             userId: userId,
@@ -138,36 +127,30 @@ export class DrugService {
             entityId: drug.id,
             ipAddress: ipAddress || null,
             details: {
-              message: "New pharmaceutical formulation asset successfully registered globally, and initialized in local facility stock inventory.",
+              message: "New pharmaceutical formulation asset successfully registered in the catalog.",
               customId: drug.customId,
               name: drug.name,
               strength: drug.strength,
               dosageForm: drug.dosageForm,
               unitPack: drug.unit,
               isControlled: drug.isControlled,
-              minStockLevel: validatedData.minStockLevel ?? 20,
-              manufacturer: validatedData.manufacturer || null,
             },
           },
         });
 
-
+        // 5. Notify
         if (recipientIds.length === 0) {
             console.warn(`⚠️ Notification Triggered, but no recipients found Facility: ${facilityId}`);
-            // Optional: You could fallback to a 'SYSTEM' user or log this to a monitoring tool
-          } else {   
+        } else {   
             await NotificationService.createNotificationInTx(
               tx,
               facilityId,
               "New Drug Catalog Entry",
-              `New item added: ${drug.name} (${drug.strength || 'N/A'}). It has been initialized in your facility inventory.`,
+              `New item registered in catalog: ${drug.name} (${drug.strength || 'N/A'}). You can now add inventory batches for this item.`,
                NotificationType.INVENTORY, 
                recipientIds
             );
-          }
-
-
-        // --- TRANSACTIONAL NOTIFICATION ---
+        }
 
         return drug;
       });
@@ -175,7 +158,7 @@ export class DrugService {
       return {
         success: true,
         status: 201,
-        message: "Pharmaceutical drug asset successfully registered and inventory record initialized.",
+        message: "Pharmaceutical drug asset successfully registered to the catalog.",
         data: newDrug,
       } as AppResponse;
 
@@ -184,12 +167,11 @@ export class DrugService {
       return {
         success: false,
         status: 500,
-        error: "Internal database service database transaction failure during formulation mapping.",
+        error: "Internal database transaction failure during formulation mapping.",
       } as AppResponse;
     }
   }
-
-
+ 
 /**
    * Updates an existing drug registry asset.
    * Modifies both the core global drug metadata and the local facility's inventory specifications (minStockLevel, manufacturer).
@@ -200,7 +182,7 @@ export class DrugService {
    * @param facilityId The ID of the current facility where this inventory stock is localized
    * @param ipAddress Optional IP trace
    */
-  static async updateDrug(
+static async updateDrug(
     id: string, 
     payload: UpdateDrugFormValues, 
     userId: string, 
@@ -225,15 +207,7 @@ export class DrugService {
 
       // 2. Fetch target drug instance to verify existence
       const currentDrug = await prisma.drug.findUnique({
-        where: { id },
-        include: {
-          inventories: {
-            where: { 
-              facilityId,
-              batchNumber: null // Querying the base inventory record
-            }
-          }
-        }
+        where: { id }
       });
 
       if (!currentDrug) {
@@ -243,8 +217,6 @@ export class DrugService {
           error: "The targeted drug record could not be located for modification.",
         } as AppResponse;
       }
-
-      const currentLocalInventory = currentDrug.inventories?.[0] || null;
 
       // 3. Proactive Unique Compound Index Conflict Checking
       const hasCompoundKeyShifted =
@@ -271,12 +243,12 @@ export class DrugService {
         }
       }
 
-             const recipientIds = await NotificationService.getRecipientIdsByRoles(facilityId, [
-                UserRole.ADMIN,
-                UserRole.PHARMACIST,
-                UserRole.STAFF,
-                UserRole.VIEWER,
-            ], userId);
+      const recipientIds = await NotificationService.getRecipientIdsByRoles(facilityId, [
+        UserRole.ADMIN,
+        UserRole.PHARMACIST,
+        UserRole.STAFF,
+        UserRole.VIEWER,
+      ], userId);
 
       // 4. Execute atomic database records updates
       const updatedDrug = await prisma.$transaction(async (tx) => {
@@ -294,108 +266,58 @@ export class DrugService {
             isControlled: validatedData.isControlled,
             categoryId: validatedData.categoryId?.trim() === "" ? null : validatedData.categoryId,
             isActive: validatedData.isActive,
-            notes: validatedData.notes,
           }
         });
 
-        // Step B: Upsert the base facility inventory record using explicit findFirst checks
-        const targetInventory = await tx.inventory.findFirst({
-          where: {
-            facilityId,
-            drugId: id,
-            batchNumber: null // Explicitly looking for the global/base batch
-          }
-        });
-
-        if (targetInventory) {
-          // If the inventory card exists, perform an update matching on the unique internal primary CUID
-          await tx.inventory.update({
-            where: { id: targetInventory.id },
-            data: {
-              minStockLevel: validatedData.minStockLevel ?? 20,
-              manufacturer: validatedData.manufacturer?.trim() || null,
-            }
-          });
-        } else {
-          // If there is no base inventory record yet, write it
-          await tx.inventory.create({
-            data: {
-              facilityId,
-              drugId: id,
-              minStockLevel: validatedData.minStockLevel ?? 20,
-              manufacturer: validatedData.manufacturer?.trim() || null,
-              availableQuantity: 0,
-              batchNumber: null,
-              isActive: true,
-            }
-          });
-        }
-
-        // Re-fetch updated drug with the localized inventory structure to return to user
+        // Re-fetch updated drug to return to user
         const finalDrugPayload = await tx.drug.findUniqueOrThrow({
           where: { id },
           include: {
             category: true,
-            inventories: {
-              where: {
-                facilityId,
-                batchNumber: null
-              }
-            }
           }
         });
-
-        const updatedLocalInventory = finalDrugPayload.inventories?.[0] || null;
 
         // 5. Document transaction write traces natively to system AuditLog
         await tx.auditLog.create({
           data: {
             userId: userId,
             facilityId: facilityId, 
-            action: AuditAction.INVENTORY_UPDATED, 
+            action: AuditAction.DRUG_UPDATED, 
             entityType: AuditEntity.DRUG,
             entityId: drug.id,
             ipAddress: ipAddress || null,
             details: {
-              message: "Pharmaceutical specification asset details successfully modified globally and locally.",
+              message: "Pharmaceutical specification asset details successfully modified.",
               customId: drug.customId,
               previousState: {
                 name: currentDrug.name,
                 strength: currentDrug.strength,
                 dosageForm: currentDrug.dosageForm,
                 isActive: currentDrug.isActive,
-                minStockLevel: currentLocalInventory?.minStockLevel ?? "N/A",
-                manufacturer: currentLocalInventory?.manufacturer ?? "N/A",
               },
               newState: {
                 name: finalDrugPayload.name,
                 strength: finalDrugPayload.strength,
                 dosageForm: finalDrugPayload.dosageForm,
                 isActive: finalDrugPayload.isActive,
-                minStockLevel: updatedLocalInventory?.minStockLevel ?? "N/A",
-                manufacturer: updatedLocalInventory?.manufacturer ?? "N/A",
               },
             },
           },
         });
 
-
         if (recipientIds.length === 0) {
             console.warn(`⚠️ Notification Triggered, but no recipients found Facility: ${facilityId}`);
-            // Optional: You could fallback to a 'SYSTEM' user or log this to a monitoring tool
-          } else {            
+        } else {            
             // --- TRANSACTIONAL NOTIFICATION ---
             await NotificationService.createNotificationInTx(
               tx,
               facilityId,
               "Drug Specification Updated",
-              `The profile for "${drug.name}" has been updated. Please verify any changes to min stock levels or manufacturer info.`,
-              NotificationType.INVENTORY,
+              `The profile for "${drug.name}" has been updated.`,
+              NotificationType.INVENTORY, // Keep as INVENTORY if it's the standard category or update to DRUG_MANAGEMENT if needed
               recipientIds
             );
-          }
-
-
+        }
 
         return finalDrugPayload;
       });
@@ -403,7 +325,7 @@ export class DrugService {
       return {
         success: true,
         status: 200,
-        message: "Pharmaceutical drug parameters and inventory rules updated successfully.",
+        message: "Pharmaceutical drug parameters updated successfully.",
         data: updatedDrug,
       } as AppResponse;
 
@@ -428,6 +350,7 @@ export class DrugService {
     search?: string;
     categoryId?: string;
     isActive?: boolean;
+    isDeleted: boolean;
     // Note: We make facilityId optional now. 
     // If passed, we can prioritize it in our UI, but we don't block other facility data.
     facilityId?: string; 
@@ -439,6 +362,10 @@ export class DrugService {
 
       const whereClause: Prisma.DrugWhereInput = {};
 
+
+      if (typeof params.isDeleted === "boolean") {
+        whereClause.isDeleted = params.isDeleted === true;
+      }
       if (typeof params.isActive === "boolean") {
         whereClause.isActive = params.isActive;
       }
@@ -540,6 +467,7 @@ export class DrugService {
               inventories: {
                 where: {
                   isActive: true,
+                  isDeleted: false,
                   availableQuantity: { gt: 0 }, // Identifies non-zero live inventory states
                 },
               },
@@ -587,7 +515,12 @@ export class DrugService {
         // Step A: Mark the main drug specification record as inactive
         const updated = await tx.drug.update({
           where: { id },
-          data: { isActive: false },
+          data: {
+            isActive: false, 
+            isDeleted:true,
+            isDeletedAt: new Date(),
+            deletedBy: userId 
+          },
         });
 
         // Step B: Cascaded deactivate: Mark all associated inventory records as inactive as well
@@ -690,7 +623,7 @@ export class DrugService {
       }
 
       // 2. Already active validation catch
-      if (drug.isActive) {
+      if (drug.isActive && !drug.isDeleted) {
         return {
           success: true,
           status: 200,
@@ -729,7 +662,7 @@ export class DrugService {
         // Step A: Mark the main drug specification record as active
         const updated = await tx.drug.update({
           where: { id },
-          data: { isActive: true },
+          data: { isActive: true, isDeleted: false },
         });
 
         // Step B: Cascade activation back down to related inventory rows
@@ -940,19 +873,7 @@ export class DrugService {
               isControlled: drugData.isControlled,
               categoryId: drugData.categoryId?.trim() === "" ? null : drugData.categoryId,
               isActive: drugData.isActive,
-              notes: drugData.notes,
               description: drugData.description?.trim() || null,
-
-              // Relation Write: Atomically create the base inventory slot for this facility
-              inventories: {
-                create: {
-                  facilityId: facilityId,
-                  manufacturer: drugData.manufacturer?.trim() || null,
-                  minStockLevel: drugData.minStockLevel ?? 20,
-                  availableQuantity: 0, // Starts at zero stock until manually received via order
-                  isActive: true,
-                }
-              }
             },
           });
 
@@ -964,12 +885,12 @@ export class DrugService {
           data: {
             userId: userId,
             facilityId: facilityId,
-            action: AuditAction.INVENTORY_CREATED,
+            action: AuditAction.DRUG_CREATED, // Updated to reflect entity creation
             ipAddress: ipAddress || null,
             entityType: AuditEntity.DRUG,
             entityId: "BULK_IMPORT",
             details: {
-              message: "Pharmaceutical specification registry bulk import completed with atomic facility inventory mappings.",
+              message: "Pharmaceutical specification registry bulk import completed.",
               totalPassedRowsInserted: insertedDrugs.length,
               totalFailedRowsRejected: failedRows.length,
               importedByUserId: userId,
@@ -977,11 +898,9 @@ export class DrugService {
           },
         });
 
-
         if (recipientIds.length === 0) {
             console.warn(`⚠️ Notification Triggered, but no recipients found Facility: ${facilityId}`);
-            // Optional: You could fallback to a 'SYSTEM' user or log this to a monitoring tool
-          } else {            
+        } else {            
             if (insertedDrugs.length > 0) {
               const failureNote = failedRows.length > 0 
                 ? ` Note: ${failedRows.length} rows were skipped due to validation or conflict errors.` 
@@ -995,9 +914,7 @@ export class DrugService {
                 recipientIds
               );
             }
-          }
-
-
+        }
 
         return insertedDrugs;
       });
@@ -1005,7 +922,7 @@ export class DrugService {
       return {
         success: true,
         status: 201,
-        message: `Bulk processing completed. Successfully imported ${transactionResult.length} assets and initialized their localized inventories. Rejected ${failedRows.length} lines.`,
+        message: `Bulk processing completed. Successfully imported ${transactionResult.length} assets. Rejected ${failedRows.length} lines.`,
         data: {
           insertedCount: transactionResult.length,
           rejectedCount: failedRows.length,

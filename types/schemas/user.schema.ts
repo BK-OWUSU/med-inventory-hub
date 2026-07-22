@@ -14,7 +14,6 @@ export const CreateUserSchema = z.object({
     required_error: "Please specify the user role",
   }),
   phone: z.string().optional().nullable().or(z.literal("")),
-  facilityId: z.string().optional().nullable(),
   isActive: z.boolean().default(true),
   needsPasswordChange: z.boolean().default(true),
 });

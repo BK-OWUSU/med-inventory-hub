@@ -29,7 +29,7 @@ const getPinningStyles = (isActionsPinned: boolean, context: 'header' | 'filter'
     };
 
     switch(context) {
-        case 'header': return { ...baseSticky, zIndex: 20, backgroundColor: "#172554" };
+        case 'header': return { ...baseSticky, zIndex: 20, backgroundColor: "#172" };
         case 'filter': return { ...baseSticky, zIndex: 15, backgroundColor: "white" }; 
         case 'body': return { ...baseSticky, zIndex: 10 };
         default: return {};

@@ -97,7 +97,10 @@ export const FacilityScalarFieldEnum = {
   isVerified: 'isVerified',
   isActive: 'isActive',
   createdAt: 'createdAt',
-  updatedAt: 'updatedAt'
+  updatedAt: 'updatedAt',
+  isDeleted: 'isDeleted',
+  isDeletedAt: 'isDeletedAt',
+  deletedBy: 'deletedBy'
 } as const
 
 export type FacilityScalarFieldEnum = (typeof FacilityScalarFieldEnum)[keyof typeof FacilityScalarFieldEnum]
@@ -116,7 +119,10 @@ export const UserScalarFieldEnum = {
   isActive: 'isActive',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt',
-  lastLoginAt: 'lastLoginAt'
+  lastLoginAt: 'lastLoginAt',
+  isDeleted: 'isDeleted',
+  isDeletedAt: 'isDeletedAt',
+  deletedBy: 'deletedBy'
 } as const
 
 export type UserScalarFieldEnum = (typeof UserScalarFieldEnum)[keyof typeof UserScalarFieldEnum]
@@ -152,6 +158,9 @@ export const DrugScalarFieldEnum = {
   categoryId: 'categoryId',
   isActive: 'isActive',
   notes: 'notes',
+  isDeleted: 'isDeleted',
+  isDeletedAt: 'isDeletedAt',
+  deletedBy: 'deletedBy',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 } as const
@@ -165,7 +174,10 @@ export const DrugCategoryScalarFieldEnum = {
   description: 'description',
   isActive: 'isActive',
   createdAt: 'createdAt',
-  updatedAt: 'updatedAt'
+  updatedAt: 'updatedAt',
+  isDeleted: 'isDeleted',
+  isDeletedAt: 'isDeletedAt',
+  deletedBy: 'deletedBy'
 } as const
 
 export type DrugCategoryScalarFieldEnum = (typeof DrugCategoryScalarFieldEnum)[keyof typeof DrugCategoryScalarFieldEnum]
@@ -184,7 +196,10 @@ export const InventoryScalarFieldEnum = {
   expiryDate: 'expiryDate',
   lastUpdated: 'lastUpdated',
   createdAt: 'createdAt',
-  isActive: 'isActive'
+  isActive: 'isActive',
+  isDeleted: 'isDeleted',
+  isDeletedAt: 'isDeletedAt',
+  deletedBy: 'deletedBy'
 } as const
 
 export type InventoryScalarFieldEnum = (typeof InventoryScalarFieldEnum)[keyof typeof InventoryScalarFieldEnum]
@@ -239,7 +254,10 @@ export const StockMovementScalarFieldEnum = {
   orderItemId: 'orderItemId',
   type: 'type',
   quantity: 'quantity',
+  previousQuantity: 'previousQuantity',
+  newQuantity: 'newQuantity',
   notes: 'notes',
+  reason: 'reason',
   performedById: 'performedById',
   performedAt: 'performedAt'
 } as const

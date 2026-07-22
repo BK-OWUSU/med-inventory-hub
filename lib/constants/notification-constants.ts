@@ -1,4 +1,4 @@
-import { NotificationType } from "@/generated/prisma/client";
+import { NotificationType } from "@/types/types/notification.types";
 import { ShoppingCart, Package, AlertTriangle, User, Building, Info, LucideIcon } from "lucide-react";
 
 export const notificationIcons: Record<NotificationType, LucideIcon> = {

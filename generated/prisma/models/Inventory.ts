@@ -52,6 +52,9 @@ export type InventoryMinAggregateOutputType = {
   lastUpdated: Date | null
   createdAt: Date | null
   isActive: boolean | null
+  isDeleted: boolean | null
+  isDeletedAt: Date | null
+  deletedBy: string | null
 }
 
 export type InventoryMaxAggregateOutputType = {
@@ -68,6 +71,9 @@ export type InventoryMaxAggregateOutputType = {
   lastUpdated: Date | null
   createdAt: Date | null
   isActive: boolean | null
+  isDeleted: boolean | null
+  isDeletedAt: Date | null
+  deletedBy: string | null
 }
 
 export type InventoryCountAggregateOutputType = {
@@ -84,6 +90,9 @@ export type InventoryCountAggregateOutputType = {
   lastUpdated: number
   createdAt: number
   isActive: number
+  isDeleted: number
+  isDeletedAt: number
+  deletedBy: number
   _all: number
 }
 
@@ -114,6 +123,9 @@ export type InventoryMinAggregateInputType = {
   lastUpdated?: true
   createdAt?: true
   isActive?: true
+  isDeleted?: true
+  isDeletedAt?: true
+  deletedBy?: true
 }
 
 export type InventoryMaxAggregateInputType = {
@@ -130,6 +142,9 @@ export type InventoryMaxAggregateInputType = {
   lastUpdated?: true
   createdAt?: true
   isActive?: true
+  isDeleted?: true
+  isDeletedAt?: true
+  deletedBy?: true
 }
 
 export type InventoryCountAggregateInputType = {
@@ -146,6 +161,9 @@ export type InventoryCountAggregateInputType = {
   lastUpdated?: true
   createdAt?: true
   isActive?: true
+  isDeleted?: true
+  isDeletedAt?: true
+  deletedBy?: true
   _all?: true
 }
 
@@ -249,6 +267,9 @@ export type InventoryGroupByOutputType = {
   lastUpdated: Date
   createdAt: Date
   isActive: boolean
+  isDeleted: boolean
+  isDeletedAt: Date | null
+  deletedBy: string | null
   _count: InventoryCountAggregateOutputType | null
   _avg: InventoryAvgAggregateOutputType | null
   _sum: InventorySumAggregateOutputType | null
@@ -288,6 +309,9 @@ export type InventoryWhereInput = {
   lastUpdated?: Prisma.DateTimeFilter<"Inventory"> | Date | string
   createdAt?: Prisma.DateTimeFilter<"Inventory"> | Date | string
   isActive?: Prisma.BoolFilter<"Inventory"> | boolean
+  isDeleted?: Prisma.BoolFilter<"Inventory"> | boolean
+  isDeletedAt?: Prisma.DateTimeNullableFilter<"Inventory"> | Date | string | null
+  deletedBy?: Prisma.StringNullableFilter<"Inventory"> | string | null
   facility?: Prisma.XOR<Prisma.FacilityScalarRelationFilter, Prisma.FacilityWhereInput>
   drug?: Prisma.XOR<Prisma.DrugScalarRelationFilter, Prisma.DrugWhereInput>
   movements?: Prisma.StockMovementListRelationFilter
@@ -307,6 +331,9 @@ export type InventoryOrderByWithRelationInput = {
   lastUpdated?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   isActive?: Prisma.SortOrder
+  isDeleted?: Prisma.SortOrder
+  isDeletedAt?: Prisma.SortOrderInput | Prisma.SortOrder
+  deletedBy?: Prisma.SortOrderInput | Prisma.SortOrder
   facility?: Prisma.FacilityOrderByWithRelationInput
   drug?: Prisma.DrugOrderByWithRelationInput
   movements?: Prisma.StockMovementOrderByRelationAggregateInput
@@ -330,6 +357,9 @@ export type InventoryWhereUniqueInput = Prisma.AtLeast<{
   lastUpdated?: Prisma.DateTimeFilter<"Inventory"> | Date | string
   createdAt?: Prisma.DateTimeFilter<"Inventory"> | Date | string
   isActive?: Prisma.BoolFilter<"Inventory"> | boolean
+  isDeleted?: Prisma.BoolFilter<"Inventory"> | boolean
+  isDeletedAt?: Prisma.DateTimeNullableFilter<"Inventory"> | Date | string | null
+  deletedBy?: Prisma.StringNullableFilter<"Inventory"> | string | null
   facility?: Prisma.XOR<Prisma.FacilityScalarRelationFilter, Prisma.FacilityWhereInput>
   drug?: Prisma.XOR<Prisma.DrugScalarRelationFilter, Prisma.DrugWhereInput>
   movements?: Prisma.StockMovementListRelationFilter
@@ -349,6 +379,9 @@ export type InventoryOrderByWithAggregationInput = {
   lastUpdated?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   isActive?: Prisma.SortOrder
+  isDeleted?: Prisma.SortOrder
+  isDeletedAt?: Prisma.SortOrderInput | Prisma.SortOrder
+  deletedBy?: Prisma.SortOrderInput | Prisma.SortOrder
   _count?: Prisma.InventoryCountOrderByAggregateInput
   _avg?: Prisma.InventoryAvgOrderByAggregateInput
   _max?: Prisma.InventoryMaxOrderByAggregateInput
@@ -373,6 +406,9 @@ export type InventoryScalarWhereWithAggregatesInput = {
   lastUpdated?: Prisma.DateTimeWithAggregatesFilter<"Inventory"> | Date | string
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"Inventory"> | Date | string
   isActive?: Prisma.BoolWithAggregatesFilter<"Inventory"> | boolean
+  isDeleted?: Prisma.BoolWithAggregatesFilter<"Inventory"> | boolean
+  isDeletedAt?: Prisma.DateTimeNullableWithAggregatesFilter<"Inventory"> | Date | string | null
+  deletedBy?: Prisma.StringNullableWithAggregatesFilter<"Inventory"> | string | null
 }
 
 export type InventoryCreateInput = {
@@ -387,6 +423,9 @@ export type InventoryCreateInput = {
   lastUpdated?: Date | string
   createdAt?: Date | string
   isActive?: boolean
+  isDeleted?: boolean
+  isDeletedAt?: Date | string | null
+  deletedBy?: string | null
   facility: Prisma.FacilityCreateNestedOneWithoutInventoriesInput
   drug: Prisma.DrugCreateNestedOneWithoutInventoriesInput
   movements?: Prisma.StockMovementCreateNestedManyWithoutInventoryInput
@@ -406,6 +445,9 @@ export type InventoryUncheckedCreateInput = {
   lastUpdated?: Date | string
   createdAt?: Date | string
   isActive?: boolean
+  isDeleted?: boolean
+  isDeletedAt?: Date | string | null
+  deletedBy?: string | null
   movements?: Prisma.StockMovementUncheckedCreateNestedManyWithoutInventoryInput
 }
 
@@ -421,6 +463,9 @@ export type InventoryUpdateInput = {
   lastUpdated?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isDeleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isDeletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deletedBy?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   facility?: Prisma.FacilityUpdateOneRequiredWithoutInventoriesNestedInput
   drug?: Prisma.DrugUpdateOneRequiredWithoutInventoriesNestedInput
   movements?: Prisma.StockMovementUpdateManyWithoutInventoryNestedInput
@@ -440,6 +485,9 @@ export type InventoryUncheckedUpdateInput = {
   lastUpdated?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isDeleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isDeletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deletedBy?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   movements?: Prisma.StockMovementUncheckedUpdateManyWithoutInventoryNestedInput
 }
 
@@ -457,6 +505,9 @@ export type InventoryCreateManyInput = {
   lastUpdated?: Date | string
   createdAt?: Date | string
   isActive?: boolean
+  isDeleted?: boolean
+  isDeletedAt?: Date | string | null
+  deletedBy?: string | null
 }
 
 export type InventoryUpdateManyMutationInput = {
@@ -471,6 +522,9 @@ export type InventoryUpdateManyMutationInput = {
   lastUpdated?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isDeleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isDeletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deletedBy?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
 }
 
 export type InventoryUncheckedUpdateManyInput = {
@@ -487,6 +541,9 @@ export type InventoryUncheckedUpdateManyInput = {
   lastUpdated?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isDeleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isDeletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deletedBy?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
 }
 
 export type InventoryListRelationFilter = {
@@ -519,6 +576,9 @@ export type InventoryCountOrderByAggregateInput = {
   lastUpdated?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   isActive?: Prisma.SortOrder
+  isDeleted?: Prisma.SortOrder
+  isDeletedAt?: Prisma.SortOrder
+  deletedBy?: Prisma.SortOrder
 }
 
 export type InventoryAvgOrderByAggregateInput = {
@@ -541,6 +601,9 @@ export type InventoryMaxOrderByAggregateInput = {
   lastUpdated?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   isActive?: Prisma.SortOrder
+  isDeleted?: Prisma.SortOrder
+  isDeletedAt?: Prisma.SortOrder
+  deletedBy?: Prisma.SortOrder
 }
 
 export type InventoryMinOrderByAggregateInput = {
@@ -557,6 +620,9 @@ export type InventoryMinOrderByAggregateInput = {
   lastUpdated?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   isActive?: Prisma.SortOrder
+  isDeleted?: Prisma.SortOrder
+  isDeletedAt?: Prisma.SortOrder
+  deletedBy?: Prisma.SortOrder
 }
 
 export type InventorySumOrderByAggregateInput = {
@@ -696,6 +762,9 @@ export type InventoryCreateWithoutFacilityInput = {
   lastUpdated?: Date | string
   createdAt?: Date | string
   isActive?: boolean
+  isDeleted?: boolean
+  isDeletedAt?: Date | string | null
+  deletedBy?: string | null
   drug: Prisma.DrugCreateNestedOneWithoutInventoriesInput
   movements?: Prisma.StockMovementCreateNestedManyWithoutInventoryInput
 }
@@ -713,6 +782,9 @@ export type InventoryUncheckedCreateWithoutFacilityInput = {
   lastUpdated?: Date | string
   createdAt?: Date | string
   isActive?: boolean
+  isDeleted?: boolean
+  isDeletedAt?: Date | string | null
+  deletedBy?: string | null
   movements?: Prisma.StockMovementUncheckedCreateNestedManyWithoutInventoryInput
 }
 
@@ -759,6 +831,9 @@ export type InventoryScalarWhereInput = {
   lastUpdated?: Prisma.DateTimeFilter<"Inventory"> | Date | string
   createdAt?: Prisma.DateTimeFilter<"Inventory"> | Date | string
   isActive?: Prisma.BoolFilter<"Inventory"> | boolean
+  isDeleted?: Prisma.BoolFilter<"Inventory"> | boolean
+  isDeletedAt?: Prisma.DateTimeNullableFilter<"Inventory"> | Date | string | null
+  deletedBy?: Prisma.StringNullableFilter<"Inventory"> | string | null
 }
 
 export type InventoryCreateWithoutDrugInput = {
@@ -773,6 +848,9 @@ export type InventoryCreateWithoutDrugInput = {
   lastUpdated?: Date | string
   createdAt?: Date | string
   isActive?: boolean
+  isDeleted?: boolean
+  isDeletedAt?: Date | string | null
+  deletedBy?: string | null
   facility: Prisma.FacilityCreateNestedOneWithoutInventoriesInput
   movements?: Prisma.StockMovementCreateNestedManyWithoutInventoryInput
 }
@@ -790,6 +868,9 @@ export type InventoryUncheckedCreateWithoutDrugInput = {
   lastUpdated?: Date | string
   createdAt?: Date | string
   isActive?: boolean
+  isDeleted?: boolean
+  isDeletedAt?: Date | string | null
+  deletedBy?: string | null
   movements?: Prisma.StockMovementUncheckedCreateNestedManyWithoutInventoryInput
 }
 
@@ -831,6 +912,9 @@ export type InventoryCreateWithoutMovementsInput = {
   lastUpdated?: Date | string
   createdAt?: Date | string
   isActive?: boolean
+  isDeleted?: boolean
+  isDeletedAt?: Date | string | null
+  deletedBy?: string | null
   facility: Prisma.FacilityCreateNestedOneWithoutInventoriesInput
   drug: Prisma.DrugCreateNestedOneWithoutInventoriesInput
 }
@@ -849,6 +933,9 @@ export type InventoryUncheckedCreateWithoutMovementsInput = {
   lastUpdated?: Date | string
   createdAt?: Date | string
   isActive?: boolean
+  isDeleted?: boolean
+  isDeletedAt?: Date | string | null
+  deletedBy?: string | null
 }
 
 export type InventoryCreateOrConnectWithoutMovementsInput = {
@@ -879,6 +966,9 @@ export type InventoryUpdateWithoutMovementsInput = {
   lastUpdated?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isDeleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isDeletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deletedBy?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   facility?: Prisma.FacilityUpdateOneRequiredWithoutInventoriesNestedInput
   drug?: Prisma.DrugUpdateOneRequiredWithoutInventoriesNestedInput
 }
@@ -897,6 +987,9 @@ export type InventoryUncheckedUpdateWithoutMovementsInput = {
   lastUpdated?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isDeleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isDeletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deletedBy?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
 }
 
 export type InventoryCreateManyFacilityInput = {
@@ -912,6 +1005,9 @@ export type InventoryCreateManyFacilityInput = {
   lastUpdated?: Date | string
   createdAt?: Date | string
   isActive?: boolean
+  isDeleted?: boolean
+  isDeletedAt?: Date | string | null
+  deletedBy?: string | null
 }
 
 export type InventoryUpdateWithoutFacilityInput = {
@@ -926,6 +1022,9 @@ export type InventoryUpdateWithoutFacilityInput = {
   lastUpdated?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isDeleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isDeletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deletedBy?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   drug?: Prisma.DrugUpdateOneRequiredWithoutInventoriesNestedInput
   movements?: Prisma.StockMovementUpdateManyWithoutInventoryNestedInput
 }
@@ -943,6 +1042,9 @@ export type InventoryUncheckedUpdateWithoutFacilityInput = {
   lastUpdated?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isDeleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isDeletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deletedBy?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   movements?: Prisma.StockMovementUncheckedUpdateManyWithoutInventoryNestedInput
 }
 
@@ -959,6 +1061,9 @@ export type InventoryUncheckedUpdateManyWithoutFacilityInput = {
   lastUpdated?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isDeleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isDeletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deletedBy?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
 }
 
 export type InventoryCreateManyDrugInput = {
@@ -974,6 +1079,9 @@ export type InventoryCreateManyDrugInput = {
   lastUpdated?: Date | string
   createdAt?: Date | string
   isActive?: boolean
+  isDeleted?: boolean
+  isDeletedAt?: Date | string | null
+  deletedBy?: string | null
 }
 
 export type InventoryUpdateWithoutDrugInput = {
@@ -988,6 +1096,9 @@ export type InventoryUpdateWithoutDrugInput = {
   lastUpdated?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isDeleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isDeletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deletedBy?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   facility?: Prisma.FacilityUpdateOneRequiredWithoutInventoriesNestedInput
   movements?: Prisma.StockMovementUpdateManyWithoutInventoryNestedInput
 }
@@ -1005,6 +1116,9 @@ export type InventoryUncheckedUpdateWithoutDrugInput = {
   lastUpdated?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isDeleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isDeletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deletedBy?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   movements?: Prisma.StockMovementUncheckedUpdateManyWithoutInventoryNestedInput
 }
 
@@ -1021,6 +1135,9 @@ export type InventoryUncheckedUpdateManyWithoutDrugInput = {
   lastUpdated?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isDeleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isDeletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deletedBy?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
 }
 
 
@@ -1068,6 +1185,9 @@ export type InventorySelect<ExtArgs extends runtime.Types.Extensions.InternalArg
   lastUpdated?: boolean
   createdAt?: boolean
   isActive?: boolean
+  isDeleted?: boolean
+  isDeletedAt?: boolean
+  deletedBy?: boolean
   facility?: boolean | Prisma.FacilityDefaultArgs<ExtArgs>
   drug?: boolean | Prisma.DrugDefaultArgs<ExtArgs>
   movements?: boolean | Prisma.Inventory$movementsArgs<ExtArgs>
@@ -1088,6 +1208,9 @@ export type InventorySelectCreateManyAndReturn<ExtArgs extends runtime.Types.Ext
   lastUpdated?: boolean
   createdAt?: boolean
   isActive?: boolean
+  isDeleted?: boolean
+  isDeletedAt?: boolean
+  deletedBy?: boolean
   facility?: boolean | Prisma.FacilityDefaultArgs<ExtArgs>
   drug?: boolean | Prisma.DrugDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["inventory"]>
@@ -1106,6 +1229,9 @@ export type InventorySelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Ext
   lastUpdated?: boolean
   createdAt?: boolean
   isActive?: boolean
+  isDeleted?: boolean
+  isDeletedAt?: boolean
+  deletedBy?: boolean
   facility?: boolean | Prisma.FacilityDefaultArgs<ExtArgs>
   drug?: boolean | Prisma.DrugDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["inventory"]>
@@ -1124,9 +1250,12 @@ export type InventorySelectScalar = {
   lastUpdated?: boolean
   createdAt?: boolean
   isActive?: boolean
+  isDeleted?: boolean
+  isDeletedAt?: boolean
+  deletedBy?: boolean
 }
 
-export type InventoryOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "facilityId" | "drugId" | "manufacturer" | "availableQuantity" | "unitPrice" | "minStockLevel" | "batchNumber" | "receivedDate" | "expiryDate" | "lastUpdated" | "createdAt" | "isActive", ExtArgs["result"]["inventory"]>
+export type InventoryOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "facilityId" | "drugId" | "manufacturer" | "availableQuantity" | "unitPrice" | "minStockLevel" | "batchNumber" | "receivedDate" | "expiryDate" | "lastUpdated" | "createdAt" | "isActive" | "isDeleted" | "isDeletedAt" | "deletedBy", ExtArgs["result"]["inventory"]>
 export type InventoryInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   facility?: boolean | Prisma.FacilityDefaultArgs<ExtArgs>
   drug?: boolean | Prisma.DrugDefaultArgs<ExtArgs>
@@ -1163,6 +1292,9 @@ export type $InventoryPayload<ExtArgs extends runtime.Types.Extensions.InternalA
     lastUpdated: Date
     createdAt: Date
     isActive: boolean
+    isDeleted: boolean
+    isDeletedAt: Date | null
+    deletedBy: string | null
   }, ExtArgs["result"]["inventory"]>
   composites: {}
 }
@@ -1602,6 +1734,9 @@ export interface InventoryFieldRefs {
   readonly lastUpdated: Prisma.FieldRef<"Inventory", 'DateTime'>
   readonly createdAt: Prisma.FieldRef<"Inventory", 'DateTime'>
   readonly isActive: Prisma.FieldRef<"Inventory", 'Boolean'>
+  readonly isDeleted: Prisma.FieldRef<"Inventory", 'Boolean'>
+  readonly isDeletedAt: Prisma.FieldRef<"Inventory", 'DateTime'>
+  readonly deletedBy: Prisma.FieldRef<"Inventory", 'String'>
 }
     
 

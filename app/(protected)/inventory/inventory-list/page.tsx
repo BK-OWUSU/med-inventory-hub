@@ -8,8 +8,6 @@ import {
   Layers, 
   AlertTriangle, 
   CalendarClock, 
-  TrendingUp,
-  RefreshCw
 } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
@@ -18,10 +16,12 @@ import { Card, CardContent } from "@/components/ui/card"
 import { useInventoryStore } from "@/store/inventoryStore"
 import { AppSheet } from "@/components/custom/drawers/AppSheet"
 import TableMain from "@/components/custom/table/TableMain"
-import { inventoryColumns, InventoryTableMeta } from "@/components/columnDef/inventory/GlobalInventoryColumnDef"
-import { CreateInventoryForm } from "./CreateInventoryFormComponent"
-import { UpdateInventoryForm } from "./UpdateInventoryFormComponent"
-import { GlobalInventoryItem } from "@/types/types/inventory.type"
+import { CreateDrugBatchForm } from "./CreateDrugBatchFormComponent"
+import { LocalInventoryItem } from "@/types/types/inventory.type"
+import { localInventoryColumns, LocalInventoryTableMeta } from "@/components/columnDef/inventory/LocalInventoryColumnDef"
+import { useDrugStore } from "@/store/drugStore"
+import { EditDrugBatchForm } from "./UpdateDrugInventoryBatchForm"
+import { BatchDetailsView } from "@/components/viewDetailsCompoents/inventory/BatchDetailsViewer"
 
 
 /// 1. Define the allowed colors as a type
@@ -38,20 +38,23 @@ interface MetricCardProps {
 
 
 export default function InventoryPage() {
-  const { fetchGlobalInventory, globalInventory = [], isLoading } = useInventoryStore();
+  const { fetchLocalInventory, localInventory = [], isLoading } = useInventoryStore();
+  const {fetchDrugs, drugs} = useDrugStore();
   
   // UI State for Sheets
   const [isAddInventoryOpen, setIsAddInventoryOpen] = React.useState(false);
-  const [isUpdateInventoryOpen, setIsUpdateInventoryOpen] = React.useState(false);
-  const [selectedInventory, setSelectedInventory] = React.useState<GlobalInventoryItem | null>();
+  const [isUpdateInventoryBatchOpen, setIsUpdateInventoryBatchOpen] = React.useState(false);
+  const [selectedInventoryBatch, setSelectedInventoryBatch] = React.useState<LocalInventoryItem | null>();
+  const [isBatchViewerOpen, setIsBatchViewerOpen] = React.useState(false);
 
   React.useEffect(() => {
-    fetchGlobalInventory();
-  }, [fetchGlobalInventory]);
+    fetchLocalInventory();
+    fetchDrugs();
+  }, [fetchLocalInventory, fetchDrugs]);
 
   // Derived Statistics
   const { totalItems, totalQuantity, lowStock, expiringSoon } = React.useMemo(() => {
-    const items = globalInventory || [];
+    const items = localInventory || [];
     const now = new Date();
     const sixtyDaysFromNow = new Date();
     sixtyDaysFromNow.setDate(now.getDate() + 60);
@@ -62,7 +65,7 @@ export default function InventoryPage() {
       lowStock: items.filter((i) => i.availableQuantity <= (i.minStockLevel || 0)).length,
       expiringSoon: items.filter((i) => i.expiryDate && new Date(i.expiryDate) <= sixtyDaysFromNow).length,
     };
-  }, [globalInventory]);
+  }, [localInventory]);
 
   return (
     <div className="w-full space-y-6 p-6 lg:p-8 bg-slate-50/30 min-h-screen font-sans">
@@ -74,15 +77,12 @@ export default function InventoryPage() {
           <p className="text-sm text-slate-500 font-normal">View and manage all medicines in stock.</p>
         </div>
         <div className="flex items-center gap-3">
-          <Button variant="outline" size="sm" className="h-9 rounded-lg gap-1.5 bg-white">
-            <Download className="h-4 w-4" /> Export
-          </Button>
           <Button 
             size="sm" 
             onClick={() => setIsAddInventoryOpen(true)}
             className="bg-emerald-800 hover:bg-emerald-700 text-white h-9 rounded-lg gap-1.5 shadow-xs"
           >
-            <Plus className="h-4 w-4" /> Add Inventory
+            <Plus className="h-4 w-4" /> Receive Stock
           </Button>
         </div>
       </div>
@@ -98,20 +98,38 @@ export default function InventoryPage() {
       {/* Table Section */}
       <Card className="bg-white border border-slate-200/80 shadow-xs rounded-xl overflow-hidden w-full">
         <TableMain
-          columns={inventoryColumns}
-          data={globalInventory}
+          columns={localInventoryColumns}
+          data={localInventory}
           loading={isLoading}
+          tableFilterButtonVisible = {true}
+          columnVisibilityFilter={true}
           searchKey="batchNumber" // Adjust based on your column schema
+          placeholder="Search batch details ..."
           meta={{
             onEdit: (inventory) => {
-              setSelectedInventory(inventory);
-              setIsUpdateInventoryOpen(true);
-            }
-          } as InventoryTableMeta}
+              setSelectedInventoryBatch(inventory);
+              setIsUpdateInventoryBatchOpen(true);
+            },
+            onViewMovements(item) {
+               setSelectedInventoryBatch(item);
+                setIsBatchViewerOpen(true)  
+            },
+          } as LocalInventoryTableMeta}
         />
       </Card>
 
       {/* -- Sheets -- */}
+
+       <AppSheet
+        isOpen={isBatchViewerOpen}
+        onClose={() => setIsBatchViewerOpen(false)}
+        title="Batch Details"
+        description="View Details about Batch"
+      >
+       <BatchDetailsView
+        inventoryId={selectedInventoryBatch ? selectedInventoryBatch.id : "" }
+       />
+      </AppSheet>
       
       {/* Add Inventory Sheet */}
       <AppSheet
@@ -120,25 +138,38 @@ export default function InventoryPage() {
         title="Add New Inventory Batch"
         description="Add a new stock batch to the system."
       >
-        <CreateInventoryForm onSuccess={() => {
-            fetchGlobalInventory();
+        <CreateDrugBatchForm
+          drugId={drugs[0]?.id}
+          drugs={drugs}
+          onSuccess={() => {
+            fetchLocalInventory();
             setIsAddInventoryOpen(false);
         }} />
       </AppSheet>
 
       {/* Update Inventory Sheet */}
       <AppSheet
-        isOpen={isUpdateInventoryOpen}
-        onClose={() => setIsUpdateInventoryOpen(false)}
+        isOpen={isUpdateInventoryBatchOpen}
+        onClose={() => setIsUpdateInventoryBatchOpen(false)}
         title="Update Stock"
         description="Process stock movements for this batch."
       >
-        {selectedInventory && (
-            <UpdateInventoryForm 
-                inventoryId={selectedInventory.id} 
+        {selectedInventoryBatch && (
+            <EditDrugBatchForm 
+                batchId={selectedInventoryBatch.id}
+                batchNumber={selectedInventoryBatch.batchNumber || ""}
+                initialData={
+                  {
+                    expiryDate:selectedInventoryBatch.expiryDate ? new Date(selectedInventoryBatch.expiryDate) : new Date(),
+                    manufacturer: selectedInventoryBatch?.manufacturer ||"",
+                    unitPrice: Number(selectedInventoryBatch.unitPrice),
+                    minStockLevel: selectedInventoryBatch.minStockLevel,
+                    isActive: selectedInventoryBatch.isActive
+                  }  
+                } 
                 onSuccess={() => {
-                    fetchGlobalInventory();
-                    setIsUpdateInventoryOpen(false);
+                    fetchLocalInventory();
+                    setIsUpdateInventoryBatchOpen(false);
                 }} 
             />
         )}

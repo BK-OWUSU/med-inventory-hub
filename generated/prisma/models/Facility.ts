@@ -40,6 +40,9 @@ export type FacilityMinAggregateOutputType = {
   isActive: boolean | null
   createdAt: Date | null
   updatedAt: Date | null
+  isDeleted: boolean | null
+  isDeletedAt: Date | null
+  deletedBy: string | null
 }
 
 export type FacilityMaxAggregateOutputType = {
@@ -58,6 +61,9 @@ export type FacilityMaxAggregateOutputType = {
   isActive: boolean | null
   createdAt: Date | null
   updatedAt: Date | null
+  isDeleted: boolean | null
+  isDeletedAt: Date | null
+  deletedBy: string | null
 }
 
 export type FacilityCountAggregateOutputType = {
@@ -76,6 +82,9 @@ export type FacilityCountAggregateOutputType = {
   isActive: number
   createdAt: number
   updatedAt: number
+  isDeleted: number
+  isDeletedAt: number
+  deletedBy: number
   _all: number
 }
 
@@ -96,6 +105,9 @@ export type FacilityMinAggregateInputType = {
   isActive?: true
   createdAt?: true
   updatedAt?: true
+  isDeleted?: true
+  isDeletedAt?: true
+  deletedBy?: true
 }
 
 export type FacilityMaxAggregateInputType = {
@@ -114,6 +126,9 @@ export type FacilityMaxAggregateInputType = {
   isActive?: true
   createdAt?: true
   updatedAt?: true
+  isDeleted?: true
+  isDeletedAt?: true
+  deletedBy?: true
 }
 
 export type FacilityCountAggregateInputType = {
@@ -132,6 +147,9 @@ export type FacilityCountAggregateInputType = {
   isActive?: true
   createdAt?: true
   updatedAt?: true
+  isDeleted?: true
+  isDeletedAt?: true
+  deletedBy?: true
   _all?: true
 }
 
@@ -223,6 +241,9 @@ export type FacilityGroupByOutputType = {
   isActive: boolean
   createdAt: Date
   updatedAt: Date
+  isDeleted: boolean
+  isDeletedAt: Date | null
+  deletedBy: string | null
   _count: FacilityCountAggregateOutputType | null
   _min: FacilityMinAggregateOutputType | null
   _max: FacilityMaxAggregateOutputType | null
@@ -262,6 +283,9 @@ export type FacilityWhereInput = {
   isActive?: Prisma.BoolFilter<"Facility"> | boolean
   createdAt?: Prisma.DateTimeFilter<"Facility"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Facility"> | Date | string
+  isDeleted?: Prisma.BoolFilter<"Facility"> | boolean
+  isDeletedAt?: Prisma.DateTimeNullableFilter<"Facility"> | Date | string | null
+  deletedBy?: Prisma.StringNullableFilter<"Facility"> | string | null
   users?: Prisma.UserListRelationFilter
   inventories?: Prisma.InventoryListRelationFilter
   outgoingOrders?: Prisma.OrderListRelationFilter
@@ -287,6 +311,9 @@ export type FacilityOrderByWithRelationInput = {
   isActive?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
+  isDeleted?: Prisma.SortOrder
+  isDeletedAt?: Prisma.SortOrderInput | Prisma.SortOrder
+  deletedBy?: Prisma.SortOrderInput | Prisma.SortOrder
   users?: Prisma.UserOrderByRelationAggregateInput
   inventories?: Prisma.InventoryOrderByRelationAggregateInput
   outgoingOrders?: Prisma.OrderOrderByRelationAggregateInput
@@ -315,6 +342,9 @@ export type FacilityWhereUniqueInput = Prisma.AtLeast<{
   isActive?: Prisma.BoolFilter<"Facility"> | boolean
   createdAt?: Prisma.DateTimeFilter<"Facility"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Facility"> | Date | string
+  isDeleted?: Prisma.BoolFilter<"Facility"> | boolean
+  isDeletedAt?: Prisma.DateTimeNullableFilter<"Facility"> | Date | string | null
+  deletedBy?: Prisma.StringNullableFilter<"Facility"> | string | null
   users?: Prisma.UserListRelationFilter
   inventories?: Prisma.InventoryListRelationFilter
   outgoingOrders?: Prisma.OrderListRelationFilter
@@ -340,6 +370,9 @@ export type FacilityOrderByWithAggregationInput = {
   isActive?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
+  isDeleted?: Prisma.SortOrder
+  isDeletedAt?: Prisma.SortOrderInput | Prisma.SortOrder
+  deletedBy?: Prisma.SortOrderInput | Prisma.SortOrder
   _count?: Prisma.FacilityCountOrderByAggregateInput
   _max?: Prisma.FacilityMaxOrderByAggregateInput
   _min?: Prisma.FacilityMinOrderByAggregateInput
@@ -364,6 +397,9 @@ export type FacilityScalarWhereWithAggregatesInput = {
   isActive?: Prisma.BoolWithAggregatesFilter<"Facility"> | boolean
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"Facility"> | Date | string
   updatedAt?: Prisma.DateTimeWithAggregatesFilter<"Facility"> | Date | string
+  isDeleted?: Prisma.BoolWithAggregatesFilter<"Facility"> | boolean
+  isDeletedAt?: Prisma.DateTimeNullableWithAggregatesFilter<"Facility"> | Date | string | null
+  deletedBy?: Prisma.StringNullableWithAggregatesFilter<"Facility"> | string | null
 }
 
 export type FacilityCreateInput = {
@@ -382,6 +418,9 @@ export type FacilityCreateInput = {
   isActive?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
+  isDeleted?: boolean
+  isDeletedAt?: Date | string | null
+  deletedBy?: string | null
   users?: Prisma.UserCreateNestedManyWithoutFacilityInput
   inventories?: Prisma.InventoryCreateNestedManyWithoutFacilityInput
   outgoingOrders?: Prisma.OrderCreateNestedManyWithoutRequesterInput
@@ -407,6 +446,9 @@ export type FacilityUncheckedCreateInput = {
   isActive?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
+  isDeleted?: boolean
+  isDeletedAt?: Date | string | null
+  deletedBy?: string | null
   users?: Prisma.UserUncheckedCreateNestedManyWithoutFacilityInput
   inventories?: Prisma.InventoryUncheckedCreateNestedManyWithoutFacilityInput
   outgoingOrders?: Prisma.OrderUncheckedCreateNestedManyWithoutRequesterInput
@@ -432,6 +474,9 @@ export type FacilityUpdateInput = {
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  isDeleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isDeletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deletedBy?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   users?: Prisma.UserUpdateManyWithoutFacilityNestedInput
   inventories?: Prisma.InventoryUpdateManyWithoutFacilityNestedInput
   outgoingOrders?: Prisma.OrderUpdateManyWithoutRequesterNestedInput
@@ -457,6 +502,9 @@ export type FacilityUncheckedUpdateInput = {
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  isDeleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isDeletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deletedBy?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   users?: Prisma.UserUncheckedUpdateManyWithoutFacilityNestedInput
   inventories?: Prisma.InventoryUncheckedUpdateManyWithoutFacilityNestedInput
   outgoingOrders?: Prisma.OrderUncheckedUpdateManyWithoutRequesterNestedInput
@@ -482,6 +530,9 @@ export type FacilityCreateManyInput = {
   isActive?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
+  isDeleted?: boolean
+  isDeletedAt?: Date | string | null
+  deletedBy?: string | null
 }
 
 export type FacilityUpdateManyMutationInput = {
@@ -500,6 +551,9 @@ export type FacilityUpdateManyMutationInput = {
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  isDeleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isDeletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deletedBy?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
 }
 
 export type FacilityUncheckedUpdateManyInput = {
@@ -518,6 +572,9 @@ export type FacilityUncheckedUpdateManyInput = {
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  isDeleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isDeletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deletedBy?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
 }
 
 export type FacilityCountOrderByAggregateInput = {
@@ -536,6 +593,9 @@ export type FacilityCountOrderByAggregateInput = {
   isActive?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
+  isDeleted?: Prisma.SortOrder
+  isDeletedAt?: Prisma.SortOrder
+  deletedBy?: Prisma.SortOrder
 }
 
 export type FacilityMaxOrderByAggregateInput = {
@@ -554,6 +614,9 @@ export type FacilityMaxOrderByAggregateInput = {
   isActive?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
+  isDeleted?: Prisma.SortOrder
+  isDeletedAt?: Prisma.SortOrder
+  deletedBy?: Prisma.SortOrder
 }
 
 export type FacilityMinOrderByAggregateInput = {
@@ -572,6 +635,9 @@ export type FacilityMinOrderByAggregateInput = {
   isActive?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
+  isDeleted?: Prisma.SortOrder
+  isDeletedAt?: Prisma.SortOrder
+  deletedBy?: Prisma.SortOrder
 }
 
 export type FacilityNullableScalarRelationFilter = {
@@ -602,6 +668,10 @@ export type BoolFieldUpdateOperationsInput = {
 
 export type DateTimeFieldUpdateOperationsInput = {
   set?: Date | string
+}
+
+export type NullableDateTimeFieldUpdateOperationsInput = {
+  set?: Date | string | null
 }
 
 export type FacilityCreateNestedOneWithoutUsersInput = {
@@ -724,6 +794,9 @@ export type FacilityCreateWithoutUsersInput = {
   isActive?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
+  isDeleted?: boolean
+  isDeletedAt?: Date | string | null
+  deletedBy?: string | null
   inventories?: Prisma.InventoryCreateNestedManyWithoutFacilityInput
   outgoingOrders?: Prisma.OrderCreateNestedManyWithoutRequesterInput
   incomingOrders?: Prisma.OrderCreateNestedManyWithoutSupplierInput
@@ -748,6 +821,9 @@ export type FacilityUncheckedCreateWithoutUsersInput = {
   isActive?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
+  isDeleted?: boolean
+  isDeletedAt?: Date | string | null
+  deletedBy?: string | null
   inventories?: Prisma.InventoryUncheckedCreateNestedManyWithoutFacilityInput
   outgoingOrders?: Prisma.OrderUncheckedCreateNestedManyWithoutRequesterInput
   incomingOrders?: Prisma.OrderUncheckedCreateNestedManyWithoutSupplierInput
@@ -788,6 +864,9 @@ export type FacilityUpdateWithoutUsersInput = {
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  isDeleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isDeletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deletedBy?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   inventories?: Prisma.InventoryUpdateManyWithoutFacilityNestedInput
   outgoingOrders?: Prisma.OrderUpdateManyWithoutRequesterNestedInput
   incomingOrders?: Prisma.OrderUpdateManyWithoutSupplierNestedInput
@@ -812,6 +891,9 @@ export type FacilityUncheckedUpdateWithoutUsersInput = {
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  isDeleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isDeletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deletedBy?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   inventories?: Prisma.InventoryUncheckedUpdateManyWithoutFacilityNestedInput
   outgoingOrders?: Prisma.OrderUncheckedUpdateManyWithoutRequesterNestedInput
   incomingOrders?: Prisma.OrderUncheckedUpdateManyWithoutSupplierNestedInput
@@ -836,6 +918,9 @@ export type FacilityCreateWithoutUserSessionLogsInput = {
   isActive?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
+  isDeleted?: boolean
+  isDeletedAt?: Date | string | null
+  deletedBy?: string | null
   users?: Prisma.UserCreateNestedManyWithoutFacilityInput
   inventories?: Prisma.InventoryCreateNestedManyWithoutFacilityInput
   outgoingOrders?: Prisma.OrderCreateNestedManyWithoutRequesterInput
@@ -860,6 +945,9 @@ export type FacilityUncheckedCreateWithoutUserSessionLogsInput = {
   isActive?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
+  isDeleted?: boolean
+  isDeletedAt?: Date | string | null
+  deletedBy?: string | null
   users?: Prisma.UserUncheckedCreateNestedManyWithoutFacilityInput
   inventories?: Prisma.InventoryUncheckedCreateNestedManyWithoutFacilityInput
   outgoingOrders?: Prisma.OrderUncheckedCreateNestedManyWithoutRequesterInput
@@ -900,6 +988,9 @@ export type FacilityUpdateWithoutUserSessionLogsInput = {
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  isDeleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isDeletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deletedBy?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   users?: Prisma.UserUpdateManyWithoutFacilityNestedInput
   inventories?: Prisma.InventoryUpdateManyWithoutFacilityNestedInput
   outgoingOrders?: Prisma.OrderUpdateManyWithoutRequesterNestedInput
@@ -924,6 +1015,9 @@ export type FacilityUncheckedUpdateWithoutUserSessionLogsInput = {
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  isDeleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isDeletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deletedBy?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   users?: Prisma.UserUncheckedUpdateManyWithoutFacilityNestedInput
   inventories?: Prisma.InventoryUncheckedUpdateManyWithoutFacilityNestedInput
   outgoingOrders?: Prisma.OrderUncheckedUpdateManyWithoutRequesterNestedInput
@@ -948,6 +1042,9 @@ export type FacilityCreateWithoutInventoriesInput = {
   isActive?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
+  isDeleted?: boolean
+  isDeletedAt?: Date | string | null
+  deletedBy?: string | null
   users?: Prisma.UserCreateNestedManyWithoutFacilityInput
   outgoingOrders?: Prisma.OrderCreateNestedManyWithoutRequesterInput
   incomingOrders?: Prisma.OrderCreateNestedManyWithoutSupplierInput
@@ -972,6 +1069,9 @@ export type FacilityUncheckedCreateWithoutInventoriesInput = {
   isActive?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
+  isDeleted?: boolean
+  isDeletedAt?: Date | string | null
+  deletedBy?: string | null
   users?: Prisma.UserUncheckedCreateNestedManyWithoutFacilityInput
   outgoingOrders?: Prisma.OrderUncheckedCreateNestedManyWithoutRequesterInput
   incomingOrders?: Prisma.OrderUncheckedCreateNestedManyWithoutSupplierInput
@@ -1012,6 +1112,9 @@ export type FacilityUpdateWithoutInventoriesInput = {
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  isDeleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isDeletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deletedBy?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   users?: Prisma.UserUpdateManyWithoutFacilityNestedInput
   outgoingOrders?: Prisma.OrderUpdateManyWithoutRequesterNestedInput
   incomingOrders?: Prisma.OrderUpdateManyWithoutSupplierNestedInput
@@ -1036,6 +1139,9 @@ export type FacilityUncheckedUpdateWithoutInventoriesInput = {
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  isDeleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isDeletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deletedBy?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   users?: Prisma.UserUncheckedUpdateManyWithoutFacilityNestedInput
   outgoingOrders?: Prisma.OrderUncheckedUpdateManyWithoutRequesterNestedInput
   incomingOrders?: Prisma.OrderUncheckedUpdateManyWithoutSupplierNestedInput
@@ -1060,6 +1166,9 @@ export type FacilityCreateWithoutOutgoingOrdersInput = {
   isActive?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
+  isDeleted?: boolean
+  isDeletedAt?: Date | string | null
+  deletedBy?: string | null
   users?: Prisma.UserCreateNestedManyWithoutFacilityInput
   inventories?: Prisma.InventoryCreateNestedManyWithoutFacilityInput
   incomingOrders?: Prisma.OrderCreateNestedManyWithoutSupplierInput
@@ -1084,6 +1193,9 @@ export type FacilityUncheckedCreateWithoutOutgoingOrdersInput = {
   isActive?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
+  isDeleted?: boolean
+  isDeletedAt?: Date | string | null
+  deletedBy?: string | null
   users?: Prisma.UserUncheckedCreateNestedManyWithoutFacilityInput
   inventories?: Prisma.InventoryUncheckedCreateNestedManyWithoutFacilityInput
   incomingOrders?: Prisma.OrderUncheckedCreateNestedManyWithoutSupplierInput
@@ -1113,6 +1225,9 @@ export type FacilityCreateWithoutIncomingOrdersInput = {
   isActive?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
+  isDeleted?: boolean
+  isDeletedAt?: Date | string | null
+  deletedBy?: string | null
   users?: Prisma.UserCreateNestedManyWithoutFacilityInput
   inventories?: Prisma.InventoryCreateNestedManyWithoutFacilityInput
   outgoingOrders?: Prisma.OrderCreateNestedManyWithoutRequesterInput
@@ -1137,6 +1252,9 @@ export type FacilityUncheckedCreateWithoutIncomingOrdersInput = {
   isActive?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
+  isDeleted?: boolean
+  isDeletedAt?: Date | string | null
+  deletedBy?: string | null
   users?: Prisma.UserUncheckedCreateNestedManyWithoutFacilityInput
   inventories?: Prisma.InventoryUncheckedCreateNestedManyWithoutFacilityInput
   outgoingOrders?: Prisma.OrderUncheckedCreateNestedManyWithoutRequesterInput
@@ -1177,6 +1295,9 @@ export type FacilityUpdateWithoutOutgoingOrdersInput = {
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  isDeleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isDeletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deletedBy?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   users?: Prisma.UserUpdateManyWithoutFacilityNestedInput
   inventories?: Prisma.InventoryUpdateManyWithoutFacilityNestedInput
   incomingOrders?: Prisma.OrderUpdateManyWithoutSupplierNestedInput
@@ -1201,6 +1322,9 @@ export type FacilityUncheckedUpdateWithoutOutgoingOrdersInput = {
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  isDeleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isDeletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deletedBy?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   users?: Prisma.UserUncheckedUpdateManyWithoutFacilityNestedInput
   inventories?: Prisma.InventoryUncheckedUpdateManyWithoutFacilityNestedInput
   incomingOrders?: Prisma.OrderUncheckedUpdateManyWithoutSupplierNestedInput
@@ -1236,6 +1360,9 @@ export type FacilityUpdateWithoutIncomingOrdersInput = {
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  isDeleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isDeletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deletedBy?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   users?: Prisma.UserUpdateManyWithoutFacilityNestedInput
   inventories?: Prisma.InventoryUpdateManyWithoutFacilityNestedInput
   outgoingOrders?: Prisma.OrderUpdateManyWithoutRequesterNestedInput
@@ -1260,6 +1387,9 @@ export type FacilityUncheckedUpdateWithoutIncomingOrdersInput = {
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  isDeleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isDeletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deletedBy?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   users?: Prisma.UserUncheckedUpdateManyWithoutFacilityNestedInput
   inventories?: Prisma.InventoryUncheckedUpdateManyWithoutFacilityNestedInput
   outgoingOrders?: Prisma.OrderUncheckedUpdateManyWithoutRequesterNestedInput
@@ -1284,6 +1414,9 @@ export type FacilityCreateWithoutNotificationsInput = {
   isActive?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
+  isDeleted?: boolean
+  isDeletedAt?: Date | string | null
+  deletedBy?: string | null
   users?: Prisma.UserCreateNestedManyWithoutFacilityInput
   inventories?: Prisma.InventoryCreateNestedManyWithoutFacilityInput
   outgoingOrders?: Prisma.OrderCreateNestedManyWithoutRequesterInput
@@ -1308,6 +1441,9 @@ export type FacilityUncheckedCreateWithoutNotificationsInput = {
   isActive?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
+  isDeleted?: boolean
+  isDeletedAt?: Date | string | null
+  deletedBy?: string | null
   users?: Prisma.UserUncheckedCreateNestedManyWithoutFacilityInput
   inventories?: Prisma.InventoryUncheckedCreateNestedManyWithoutFacilityInput
   outgoingOrders?: Prisma.OrderUncheckedCreateNestedManyWithoutRequesterInput
@@ -1348,6 +1484,9 @@ export type FacilityUpdateWithoutNotificationsInput = {
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  isDeleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isDeletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deletedBy?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   users?: Prisma.UserUpdateManyWithoutFacilityNestedInput
   inventories?: Prisma.InventoryUpdateManyWithoutFacilityNestedInput
   outgoingOrders?: Prisma.OrderUpdateManyWithoutRequesterNestedInput
@@ -1372,6 +1511,9 @@ export type FacilityUncheckedUpdateWithoutNotificationsInput = {
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  isDeleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isDeletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deletedBy?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   users?: Prisma.UserUncheckedUpdateManyWithoutFacilityNestedInput
   inventories?: Prisma.InventoryUncheckedUpdateManyWithoutFacilityNestedInput
   outgoingOrders?: Prisma.OrderUncheckedUpdateManyWithoutRequesterNestedInput
@@ -1396,6 +1538,9 @@ export type FacilityCreateWithoutAuditLogsInput = {
   isActive?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
+  isDeleted?: boolean
+  isDeletedAt?: Date | string | null
+  deletedBy?: string | null
   users?: Prisma.UserCreateNestedManyWithoutFacilityInput
   inventories?: Prisma.InventoryCreateNestedManyWithoutFacilityInput
   outgoingOrders?: Prisma.OrderCreateNestedManyWithoutRequesterInput
@@ -1420,6 +1565,9 @@ export type FacilityUncheckedCreateWithoutAuditLogsInput = {
   isActive?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
+  isDeleted?: boolean
+  isDeletedAt?: Date | string | null
+  deletedBy?: string | null
   users?: Prisma.UserUncheckedCreateNestedManyWithoutFacilityInput
   inventories?: Prisma.InventoryUncheckedCreateNestedManyWithoutFacilityInput
   outgoingOrders?: Prisma.OrderUncheckedCreateNestedManyWithoutRequesterInput
@@ -1460,6 +1608,9 @@ export type FacilityUpdateWithoutAuditLogsInput = {
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  isDeleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isDeletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deletedBy?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   users?: Prisma.UserUpdateManyWithoutFacilityNestedInput
   inventories?: Prisma.InventoryUpdateManyWithoutFacilityNestedInput
   outgoingOrders?: Prisma.OrderUpdateManyWithoutRequesterNestedInput
@@ -1484,6 +1635,9 @@ export type FacilityUncheckedUpdateWithoutAuditLogsInput = {
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  isDeleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isDeletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deletedBy?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   users?: Prisma.UserUncheckedUpdateManyWithoutFacilityNestedInput
   inventories?: Prisma.InventoryUncheckedUpdateManyWithoutFacilityNestedInput
   outgoingOrders?: Prisma.OrderUncheckedUpdateManyWithoutRequesterNestedInput
@@ -1593,6 +1747,9 @@ export type FacilitySelect<ExtArgs extends runtime.Types.Extensions.InternalArgs
   isActive?: boolean
   createdAt?: boolean
   updatedAt?: boolean
+  isDeleted?: boolean
+  isDeletedAt?: boolean
+  deletedBy?: boolean
   users?: boolean | Prisma.Facility$usersArgs<ExtArgs>
   inventories?: boolean | Prisma.Facility$inventoriesArgs<ExtArgs>
   outgoingOrders?: boolean | Prisma.Facility$outgoingOrdersArgs<ExtArgs>
@@ -1619,6 +1776,9 @@ export type FacilitySelectCreateManyAndReturn<ExtArgs extends runtime.Types.Exte
   isActive?: boolean
   createdAt?: boolean
   updatedAt?: boolean
+  isDeleted?: boolean
+  isDeletedAt?: boolean
+  deletedBy?: boolean
 }, ExtArgs["result"]["facility"]>
 
 export type FacilitySelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
@@ -1637,6 +1797,9 @@ export type FacilitySelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Exte
   isActive?: boolean
   createdAt?: boolean
   updatedAt?: boolean
+  isDeleted?: boolean
+  isDeletedAt?: boolean
+  deletedBy?: boolean
 }, ExtArgs["result"]["facility"]>
 
 export type FacilitySelectScalar = {
@@ -1655,9 +1818,12 @@ export type FacilitySelectScalar = {
   isActive?: boolean
   createdAt?: boolean
   updatedAt?: boolean
+  isDeleted?: boolean
+  isDeletedAt?: boolean
+  deletedBy?: boolean
 }
 
-export type FacilityOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "customId" | "name" | "imageUrl" | "fileKey" | "type" | "location" | "address" | "phone" | "email" | "licenseNumber" | "isVerified" | "isActive" | "createdAt" | "updatedAt", ExtArgs["result"]["facility"]>
+export type FacilityOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "customId" | "name" | "imageUrl" | "fileKey" | "type" | "location" | "address" | "phone" | "email" | "licenseNumber" | "isVerified" | "isActive" | "createdAt" | "updatedAt" | "isDeleted" | "isDeletedAt" | "deletedBy", ExtArgs["result"]["facility"]>
 export type FacilityInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   users?: boolean | Prisma.Facility$usersArgs<ExtArgs>
   inventories?: boolean | Prisma.Facility$inventoriesArgs<ExtArgs>
@@ -1698,6 +1864,9 @@ export type $FacilityPayload<ExtArgs extends runtime.Types.Extensions.InternalAr
     isActive: boolean
     createdAt: Date
     updatedAt: Date
+    isDeleted: boolean
+    isDeletedAt: Date | null
+    deletedBy: string | null
   }, ExtArgs["result"]["facility"]>
   composites: {}
 }
@@ -2143,6 +2312,9 @@ export interface FacilityFieldRefs {
   readonly isActive: Prisma.FieldRef<"Facility", 'Boolean'>
   readonly createdAt: Prisma.FieldRef<"Facility", 'DateTime'>
   readonly updatedAt: Prisma.FieldRef<"Facility", 'DateTime'>
+  readonly isDeleted: Prisma.FieldRef<"Facility", 'Boolean'>
+  readonly isDeletedAt: Prisma.FieldRef<"Facility", 'DateTime'>
+  readonly deletedBy: Prisma.FieldRef<"Facility", 'String'>
 }
     
 

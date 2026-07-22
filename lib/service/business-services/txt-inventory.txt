@@ -1,0 +1,365 @@
+ /**
+   * Adjusts stock levels for an existing inventory batch.
+   * Calculates new available quantities based on movement type, enforces safety minimums 
+   * (no negative stock), records the StockMovement, and logs an Audit trace.
+   * * @param payload Structurally parsed data conforming to UpdateStockInput
+   * @param userId The ID of the authenticated user performing this movement
+   * @param facilityId The scope identifier extracted from the user's JWT session
+   * @param ipAddress Optional IP trace
+   */
+  static async updateStock(
+    payload: UpdateStockInput,
+    userId: string,
+    facilityId: string,
+    ipAddress?: string
+  ): Promise<AppResponse> {
+    try {
+      // 1. Structural runtime validation check using Zod
+      const validation = updateStockSchema.safeParse(payload);
+      if (!validation.success) {
+        return {
+          success: false,
+          status: 400,
+          error: validation.error.errors[0]?.message || "Invalid stock update payload.",
+        } as AppResponse;
+      }
+
+      const { inventoryId, type, quantity, notes } = validation.data;
+
+      // 2. Fetch the existing inventory record and check multi-tenant scope
+      const existingInventory = await prisma.inventory.findFirst({
+        where: { id: inventoryId },
+        include: {
+          drug: {
+            select: {
+              name: true,
+              strength: true,
+            },
+          },
+        },
+      });
+
+      if (!existingInventory) {
+        return {
+          success: false,
+          status: 404,
+          error: "Inventory batch record not found.",
+        } as AppResponse;
+      }
+
+      // Security Check: Verify that the inventory batch belongs to the logged-in user's facility
+      if (existingInventory.facilityId !== facilityId) {
+        return {
+          success: false,
+          status: 403,
+          error: "Unauthorized. You do not have permission to modify inventory at another facility.",
+        } as AppResponse;
+      }
+
+      // 3. Determine mathematical direction based on StockMovementType
+      let isAddition = false;
+
+      switch (type) {
+        case StockMovementType.IN:
+        case StockMovementType.RETURN:
+          isAddition = true;
+          break;
+        case StockMovementType.OUT:
+        case StockMovementType.EXPIRY:
+        case StockMovementType.TRANSFER: // Assuming manual transfer-out of stock
+        case StockMovementType.ADJUSTMENT: // Defaulting manual adjustment to subtraction (shrinkage/breakage)
+          isAddition = false;
+          break;
+        default:
+          return {
+            success: false,
+            status: 400,
+            error: `Unsupported stock movement type: ${type}`,
+          } as AppResponse;
+      }
+
+      // Calculate the theoretical new total
+      const currentQty = existingInventory.availableQuantity;
+      const newQty = isAddition ? currentQty + quantity : currentQty - quantity;
+
+      // Enforce physical bounds: Stock cannot drop below zero
+      if (newQty < 0) {
+        return {
+          success: false,
+          status: 400,
+          error: `Insufficient stock. Attempting to withdraw ${quantity} units, but only ${currentQty} units are available.`,
+        } as AppResponse;
+      }
+
+      const recipientIds = await NotificationService.getRecipientIdsByRoles(facilityId, [
+        UserRole.ADMIN,
+        UserRole.PHARMACIST,
+        UserRole.STAFF,
+        UserRole.VIEWER,
+      ], userId);
+      // 4. Execute atomic transaction for state changes
+      const updatedInventory = await prisma.$transaction(async (tx) => {
+        // A. Generate Custom Movement ID inside the transaction
+        const movementCustomId = await generateNextCustomId({
+          tx,
+          facilityId,
+          sequenceType: "STOCK_MOVEMENT",
+          prefix: "MV",
+        });
+
+        // B. Update the inventory level
+        const inventory = await tx.inventory.update({
+          where: { id: inventoryId },
+          data: {
+            availableQuantity: newQty,
+          },
+          include: {
+            drug: {
+              select: {
+                id: true,
+                name: true,
+                strength: true,
+                dosageForm: true,
+                unit: true,
+              },
+            },
+          },
+        });
+
+        // C. Log the transaction to StockMovements ledger
+        await tx.stockMovement.create({
+          data: {
+            customId: movementCustomId,
+            inventoryId: inventory.id,
+            type,
+            quantity,
+            referenceNo: inventory.batchNumber,
+            notes: notes?.trim() || `Manual ${type} adjustment recorded.`,
+            performedById: userId,
+          },
+        });
+
+        // D. Create trace in System Audit Log
+        await tx.auditLog.create({
+          data: {
+            userId,
+            facilityId,
+            action: AuditAction.INVENTORY_UPDATED,
+            entityType: AuditEntity.INVENTORY,
+            entityId: inventory.id,
+            ipAddress: ipAddress || null,
+            details: {
+              message: "Stock level modified via movement transaction.",
+              drugName: `${inventory.drug.name} ${inventory.drug.strength || ""}`,
+              batchNumber: inventory.batchNumber,
+              movementType: type,
+              movementQuantity: quantity,
+              previousQuantity: currentQty,
+              newQuantity: newQty,
+              notes,
+            },
+          },
+        });
+
+        if (recipientIds.length === 0) {
+            console.warn(`⚠️ Notification Triggered, but no recipients found Facility: ${facilityId}`);
+            // Optional: You could fallback to a 'SYSTEM' user or log this to a monitoring tool
+          } else {
+            // ---TRANSACTIONAL NOTIFICATIONS ---
+            // 1. Notify the specific movement
+            await NotificationService.createNotificationInTx(
+              tx,
+              facilityId,
+              `Stock ${type.charAt(0) + type.slice(1).toLowerCase()} Processed`,
+              `Movement recorded: ${type} for ${inventory.drug.name} (${inventory.batchNumber}). New Balance: ${newQty}`,
+              NotificationType.INVENTORY,
+              recipientIds
+            );            
+          }
+
+
+          // 2. Alert if stock is low
+          if (newQty <= inventory.minStockLevel) {
+            if (recipientIds.length === 0) {
+              console.warn(`⚠️ Notification Triggered, but no recipients found Facility: ${facilityId}`);
+              // Optional: You could fallback to a 'SYSTEM' user or log this to a monitoring tool
+            } else {
+              await NotificationService.createNotificationInTx(
+                tx,
+                facilityId,
+                "Low Stock Warning",
+                `Warning: ${inventory.drug.name} (${inventory.batchNumber}) is at or below minimum stock level (${newQty} remaining).`,
+                NotificationType.INVENTORY,
+                recipientIds
+              );
+            }
+          }
+
+
+
+        return inventory;
+      });
+
+      return {
+        success: true,
+        status: 200,
+        message: `Successfully processed ${type} movement of ${quantity} units for ${updatedInventory.drug.name}.`,
+        data: updatedInventory,
+      } as AppResponse;
+
+    } catch (error) {
+      console.error("🚨 Critical System Level Update-Stock Service Error:", error);
+      return {
+        success: false,
+        status: 500,
+        error: "Internal failure occurred while recording stock movement and updating ledger.",
+      } as AppResponse;
+    }
+}
+
+
+static async executeStockAdjustment(
+    input: ExecuteAdjustmentInput, 
+    userId: string,
+    facilityId: string, 
+    ipAddress: string, 
+    userAgent:string
+    ): Promise<AppResponse> {
+
+      const recipientIds = await NotificationService.getRecipientIdsByRoles(facilityId, [
+        UserRole.ADMIN,
+        UserRole.PHARMACIST,
+        UserRole.STAFF,
+        UserRole.VIEWER,
+      ], userId);
+  try {
+    const transactionResult = await prisma.$transaction(async (tx) => {
+      // 1. Find the parent inventory profile with drug details included
+      const item = await tx.inventory.findUnique({
+        where: { id: input.inventoryId },
+        include: {
+          drug: {
+            select: { name: true, strength: true },
+          },
+        },
+      });
+
+      if (!item || item.facilityId !== facilityId) {
+        throw new Error("Inventory target profile not found or facility mismatched.");
+      }
+
+      // 2. Adjust balance safely
+      const newQuantity = item.availableQuantity + input.quantityChange;
+      if (newQuantity < 0) {
+        throw new Error("Cannot complete operation: requested quantity would result in negative stock.");
+      }
+
+      // 3. Generate sequential movement Custom ID using the sequence manager
+      const customId = await generateNextCustomId({
+        tx,
+        facilityId: facilityId, 
+        sequenceType: "STOCK_MOVEMENT",
+        prefix: "MV",
+      });
+
+      // 4. Update core inventory level
+      const updatedInventory = await tx.inventory.update({
+        where: { id: input.inventoryId },
+        data: { availableQuantity: newQuantity },
+        include: { drug: { select: { name: true } } },
+      });
+
+      // 5. Append physical stock movement record
+      const movement = await tx.stockMovement.create({
+        data: {
+          customId,
+          inventoryId: input.inventoryId,
+          type: input.type,
+          quantity: input.quantityChange,
+          referenceNo: input.referenceNo,
+          notes: input.notes,
+          performedById: userId,
+        },
+      });
+
+      // 6. Append System Audit Log entry
+      await tx.auditLog.create({
+        data: {
+          userId: userId,
+          facilityId: facilityId,
+          action: AuditAction.INVENTORY_UPDATED,
+          entityType: AuditEntity.INVENTORY,
+          entityId: item.id,
+          ipAddress: ipAddress || null,
+          userAgent: userAgent || null,
+          details: {
+            message: "Stock level modified via manual inventory action.",
+            drugName: `${item.drug.name} ${item.drug.strength || ""}`.trim(),
+            batchNumber: item.batchNumber || "N/A",
+            movementCustomId: customId,
+            movementType: input.type,
+            movementQuantity: input.quantityChange,
+            previousQuantity: item.availableQuantity,
+            newQuantity: newQuantity,
+            notes: input.notes || null,
+          },
+        },
+      });
+
+      // --- TRANSACTIONAL NOTIFICATIONS ---
+
+      if (recipientIds.length === 0) {
+            console.warn(`⚠️ Notification Triggered, but no recipients found Facility: ${facilityId}`);
+            // Optional: You could fallback to a 'SYSTEM' user or log this to a monitoring tool
+          } else {
+            
+            // A. Notify that the adjustment was performed
+            await NotificationService.createNotificationInTx(
+              tx,
+              facilityId,
+              "Stock Adjustment Processed",
+              `Adjustment for ${item.drug.name} (${item.batchNumber || 'No Batch'}): ${input.quantityChange > 0 ? '+' : ''}${input.quantityChange} units. New Balance: ${newQuantity}.`,
+              NotificationType.INVENTORY,
+              recipientIds
+            );
+          }
+
+
+          
+          // B. Trigger Low Stock alert if necessary
+          if (newQuantity <= item.minStockLevel) {
+        if (recipientIds.length === 0) {
+            console.warn(`⚠️ Notification Triggered, but no recipients found Facility: ${facilityId}`);
+            // Optional: You could fallback to a 'SYSTEM' user or log this to a monitoring tool
+          } else {
+            
+            await NotificationService.createNotificationInTx(
+              tx,
+              facilityId,
+              "Low Stock Warning",
+              `Alert: ${item.drug.name} (${item.batchNumber || 'No Batch'}) is at or below minimum stock level (${newQuantity} remaining).`,
+              NotificationType.INVENTORY,
+              recipientIds
+            );
+          }
+      }
+
+      return { updatedInventory, movement };
+    });
+
+    return {
+      success: true,
+      status: 201,
+      message: `Successfully updated stock levels for ${transactionResult.updatedInventory.drug.name}.`,
+      data: transactionResult,
+    } as AppResponse;
+
+  } catch (error: unknown) {
+    console.error("🚨 Inventory mutation rolled back safely:", error);
+    return {
+      success: false,
+      status: 400,
+      error: (error as Error).message || "Failed to process stock adjustment safely.",
+    } as AppResponse;
+  }
+}

@@ -15,7 +15,7 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import TableMain from "@/components/custom/table/TableMain"
 import { AppSheet } from "@/components/custom/drawers/AppSheet"
-import { userColumns, UserTableMeta } from "@/components/columnDef/userColumnDef"
+import { userColumns, UserTableMeta } from "@/components/columnDef/drugs/userColumnDef"
 import AddUserForm from "./AddUserForm"
 import EditUserForm from "./EditUserForm"
 import { useUserStore } from "@/store/userStore"
@@ -28,15 +28,19 @@ export default function UsersPage() {
   const [isAddUserOpen, setIsAddUserOpen] = React.useState(false)
   const [isEditUserOpen, setIsEditUserOpen] = React.useState(false)
   const [selectedUser, setSelectedUser] = React.useState<UserListResponse["users"][number] | null>(null)
-
-const metrics = React.useMemo(() => {
-  // Explicitly ensure it's an array
-  const safeUsers = Array.isArray(users) ? users : [];
+  
+  const metrics = React.useMemo(() => {
+    // Explicitly ensure it's an array
+    const safeUsers = Array.isArray(users) ? users : [];
+    // const safeUsers = users || [];
+    
+    console.log('SAFE')
+    console.log(safeUsers)
   
   const total = safeUsers.length;
   const active = safeUsers.filter(u => u.isActive).length;
   const inactive = safeUsers.filter(u => !u.isActive).length;
-    const admins = safeUsers.filter(u => u.role === "ADMIN").length
+  const admins = safeUsers.filter(u => u.role === "ADMIN").length
   const pharmacists = safeUsers.filter(u => u.role === "PHARMACIST").length;
 
   const activePercentage = total > 0 ? Math.round((active / total) * 100) : 0;

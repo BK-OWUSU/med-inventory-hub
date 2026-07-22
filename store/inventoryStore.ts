@@ -4,7 +4,9 @@ import {
   LocalInventoryFilters, 
   LocalInventoryItem,
   PaginationMeta,
-  InventorySummary
+  InventorySummary,
+  StockAdjustmentRow,
+  AdjustmentFilters
 } from "@/types/types/inventory.type";
 import { create } from "zustand";
 import apiClient from "@/lib/api-client";
@@ -22,6 +24,10 @@ interface InventoryStore {
   movements: StockMovementItem[];
   movementsSummary: StockMovementsSummary | null;
   movementsMeta: PaginationMeta | null;
+
+  // Stock Adjustments History
+  adjustments: StockAdjustmentRow[];
+  adjustmentsMeta: PaginationMeta | null;
   
   isLoading: boolean;
   error: string | null;
@@ -31,6 +37,7 @@ interface InventoryStore {
   fetchGlobalInventory: (filters?: GlobalInventoryFilters) => Promise<void>;
   fetchInventorySummary: () => Promise<void>;
   fetchStockMovements: (filters?: MovementFilters) => Promise<void>;
+  fetchAdjustments: (filters?: AdjustmentFilters) => Promise<void>;
 }
 
 /**
@@ -58,6 +65,8 @@ export const useInventoryStore = create<InventoryStore>((set) => ({
   movements: [],
   movementsSummary: null,
   movementsMeta: null,
+  adjustments: [],
+  adjustmentsMeta: null,
   isLoading: false,
   error: null,
 
@@ -66,8 +75,9 @@ export const useInventoryStore = create<InventoryStore>((set) => ({
     try {
       const queryString = filters ? `?${toQueryString(filters)}` : "";
       const response = await apiClient.get(`/pharmsync/inventory/local${queryString}`);
+      const localData = response.data.data?.inventories as LocalInventoryItem[] || [];
       set({ 
-        localInventory: (response.data.data?.inventories as LocalInventoryItem[]) || [], 
+        localInventory: localData, 
         isLoading: false 
       });
     } catch (err) {
@@ -81,9 +91,10 @@ export const useInventoryStore = create<InventoryStore>((set) => ({
     try {
       const queryString = filters ? `?${toQueryString(filters)}` : "";
       const response = await apiClient.get(`/pharmsync/inventory/global${queryString}`);
-      console.log(response)
+      const globalData = response.data.data?.inventories as GlobalInventoryItem[] || [];
+      console.log(globalData)
       set({ 
-        globalInventory: (response.data.data?.inventories as GlobalInventoryItem[]) || [], 
+        globalInventory: globalData, 
         isLoading: false 
       });
     } catch (err) {
@@ -125,6 +136,28 @@ export const useInventoryStore = create<InventoryStore>((set) => ({
         movementsSummary: null, 
         movementsMeta: null, 
         error: "Failed to load stock movements.", 
+        isLoading: false 
+      });
+    }
+  },
+
+  fetchAdjustments: async (filters) => {
+    set({ isLoading: true, error: null });
+    try {
+      const queryString = filters ? `?${toQueryString(filters)}` : "";
+      const response = await apiClient.get(`/pharmsync/inventory/adjustments${queryString}`);
+
+      set({
+        adjustments: response.data.data as StockAdjustmentRow[] || [],
+        adjustmentsMeta: response.data.meta as PaginationMeta || null,
+        isLoading: false,
+      });
+    } catch (err) {
+      console.log("STOCK_ADJUSTMENTS_FETCH_ERROR: ", err);
+      set({ 
+        adjustments: [], 
+        adjustmentsMeta: null, 
+        error: "Failed to load stock adjustment history.", 
         isLoading: false 
       });
     }

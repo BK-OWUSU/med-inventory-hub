@@ -19,20 +19,6 @@ export interface StockMovementTableMeta {
   onViewDetails?: (item: StockMovementItem) => void;
 }
 
-// Helper to determine styling based on movement type
-const getMovementTypeStyles = (type: string) => {
-  switch (type) {
-    case "RESTOCK":
-      return { label: "Restock", color: "bg-emerald-50 text-emerald-700 border-emerald-200", icon: ArrowDownLeft };
-    case "ISSUE":
-      return { label: "Issue", color: "bg-orange-50 text-orange-700 border-orange-200", icon: ArrowUpRight };
-    case "ADJUSTMENT":
-      return { label: "Adjustment", color: "bg-blue-50 text-blue-700 border-blue-200", icon: RotateCcw };
-    default:
-      return { label: type, color: "bg-slate-50 text-slate-600 border-slate-200", icon: Hash };
-  }
-};
-
 const formatDate = (dateInput: Date | string) => {
   return new Intl.DateTimeFormat("en-US", {
     month: "short",
@@ -43,29 +29,41 @@ const formatDate = (dateInput: Date | string) => {
   }).format(new Date(dateInput));
 };
 
-export const stockMovementColumns: ColumnDef<StockMovementItem>[] = [
+export const stockMovementColumn: ColumnDef<StockMovementItem>[] = [
   {
-    accessorKey: "performedAt",
-    header: "Timestamp",
-    cell: ({ row }) => (
-      <span className="text-xs font-medium text-slate-500 whitespace-nowrap">
-        {formatDate(row.original.performedAt)}
-      </span>
-    ),
+      accessorKey: "customId",
+      header: "Movement ID",
+      cell: ({ row }) => (
+        <Badge variant="outline" className="bg-slate-50 text-slate-700 border-slate-200 font-semibold px-2.5 py-0.5 rounded-md text-[11px]">
+          <Hash className="h-3 w-3 text-slate-400" />
+          {row.original.customId}
+        </Badge>
+      )
   },
   {
-    accessorKey: "referenceNo",
-    header: "Reference",
+    accessorKey: "performedAt",
+    header: "Date & Time",
     cell: ({ row }) => (
-      <div className="flex items-center gap-1.5 text-slate-600 font-mono text-xs">
-        <Hash className="h-3 w-3 text-slate-400" />
-        {row.original.referenceNo || row.original.customId}
+       <div className="flex flex-col font-sans text-xs">
+          <span className="font-semibold text-slate-900">{formatDate(row.original.performedAt)}</span>
+      </div>
+    ),
+  },
+   {
+    accessorKey: "performedBy.fullName",
+    header: "Performed By",
+    cell: ({ row }) => (
+      <div className="flex items-center gap-2 text-sm text-slate-600">
+        <div className="h-6 w-6 rounded-full bg-slate-100 flex items-center justify-center">
+          <User className="h-3 w-3 text-slate-500" />
+        </div>
+        {row.original.performedBy?.fullName || "System"}
       </div>
     ),
   },
   {
     accessorKey: "inventory.drug.name",
-    header: "Medicine",
+    header: "Drug",
     cell: ({ row }) => (
       <div className="flex flex-col">
         <span className="text-sm font-semibold text-slate-900">{row.original.inventory.drug.name}</span>
@@ -79,14 +77,24 @@ export const stockMovementColumns: ColumnDef<StockMovementItem>[] = [
     accessorKey: "type",
     header: "Type",
     cell: ({ row }) => {
-      const { label, color, icon: Icon } = getMovementTypeStyles(row.original.type as string);
+      const type = row.original.type
+      
+      const configurations: Record<string, { label: string; style: string }> = {
+        IN: { label: "↓ IN", style: "bg-emerald-50 text-emerald-700 border-emerald-200" },
+        OUT: { label: "↑ OUT", style: "bg-rose-50 text-rose-700 border-rose-200" },
+        ADJUSTMENT: { label: "⇄ ADJUSTMENT", style: "bg-blue-50 text-blue-700 border-blue-200" },
+        EXPIRY: { label: "🗙 EXPIRY", style: "bg-amber-50 text-amber-700 border-amber-200" },
+        TRANSFER: { label: "⇆ TRANSFER", style: "bg-purple-50 text-purple-700 border-purple-200" },
+      }
+
+      const current = configurations[type] || { label: type, style: "bg-slate-50 text-slate-600" }
+
       return (
-        <Badge variant="outline" className={`${color} rounded-md px-2 py-0.5 font-semibold flex w-fit items-center gap-1`}>
-          <Icon className="h-3 w-3" />
-          {label}
+        <Badge variant="outline" className={`${current.style} font-bold text-[10px] px-2 py-0.5 uppercase tracking-wide rounded-md`}>
+          {current.label}
         </Badge>
-      );
-    },
+      )
+    }
   },
   {
     accessorKey: "quantity",
@@ -102,16 +110,9 @@ export const stockMovementColumns: ColumnDef<StockMovementItem>[] = [
     },
   },
   {
-    accessorKey: "performedBy.fullName",
-    header: "Performed By",
-    cell: ({ row }) => (
-      <div className="flex items-center gap-2 text-sm text-slate-600">
-        <div className="h-6 w-6 rounded-full bg-slate-100 flex items-center justify-center">
-          <User className="h-3 w-3 text-slate-500" />
-        </div>
-        {row.original.performedBy?.fullName || "System"}
-      </div>
-    ),
+    accessorKey: "reference",
+    header: "Reference",
+    cell: ({ row }) => <span className="text-slate-500 text-xs font-mono">{row.original.referenceNo}</span>
   },
   {
     id: "actions",

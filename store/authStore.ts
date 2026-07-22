@@ -24,7 +24,6 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
     try {
       set({ loading: true })
       const response = await apiClient.get("/auth/me")
-      console.log(response)
       const userData = response.data?.data as AppUser 
       set({
         user: userData,

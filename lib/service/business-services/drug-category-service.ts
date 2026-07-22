@@ -284,6 +284,7 @@ export class DrugCategoryService {
     try {
       // Fetch categories alongside their aggregated drug counts
       const categories = await prisma.drugCategory.findMany({
+        where: {isDeleted: false},
         include: {
           _count: {
             select: {
@@ -359,7 +360,7 @@ export class DrugCategoryService {
       }
 
       // 3. Prevent redundant updates if it is already deactivated
-      if (!categoryWithCount.isActive) {
+      if (categoryWithCount.isDeleted || !categoryWithCount.isActive) {
         return {
           success: false,
           status: 400,
@@ -372,7 +373,10 @@ export class DrugCategoryService {
         const category = await tx.drugCategory.update({
           where: { id },
           data: {
-            isActive: false,
+              isDeleted: true,
+              isActive: false,
+              isDeletedAt: new Date(),
+              deletedBy: userId
           },
         });
 
@@ -443,7 +447,7 @@ export class DrugCategoryService {
       }
 
       // 2. Prevent redundant execution if it is already active
-      if (existingCategory.isActive) {
+      if (existingCategory.isActive || !existingCategory.isDeleted) {
         return {
           success: false,
           status: 400,
@@ -456,7 +460,8 @@ export class DrugCategoryService {
         where: {
           name: { equals: existingCategory.name.trim(), mode: "insensitive" },
           id: { not: id },
-          isActive: true, // Only conflict with active ones
+          isDeleted: false,
+          isActive: true 
         },
       });
 
