@@ -13,6 +13,7 @@ export const CreateUserSchema = z.object({
   role: z.enum(VISIBLE_ROLES, {
     required_error: "Please specify the user role",
   }),
+  facilityId: z.string().min(1, "Facility is required"), // 👈 Add th
   phone: z.string().optional().nullable().or(z.literal("")),
   isActive: z.boolean().default(true),
   needsPasswordChange: z.boolean().default(true),
