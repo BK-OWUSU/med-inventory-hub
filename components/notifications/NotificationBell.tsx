@@ -42,7 +42,7 @@ export const NotificationBell = ({ notifications = [] }: {notifications: Notific
       </button>
 
       {/* Dropdown Panel */}
-      <div className="absolute right-0 mt-2 w-80 bg-white border border-gray-200 shadow-xl rounded-lg hidden group-hover:block z-50 overflow-hidden">
+      <div className="absolute z-9999 right-0 mt-2 w-80 bg-white border border-gray-200 shadow-xl rounded-lg hidden group-hover:block overflow-hidden">
         <div className="p-4 border-b flex justify-between items-center bg-gray-50">
           <span className="font-bold text-sm">Notifications</span>
           {unreadCount > 0 && (

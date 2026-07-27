@@ -1,5 +1,5 @@
 
-import { Prisma, User } from "@/generated/prisma/client";
+import { Prisma } from "@/generated/prisma/client";
 import { NotificationType, UserRole } from "@/generated/prisma/enums";
 import { prisma } from "@/lib/database/dbConnection";
 import { AppResponse } from "@/types/types/app.type";
@@ -9,8 +9,9 @@ import { AuditAction, AuditEntity } from "@/generated/prisma/browser";
 import { generateNextCustomId } from "@/lib/utils";
 import { sendTempPasswordEmail } from "@/lib/mailer/email";
 import { randomBytes } from "crypto";
-import { hashPassword } from "@/lib/auths/auths-functions";
+import { hashPassword, verifyPassword } from "@/lib/auths/auths-functions";
 import { NotificationService } from "../business-services/notification.service";
+import { PasswordChangeInput, passwordChangeSchema } from "@/types/schemas/auth.schema";
 
 export class UserService {
   /**
@@ -66,6 +67,8 @@ export class UserService {
             id: true,
             customId: true,
             email: true,
+            imageUrl:true,
+            fileKey: true,
             fullName: true,
             role: true,
             phone: true,
@@ -97,6 +100,8 @@ export class UserService {
         id: user.id,
         customId: user.customId,
         email: user.email,
+        imageUrl: user.imageUrl,
+        fileKey: user.fileKey,
         fullName: user.fullName,
         role: user.role,
         phone: user.phone,
@@ -176,6 +181,9 @@ export class UserService {
         error: "A user with this email already exists.",
       } as AppResponse;
     }
+
+    console.log("EMAIL: ", cleanEmail)
+    console.log("TEMP PASSWORD: ", tempPassword)
 
    
     const recipientIds = await NotificationService.getRecipientIdsByRoles(facilityId, [UserRole.ADMIN], userId);
@@ -496,6 +504,70 @@ export class UserService {
         status: 500,
         error: "Internal failure occurred while updating user status.",
       } as AppResponse;
+    }
+  }
+
+
+  static async  changePassword(
+    userId: string, 
+    data: PasswordChangeInput,
+    ipAddress?: string,
+    userAgent?: string
+  ): Promise<AppResponse> {
+    const result = passwordChangeSchema.safeParse(data);
+    if (!result.success) {
+      return { success: false, error: "Invalid form data." };
+    }
+  
+    try {
+      const user = await prisma.user.findUnique({ where: { id: userId } });
+      if (!user) {
+        return { success: false, error: "User not found." };
+      }
+  
+      // Verify current password
+      const isValidPassword = await verifyPassword(data.currentPassword, user.password);
+      if (!isValidPassword) {
+        return { success: false, error: "Incorrect current password." };
+      }
+  
+      // Hash new password
+      const hashedPassword = await hashPassword(data.newPassword)
+  
+      await prisma.$transaction(async (tx) => {
+        // Update user record and clear the forced password change flag
+        await tx.user.update({
+          where: { id: userId },
+          data: {
+            password: hashedPassword,
+            needsPasswordChange: false,
+          },
+        });
+
+         // Record security audit event
+        await tx.auditLog.create({
+          data: {
+            userId: user.id,
+            facilityId: user.facilityId,
+            action: AuditAction.PASSWORD_CHANGE,
+            entityType: AuditEntity.USER,
+            entityId: user.id,
+            ipAddress,
+            userAgent,
+            details: {
+              message: "User successfully changed password.",
+              customId: user.customId,
+              roleName: user.role,
+            },
+          },
+        });
+
+    
+      })
+      return { success: true, message: "Password updated successfully." };
+    } catch (error) {
+      console.error("Error updating password:", error);
+      return { success: false, error: "Something went wrong. Please try again." };
     }
   }
 }

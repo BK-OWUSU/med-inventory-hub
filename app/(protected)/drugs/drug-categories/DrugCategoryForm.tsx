@@ -27,6 +27,9 @@ import { Switch } from "@/components/ui/switch"
 import { DrugCategoryFormValues, drugCategorySchema } from "@/types/schemas/drug.schema"
 import { Textarea } from "@/components/ui/textarea"
 import { createDrugCategoryAction, updateDrugCategoryAction } from "@/lib/actions/drug-category-actions"
+import { Can } from "@/components/security/Can"
+import { Badge } from "@/components/ui/badge"
+import { PERMISSIONS } from "@/lib/constants/permisions"
 
 // 1. Extend props to accept optional initial data for edit operations
 interface DrugCategoryFormProps {
@@ -254,12 +257,15 @@ async function onSubmit(data: DrugCategoryFormValues) {
           >
             {isEditMode ? "Reset Changes" : "Clear Form"}
           </Button>
+          <Can
+             permission={PERMISSIONS.DRUG_CREATE}
+             fallback={<Badge>Read Only</Badge>}>
           <Button
             type="submit"
             form="drug-category-form"
             disabled={isPending}
             className="bg-emerald-800 hover:bg-emerald-700 text-white font-medium text-xs h-9 rounded-lg gap-1.5 px-4 shadow-xs disabled:opacity-70 min-w-27.5"
-          >
+            >
             {isPending ? (
               <>
                 <Loader2 className="h-3.5 w-3.5 animate-spin" />
@@ -269,6 +275,7 @@ async function onSubmit(data: DrugCategoryFormValues) {
               isEditMode ? "Update Category" : "Save Category"
             )}
           </Button>
+        </Can>
         </Field>
       </CardFooter>
     </Card>

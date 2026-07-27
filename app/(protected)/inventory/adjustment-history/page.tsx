@@ -13,7 +13,6 @@ import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import TableMain from "@/components/custom/table/TableMain"
 import { AppSheet } from "@/components/custom/drawers/AppSheet"
-import { StockAdjustmentFormComponent } from "./InventoryAdjustmentForm"
 import { StockAdjustmentRow } from "@/types/types/inventory.type"
 import { adjustmentHistoryColumns, StockAdjustmentTableMeta } from "@/components/columnDef/inventory/AdjustmentHistoryColumnDef"
 import { useInventoryStore } from "@/store/inventoryStore"
@@ -25,7 +24,6 @@ export default function AdjustmentHistoryPage() {
   const { isLoading, fetchAdjustments, adjustments, adjustmentsMeta } = useInventoryStore()
   
   const [selectedAdjustmentHistory, setSelectedAdjustmentHistory] = React.useState<StockAdjustmentRow | null>(null)
-  const [isCreateAdjustmentDrawerOpen, setIsCreateAdjustmentDrawerOpen] = React.useState(false)
   const [isViewAdjustmentDrawerOpen, setIsViewAdjustmentDrawerOpen] = React.useState(false)
   const [isEditAdjustmentDrawerOpen, setIsEditAdjustmentDrawerOpen] = React.useState(false)
 
@@ -88,17 +86,6 @@ export default function AdjustmentHistoryPage() {
               className="bg-transparent focus:outline-none text-slate-700 font-medium cursor-pointer border-0 shadow-none h-auto p-0 focus-visible:ring-0"
             />
           </div>
-          
-          <Button 
-            onClick={() => {
-              setSelectedAdjustmentHistory(null);
-              setIsCreateAdjustmentDrawerOpen(true);
-            }}
-            className="gap-1.5 h-9 text-xs font-medium"
-          >
-            <Plus className="h-4 w-4" />
-            Create Adjustment
-          </Button>
         </div>
       </div>
 
@@ -183,24 +170,6 @@ export default function AdjustmentHistoryPage() {
         />
       </div>
 
-      <AppSheet
-        isOpen={isCreateAdjustmentDrawerOpen}
-        onClose={() => setIsCreateAdjustmentDrawerOpen(false)}
-        title="Create Adjustment"
-        description="Create new adjustment"
-      >
-        <StockAdjustmentFormComponent
-          inventoryId={selectedAdjustmentHistory ? selectedAdjustmentHistory.id : ""}
-          onSuccess={() => {
-            setIsCreateAdjustmentDrawerOpen(false);
-            setSelectedAdjustmentHistory(null)
-            fetchAdjustments({
-              startDate: startDate ? new Date(startDate) : undefined,
-              endDate: endDate ? new Date(endDate) : undefined,
-            });
-          }}
-        />
-      </AppSheet>  
       <AppSheet
         isOpen={isEditAdjustmentDrawerOpen}
         onClose={() => setIsEditAdjustmentDrawerOpen(false)}

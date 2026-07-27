@@ -28,7 +28,8 @@ type ParsedNavGroup = Omit<NavGroup, "items"> & {
 }
 
 export function NavMain({ items }: { items: ParsedNavGroup[] }) {
-  const pathname = usePathname()
+  const pathname = usePathname();
+
   const [openGroup, setOpenGroup] = React.useState<string | null>(() => {
     const activeGroup = items.find((group) =>
       group.items?.some((subItem) => pathname === subItem.url)

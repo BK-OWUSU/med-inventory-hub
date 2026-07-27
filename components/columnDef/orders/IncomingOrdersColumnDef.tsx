@@ -5,7 +5,6 @@ import {
   MoreHorizontal, 
   Eye,
   FileText,
-  CheckCircle2,
   Building2
 } from "lucide-react";
 import { 
@@ -19,13 +18,13 @@ import {
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { OrderWithRelations } from "@/types/types/orders.type";
-
+import { Can } from "@/components/security/Can";
+import { PERMISSIONS } from "@/lib/constants/permisions";
 
 // 1. Declare Table Meta interface for Order Actions
 export interface OrderTableMeta {
   onViewDetails?: (order: OrderWithRelations) => void;
   onReviewOrder?: (order: OrderWithRelations) => void;
-  onReceiveOrder?: (order: OrderWithRelations) => void;
 }
 
 // Formatting helpers
@@ -72,41 +71,38 @@ export function OrderRowActions({
   const order = row.original;
   const meta = table.options.meta as OrderTableMeta | undefined;
 
-  // Determine primary action button based on order status from your schema
+  // Determine primary action button based on order status
   const renderPrimaryAction = () => {
     switch (order.status) {
       case "PENDING":
         return (
+           <Can
+              permission={PERMISSIONS.ORDER_APPROVE}
+              fallback={<Badge>Read Only</Badge>}>  
           <Button 
             size="sm"
             className="h-8 bg-emerald-800 hover:bg-emerald-700 text-white text-xs font-semibold rounded-lg px-3 shadow-xs"
             onClick={() => meta?.onReviewOrder?.(order)}
-          >
+            >
             Review
           </Button>
-        );
-      case "APPROVED":
-      case "PARTIALLY_FULFILLED":
-      case "SHIPPED":
-        return (
-          <Button 
-            size="sm"
-            className="h-8 bg-emerald-800 hover:bg-emerald-700 text-white text-xs font-semibold rounded-lg px-3 shadow-xs"
-            onClick={() => meta?.onReceiveOrder?.(order)}
-          >
-            Receive
-          </Button>
+        </Can>
         );
       default:
         return (
+           <Can
+            permission={PERMISSIONS.ORDER_VIEW}
+            fallback={<Badge>Read Only</Badge>}>
+
           <Button 
             variant="outline"
             size="sm"
             className="h-8 border-slate-200 text-slate-700 hover:bg-slate-100 text-xs font-semibold rounded-lg px-3"
             onClick={() => meta?.onViewDetails?.(order)}
-          >
+            >
             View
           </Button>
+        </Can>     
         );
     }
   };
@@ -127,21 +123,23 @@ export function OrderRowActions({
         <DropdownMenuContent align="end" className="w-48">
           <DropdownMenuLabel>Actions</DropdownMenuLabel>
           <DropdownMenuSeparator />
+           <Can
+            permission={PERMISSIONS.ORDER_VIEW}
+            fallback={<Badge>Read Only</Badge>}>
           <DropdownMenuItem onClick={() => meta?.onViewDetails?.(order)}>
             <Eye className="h-4 w-4 mr-2 text-slate-400" />
             View details
           </DropdownMenuItem>
+          </Can>
           {order.status === "PENDING" && (
+             <Can
+            permission={PERMISSIONS.ORDER_APPROVE}
+            fallback={<Badge>Read Only</Badge>}>
             <DropdownMenuItem onClick={() => meta?.onReviewOrder?.(order)}>
               <FileText className="h-4 w-4 mr-2 text-slate-400" />
               Review Order
             </DropdownMenuItem>
-          )}
-          {(order.status === "APPROVED" || order.status === "PARTIALLY_FULFILLED" || order.status === "SHIPPED") && (
-            <DropdownMenuItem onClick={() => meta?.onReceiveOrder?.(order)}>
-              <CheckCircle2 className="h-4 w-4 mr-2 text-slate-400" />
-              Receive Items
-            </DropdownMenuItem>
+            </Can>
           )}
         </DropdownMenuContent>
       </DropdownMenu>
@@ -184,15 +182,15 @@ export const incomingOrdersColumns: ColumnDef<OrderWithRelations>[] = [
     header: "Order Type",
     cell: ({ row }) => {
       const type = row.original.type;
-      const isEmergency = type === "EMERGENCY"; // Assuming EMERGENCY might be part of your OrderType enum
+      
+      let badgeStyle = "bg-emerald-50 text-emerald-700 border-emerald-200"; // REQUEST
+      if (type === "SUPPLY") badgeStyle = "bg-indigo-50 text-indigo-700 border-indigo-200";
+      if (type === "EMERGENCY") badgeStyle = "bg-rose-50 text-rose-700 border-rose-200";
+
       return (
         <Badge 
           variant="outline" 
-          className={`font-bold text-[10px] px-2.5 py-0.5 rounded-md tracking-wide w-fit ${
-            isEmergency 
-              ? "bg-rose-50 text-rose-700 border-rose-200" 
-              : "bg-emerald-50 text-emerald-700 border-emerald-200"
-          }`}
+          className={`font-bold text-[10px] px-2.5 py-0.5 rounded-md tracking-wide w-fit ${badgeStyle}`}
         >
           {type}
         </Badge>
@@ -213,6 +211,7 @@ export const incomingOrdersColumns: ColumnDef<OrderWithRelations>[] = [
     },
   },
   {
+    id: "requester",
     accessorKey: "requester",
     header: "Requested By",
     cell: ({ row }) => {
@@ -220,7 +219,7 @@ export const incomingOrdersColumns: ColumnDef<OrderWithRelations>[] = [
       return (
         <div className="flex flex-col text-xs">
           <span className="font-semibold text-slate-800">{requestedBy?.name || "System User"}</span>
-          <span className="text-[10px] text-slate-400">{row.original.requester?.name || "Facility"}</span>
+          <span className="text-[10px] text-slate-400">{requestedBy?.location || "Facility"}</span>
         </div>
       );
     },
@@ -259,7 +258,7 @@ export const incomingOrdersColumns: ColumnDef<OrderWithRelations>[] = [
       let badgeStyle = "bg-amber-50 text-amber-700 border-amber-200"; // PENDING
       if (status === "APPROVED") badgeStyle = "bg-emerald-50 text-emerald-700 border-emerald-200";
       if (status === "PARTIALLY_FULFILLED" || status === "SHIPPED") badgeStyle = "bg-sky-50 text-sky-700 border-sky-200";
-      if (status === "RECEIVED" || status === "DELIVERED" || status === "COMPLETED") badgeStyle = "bg-slate-100 text-slate-700 border-slate-200";
+      if (status === "COMPLETED") badgeStyle = "bg-slate-100 text-slate-700 border-slate-200";
       if (status === "REJECTED" || status === "CANCELLED") badgeStyle = "bg-rose-50 text-rose-700 border-rose-200";
 
       const formattedStatus = status.replace(/_/g, " ");

@@ -81,7 +81,7 @@ async function main() {
     userCustomId = await generateNextCustomId({
       tx,
       facilityId: facility.id || "", 
-      sequenceType: "USER",
+      sequenceType: "USER_ID",
       prefix: "SADM",
     })
 

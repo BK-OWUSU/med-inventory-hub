@@ -146,6 +146,7 @@ export const useInventoryStore = create<InventoryStore>((set) => ({
     try {
       const queryString = filters ? `?${toQueryString(filters)}` : "";
       const response = await apiClient.get(`/pharmsync/inventory/adjustments${queryString}`);
+      console.log(response.data.data)
 
       set({
         adjustments: response.data.data as StockAdjustmentRow[] || [],

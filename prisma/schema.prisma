@@ -54,6 +54,8 @@ model User {
   id       String   @id @default(cuid())
   customId String   @unique
   email    String   @unique
+  imageUrl String?  @default("/img/system-user.png")
+  fileKey  String?
   password String // Hashed
   fullName String
   role     UserRole @default(STAFF)
@@ -72,7 +74,7 @@ model User {
   createdAt       DateTime         @default(now())
   updatedAt       DateTime         @updatedAt
   lastLoginAt     DateTime?
-    isDeleted     Boolean   @default(false)
+  isDeleted     Boolean   @default(false)
   isDeletedAt     DateTime?
   deletedBy       String?  
 
@@ -82,6 +84,14 @@ model User {
   @@index([role])
   @@map("users")
   notificationRecipients NotificationRecipient[]
+}
+
+enum UserRole {
+  SUPER_ADMIN
+  ADMIN
+  PHARMACIST
+  STAFF
+  VIEWER
 }
 
 model UserSessionLog {
@@ -206,36 +216,36 @@ model Inventory {
 }
 
 model Order {
-  id          String @id @default(cuid())
-  orderNumber String @unique @default(cuid())
-  customId    String @unique
+  id              String @id @default(cuid())
+  orderNumber     String @unique @default(cuid())
+  customId        String @unique
 
-  requesterId String
-  requester   Facility @relation("RequesterFacility", fields: [requesterId], references: [id])
+  requesterId     String
+  requester       Facility @relation("RequesterFacility", fields: [requesterId], references: [id])
 
-  supplierId String?
-  supplier   Facility? @relation("SupplierFacility", fields: [supplierId], references: [id])
+  supplierId      String?
+  supplier        Facility? @relation("SupplierFacility", fields: [supplierId], references: [id])
 
-  type   OrderType   @default(REQUEST)
-  status OrderStatus @default(PENDING)
+  type            OrderType   @default(REQUEST)
+  status          OrderStatus @default(PENDING)
 
-  requestedById String
-  requestedBy   User   @relation("RequestedBy", fields: [requestedById], references: [id])
+  requestedById   String
+  requestedBy     User   @relation("RequestedBy", fields: [requestedById], references: [id])
 
-  approvedById String?
-  approvedBy   User?   @relation("ApprovedBy", fields: [approvedById], references: [id])
+  approvedById    String?
+  approvedBy      User?   @relation("ApprovedBy", fields: [approvedById], references: [id])
 
   notes           String?
   rejectionReason String?
   totalValue      Decimal?
 
-  items OrderItem[]
+  items           OrderItem[]
 
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  approvedAt DateTime?
-  receivedAt DateTime?
-  deliveredAt DateTime?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  approvedAt      DateTime?
+  receivedAt      DateTime?
+  deliveredAt     DateTime?
 
   @@index([status])
   @@index([requesterId])
@@ -267,16 +277,22 @@ model OrderItem {
 }
 
 enum OrderStatus {
+  /// Placed, waiting for approval
   PENDING
+  /// Approved by admin/supplier, processing begins
   APPROVED
-  PARTIALLY_FULFILLED
-  SHIPPED
-  RECEIVED
-  DELIVERED
-  COMPLETED
+  /// Denied
   REJECTED
+  /// Cancelled before processing
   CANCELLED
+  /// Only some items were available/sent
+  PARTIALLY_FULFILLED
+  /// Dispatched and in transit
+  SHIPPED
+  /// Delivered, verified, and stock successfully updated/closed
+  COMPLETED
 }
+
 
 
 // ==================== LOGGING MODELS ====================
@@ -402,13 +418,6 @@ enum DosageForm {
   OINTMENT
 }
 
-enum UserRole {
-  SUPER_ADMIN
-  ADMIN
-  PHARMACIST
-  STAFF
-  VIEWER
-}
 
 enum FacilityType {
   HOSPITAL
@@ -440,6 +449,7 @@ enum AuditAction {
   ORDER_APPROVED
   ORDER_REJECTED
   ORDER_DELIVERED
+  ORDER_UPDATED
   INVENTORY_UPDATED
   INVENTORY_CREATED
   USER_CREATED
@@ -450,6 +460,7 @@ enum AuditAction {
   FACILITY_UPDATED
   FACILITY_VERIFIED
   PASSWORD_RESET
+  PASSWORD_CHANGE
 }
 
 enum AuditEntity {

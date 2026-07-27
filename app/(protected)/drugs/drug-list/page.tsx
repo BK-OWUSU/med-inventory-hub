@@ -23,6 +23,9 @@ import { DrugWithCategory } from "@/types/types/drugs.types"
 import EditDrugForm from "../add-drug/EditDrugForms"
 import { useDrugCategoryStore } from "@/store/drugCategory"
 import { useAuthStore } from "@/store/authStore"
+import { Can } from "@/components/security/Can"
+import { Badge } from "@/components/ui/badge"
+import { PERMISSIONS } from "@/lib/constants/permisions"
 
 interface MetricsCardProps {
   title: string
@@ -64,6 +67,7 @@ export default function DrugManagementPage() {
   const { fetchDrugs, loading, drugs = [] } = useDrugStore();
   const { fetchCategories, categories = [] } = useDrugCategoryStore()
   const router = useRouter();
+  const currentUserFacilityId = user?.facility?.id
   
   const addDrugPath = "/drugs/add-drug";
   const handleAddDrugLink = () => {
@@ -184,12 +188,17 @@ export default function DrugManagementPage() {
             <RefreshCw className={`h-4 w-4 text-slate-600 ${isRefreshing ? "animate-spin" : ""}`} />
           </Button>
 
+          <Can
+            permission={PERMISSIONS.DRUG_CREATE}
+            fallback={<Badge>Read Only</Badge>}
+          > 
           <Button
             onClick={handleAddDrugLink} 
             className="h-9 gap-1.5 px-4 text-xs font-semibold bg-emerald-800 hover:bg-emerald-700 text-white shadow-xs rounded-lg transition-colors duration-200"
-          >
+            >
             <Plus className="h-4 w-4 stroke-[2.5]" /> Add Drug
           </Button>
+          </Can>
         </div>
       </div>
 
@@ -244,6 +253,7 @@ export default function DrugManagementPage() {
           columnVisibilityFilter={true}
           placeholder="Search by medicine name..."
           meta={{
+            currentFacilityId: currentUserFacilityId,
             onViewDrug(drug) {
               setIsDrugViewDetailsOpen(true);
               setSelectedDrug(drug);

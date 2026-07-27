@@ -1,7 +1,19 @@
-import React from 'react'
+"use client" 
 
-export default function page() {
+import React from 'react'
+import UserProfilePage from './UserProfileComponent'
+import { useAuthStore } from '@/store/authStore'
+
+export default function ProfilePage() {
+  const {user, logout} = useAuthStore();
   return (
-    <div>page</div>
+    <div>
+      {user && (
+        <UserProfilePage
+          user={user}
+          onLogout={logout}
+      />
+      )}
+    </div>
   )
 }

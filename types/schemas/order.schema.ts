@@ -49,3 +49,26 @@ export const getOrdersQuerySchema = z.object({
 });
 
 export type GetOrdersQueryInput = z.input<typeof getOrdersQuerySchema>;
+
+
+// export interface ReceivedOrderItemInput {
+//   orderItemId: string;
+//   quantitySupplied: number;
+//   expiryDate?: Date | string;
+//   manufacturer?: string;
+//   inventoryId?: string; // Optional: if updating an existing specific inventory row
+// }
+
+export const receivedOrderItemInputSchema = z.object({
+  orderItemId: z.string().min(1),
+  quantitySupplied: z.number().int().positive(),
+  batchNumber: z.string().min(1, "Batch number is required upon receiving goods."), // Captured from the delivery note
+  expiryDate: z.string().optional(),
+  manufacturer: z.string().optional(),
+  inventoryId: z.string().optional(),
+});
+
+// Infer the single item type from the schema
+export type ReceivedOrderItemInput = z.infer<typeof receivedOrderItemInputSchema>;
+// Define the array type correctly
+export type ReceivedOrderItemsInput = ReceivedOrderItemInput[];

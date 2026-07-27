@@ -98,7 +98,7 @@ export class FacilityService {
       // C. Generate User ID for Admin
       const customUserId = await generateNextCustomId({
         tx,
-        facilityId: facility.id, // Using the new facility's ID
+        facilityId: "GLOBAL_SYSTEM",
         sequenceType: "USER_ID",
         prefix: "USR",
       });
@@ -181,6 +181,9 @@ export class FacilityService {
         admin.fullName,
         facility.name
       );
+      
+    console.log("EMAIL: ", admin.email)
+    console.log("TEMP PASSWORD: ", tempPassword)
     } catch (mailError) {
       console.error("⚠️ Mailer Error (Facility created, email failed):", mailError);
     }

@@ -4,7 +4,7 @@ import * as React from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Controller, useForm } from "react-hook-form";
 import { toast } from "sonner";
-import { Loader2 } from "lucide-react";
+import { Loader2, Package, Layers } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -18,10 +18,23 @@ import { Textarea } from "@/components/ui/textarea";
 
 import { stockAdjustmentSchema, StockAdjustmentInput } from "@/types/schemas/inventory.schema";
 import { createInventoryAdjustment } from "@/lib/actions/inventory.action";
-import { StockMovementType, MovementReason } from "@/generated/prisma/browser";
+import { StockMovementType, MovementReason, Unit, DosageForm } from "@/generated/prisma/browser";
+
+
+interface InventoryItem {
+  id: string;
+  availableQuantity: number;
+  batchNumber: string | null;
+  drug: {
+    name: string;
+    strength: string | null;
+    unit: Unit;
+    dosageForm: DosageForm | null;
+  };
+}
 
 interface StockAdjustmentFormProp {
-  inventoryId: string;
+  inventoryItem: InventoryItem;
   onSuccess?: () => void;
 }
 
@@ -42,15 +55,15 @@ const REASON_OPTIONS = [
   { label: "Dispensed", value: MovementReason.DISPENSED },
 ];
 
-export function StockAdjustmentFormComponent({ inventoryId, onSuccess }: StockAdjustmentFormProp) {
+export function StockAdjustmentFormComponent({ inventoryItem, onSuccess }: StockAdjustmentFormProp) {
   const [isPending, startTransition] = React.useTransition();
 
   const form = useForm<StockAdjustmentInput>({
     resolver: zodResolver(stockAdjustmentSchema),
     defaultValues: {
-      inventoryId: inventoryId,
+      inventoryId: inventoryItem.id,
       type: StockMovementType.ADJUSTMENT,
-      newQuantity: 0,
+      newQuantity: inventoryItem.availableQuantity,
       reason: undefined,
       referenceNo: "",
       notes: "",
@@ -73,6 +86,33 @@ export function StockAdjustmentFormComponent({ inventoryId, onSuccess }: StockAd
     <div className="flex flex-col h-full font-sans">
       {/* Scrollable Form Content */}
       <div className="flex-1 overflow-y-auto max-h-[calc(100vh-12rem)] pr-1 space-y-4">
+        
+        {/* Item Summary Context Card */}
+        <div className="p-3 bg-slate-50 border border-slate-200/80 rounded-xl space-y-2">
+          <div className="flex items-center gap-2">
+            <div className="p-1.5 bg-emerald-50 text-emerald-700 rounded-lg">
+              <Package className="h-4 w-4" />
+            </div>
+            <div>
+              <span className="font-bold text-slate-900 text-xs block">
+                {inventoryItem.drug.name} {inventoryItem.drug.strength ? `• ${inventoryItem.drug.strength}` : ""}
+              </span>
+              <span className="text-[10px] text-slate-500 uppercase tracking-wide">
+                {inventoryItem.drug.dosageForm || inventoryItem.drug.unit}
+              </span>
+            </div>
+          </div>
+          <div className="grid grid-cols-2 gap-2 pt-1 border-t border-slate-200/60 text-[11px]">
+            <div className="flex items-center gap-1.5 text-slate-600">
+              <Layers className="h-3.5 w-3.5 text-slate-400" />
+              <span>Batch: <strong className="text-slate-900">{inventoryItem.batchNumber || "N/A"}</strong></span>
+            </div>
+            <div className="text-right text-slate-600">
+              <span>Current Stock: <strong className="text-emerald-700">{inventoryItem.availableQuantity} units</strong></span>
+            </div>
+          </div>
+        </div>
+
         <form id="update-stock-form" onSubmit={form.handleSubmit(onSubmit)}>
           <FieldGroup className="space-y-4">
             

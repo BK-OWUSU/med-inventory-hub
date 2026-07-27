@@ -10,10 +10,13 @@ import { AuthGuard } from "@/securityContext/AuthGuard"
 import { useNotificationStore } from "@/store/notificationStore"
 import { NotificationBell } from "@/components/notifications/NotificationBell"
 import { NavbarUser } from "@/components/NavbarUser"
+import { useAuthStore } from "@/store/authStore"
 
 export default function MainLayout({ children }: { children: React.ReactNode }) {
+  const {user} = useAuthStore()
   const { notifications } = useNotificationStore();
   const pathname = usePathname();
+  const facilityName = user?.facility?.name || "PharmSync"
 
 
 
@@ -33,7 +36,7 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
               <Breadcrumb>
                 <BreadcrumbList>
                   <BreadcrumbItem className="hidden md:block">
-                    <span className="text-slate-400 font-medium">multiPOS</span>
+                    <span className="text-slate-400 font-medium">{facilityName}</span>
                   </BreadcrumbItem>
                   <BreadcrumbSeparator className="hidden md:block" />
                   <BreadcrumbItem>

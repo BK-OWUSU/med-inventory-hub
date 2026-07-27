@@ -22,6 +22,7 @@ import { localInventoryColumns, LocalInventoryTableMeta } from "@/components/col
 import { useDrugStore } from "@/store/drugStore"
 import { EditDrugBatchForm } from "./UpdateDrugInventoryBatchForm"
 import { BatchDetailsView } from "@/components/viewDetailsCompoents/inventory/BatchDetailsViewer"
+import { StockAdjustmentFormComponent } from "../adjustment-history/InventoryAdjustmentForm"
 
 
 /// 1. Define the allowed colors as a type
@@ -46,6 +47,7 @@ export default function InventoryPage() {
   const [isUpdateInventoryBatchOpen, setIsUpdateInventoryBatchOpen] = React.useState(false);
   const [selectedInventoryBatch, setSelectedInventoryBatch] = React.useState<LocalInventoryItem | null>();
   const [isBatchViewerOpen, setIsBatchViewerOpen] = React.useState(false);
+  const [isCreateAdjustmentDrawerOpen, setIsCreateAdjustmentDrawerOpen] = React.useState(false)
 
   React.useEffect(() => {
     fetchLocalInventory();
@@ -110,6 +112,10 @@ export default function InventoryPage() {
               setSelectedInventoryBatch(inventory);
               setIsUpdateInventoryBatchOpen(true);
             },
+            onAdjustStock(item) {
+                setSelectedInventoryBatch(item)
+                setIsCreateAdjustmentDrawerOpen(true)
+            },
             onViewMovements(item) {
                setSelectedInventoryBatch(item);
                 setIsBatchViewerOpen(true)  
@@ -117,6 +123,23 @@ export default function InventoryPage() {
           } as LocalInventoryTableMeta}
         />
       </Card>
+      <AppSheet
+          isOpen={isCreateAdjustmentDrawerOpen}
+          onClose={() => setIsCreateAdjustmentDrawerOpen(false)}
+          title="Create Adjustment"
+          description="Create new adjustment"
+        >
+          {selectedInventoryBatch && (
+          <StockAdjustmentFormComponent
+            inventoryItem={selectedInventoryBatch}
+            onSuccess={() => {
+              setIsCreateAdjustmentDrawerOpen(false);
+              setSelectedInventoryBatch(null)
+              fetchLocalInventory()
+            }}
+          />)
+          }
+        </AppSheet>  
 
       {/* -- Sheets -- */}
 

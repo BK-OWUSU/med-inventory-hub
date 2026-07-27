@@ -294,7 +294,6 @@ export class AuthService {
     try {
       // 1. Zod runtime validation
       const validation = resetPasswordSchema.safeParse(data);
-      console.log("RECEIVED DATA: ",data)
       if (!validation.success) {
         return NextResponse.json(
           { 
@@ -338,8 +337,6 @@ export class AuthService {
           { status: 404 }
         );
       }
-
-      console.log("USER: ", user)
 
       // 4. Hash the new password
       const hashedPassword = await hashPassword(data.newPassword);
@@ -451,6 +448,8 @@ export class AuthService {
           id: true,
           customId: true,
           email: true,
+          imageUrl: true,
+          fileKey:true,
           fullName: true,
           role: true,
           phone: true,
@@ -513,6 +512,8 @@ export class AuthService {
           id: user.id,
           customId: user.customId,
           email: user.email,
+          imageUrl: user.imageUrl,
+          fileKey:user.fileKey,
           fullName: user.fullName,
           role: user.role,
           phone: user.phone,

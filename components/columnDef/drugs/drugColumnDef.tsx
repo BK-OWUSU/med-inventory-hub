@@ -19,6 +19,8 @@ import {
 } from "@/components/ui/tooltip";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { Can } from "@/components/security/Can";
+import { PERMISSIONS } from "@/lib/constants/permisions";
 
 // Safe date formatter helper
 const formatDate = (dateInput: Date | string) => {
@@ -99,7 +101,7 @@ export const drugsColumns: ColumnDef<DrugWithCategory>[] = [
     accessorKey: "stockStatus",
     header: "Stock Status",
     meta: { 
-      filterVariant: "select",
+      filterVariant: "selectArray",
       options: [
         { label: "In Stock", value: "in-stock" },
         { label: "Low Stock", value: "low-stock" },
@@ -224,7 +226,7 @@ export const drugsColumns: ColumnDef<DrugWithCategory>[] = [
       return (
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Button variant="ghost" className="h-8 w-8 p-0 hover:bg-slate-100">
+             <Button variant="ghost" className="h-8 w-8 p-0 hover:bg-slate-100">
               <span className="sr-only">Open menu</span>
               <MoreHorizontal className="h-4 w-4 text-slate-500" />
             </Button>
@@ -232,20 +234,28 @@ export const drugsColumns: ColumnDef<DrugWithCategory>[] = [
           <DropdownMenuContent align="end" className="w-56">
             <DropdownMenuLabel>Actions</DropdownMenuLabel>
             <DropdownMenuSeparator />
+            <Can
+              permission={PERMISSIONS.DRUG_VIEW}
+              fallback={<Badge>Read Only</Badge>}>
             <DropdownMenuItem 
               className="flex items-center gap-2 cursor-pointer text-slate-700"
               onClick={() => meta?.onViewDrug?.(drug)}
-            >
+              >
               <Eye className="h-4 w-4" />
               View details
             </DropdownMenuItem>
+            </Can>
+            <Can
+              permission={[PERMISSIONS.DRUG_UPDATE]}
+              fallback={<Badge>Read Only</Badge>}>
             <DropdownMenuItem 
               className="flex items-center gap-2 cursor-pointer text-slate-700"
               onClick={() => meta?.onEditDrug?.(drug)}
-            >
+              >
               <Edit2 className="h-4 w-4" />
               Edit
             </DropdownMenuItem>
+            </Can>
 
             {peerStocks.length > 0 && meta?.onRequestTransfer && (
               <>
@@ -266,13 +276,17 @@ export const drugsColumns: ColumnDef<DrugWithCategory>[] = [
             )}
 
             <DropdownMenuSeparator />
+            <Can
+              permission={PERMISSIONS.DRUG_DELETE}
+              fallback={<Badge>Read Only</Badge>}>
             <DropdownMenuItem 
               className="flex items-center gap-2 cursor-pointer text-red-600 focus:text-red-600 focus:bg-red-50"
               onClick={() => meta?.onDeleteDrug?.(drug)}
-            >
+              >
               <Trash2 className="h-4 w-4" />
-              Delete
+                Delete
             </DropdownMenuItem>
+            </Can>
           </DropdownMenuContent>
         </DropdownMenu>
       );

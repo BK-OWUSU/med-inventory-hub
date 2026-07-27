@@ -9,6 +9,7 @@ import {
   Pill, 
   AlertTriangle, 
   History,
+  Proportions,
 } from "lucide-react";
 import { 
   DropdownMenu, 
@@ -30,8 +31,9 @@ import { useInventoryStore } from "@/store/inventoryStore";
 // 1. Declare Table Meta interface for Local Inventory Actions
 export interface LocalInventoryTableMeta {
   onEdit?: (item: LocalInventoryItem) => void;
-  onDelete?: (item: LocalInventoryItem) => void;
+  onAdjustStock?: (item: LocalInventoryItem) => void;
   onViewMovements?: (item: LocalInventoryItem) => void;
+  onDelete?: (item: LocalInventoryItem) => void;
 }
 
 // Formatting helpers
@@ -112,6 +114,10 @@ export function InventoryRowActions<TData extends LocalInventoryItem>({
           <DropdownMenuItem onClick={() => meta?.onEdit?.(item)}>
             <Edit2 className="h-4 w-4 mr-2 text-slate-400" />
             Edit Details
+          </DropdownMenuItem> 
+          <DropdownMenuItem onClick={() => meta?.onAdjustStock?.(item)}>
+            <Proportions className="h-4 w-4 mr-2 text-slate-400" />
+             Adjust Batch
           </DropdownMenuItem>
           <DropdownMenuSeparator />
           <DropdownMenuItem 

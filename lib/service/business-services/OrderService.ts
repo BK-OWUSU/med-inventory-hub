@@ -1,6 +1,6 @@
 import { AuditAction, AuditEntity, MovementReason, NotificationType, OrderStatus, OrderType, StockMovementType, UserRole } from "@/generated/prisma/enums";
 import { prisma } from "@/lib/database/dbConnection";
-import { CreateOrderInput, createOrderSchema, GetOrdersQueryInput, getOrdersQuerySchema, UpdateOrderInput } from "@/types/schemas/order.schema";
+import { CreateOrderInput, createOrderSchema, GetOrdersQueryInput, getOrdersQuerySchema, ReceivedOrderItemInput, UpdateOrderInput } from "@/types/schemas/order.schema";
 import { AppResponse } from "@/types/types/app.type";
 import { NotificationService } from "./notification.service";
 import { generateNextCustomId } from "@/lib/utils";
@@ -21,6 +21,10 @@ export class OrderService {
   ): Promise<AppResponse> {
     try {
       const validatedData = createOrderSchema.parse(input);
+      console.log('RAW DATA')
+      console.log(input)
+      console.log('PARSED DATA')
+      console.log(validatedData)
 
       if (validatedData.supplierId && validatedData.supplierId === facilityId) {
         throw new Error("A facility cannot send an order to itself.");
@@ -156,8 +160,8 @@ export class OrderService {
     }
   }
 
-  /**
-   * Updates an order's items and notes while it is still in PENDING status
+/**
+   * Updates an order's items, total value, and notes while it is still in PENDING status
    */
   static async updateOrder(
     orderId: string,
@@ -182,38 +186,60 @@ export class OrderService {
       }
 
       const updatedOrder = await prisma.$transaction(async (tx) => {
-// 1. If new items are provided, replace the old items cleanly
-        if (input.items && input.items.length > 0) {
-          await tx.orderItem.deleteMany({
-            where: { orderId: orderId },
-          });
+      
 
-          // Fetch drug details to satisfy Prisma's required snapshot fields (drugName, unit)
+        // 1. If new items are provided, validate drugs, recalculate total, and replace old items
+        let newTotalValue = Number(order.totalValue);
+
+        // 1. If new items are provided, replace the old items cleanly and recalculate total
+        if (input.items && input.items.length > 0) {
           const drugIds = input.items.map((i) => i.drugId);
           const drugs = await tx.drug.findMany({
             where: { id: { in: drugIds } },
           });
           const drugMap = new Map(drugs.map((d) => [d.id, d]));
 
-          await tx.orderItem.createMany({
-            data: input.items.map((item) => {
-              const drug = drugMap.get(item.drugId);
-              return {
-                orderId: orderId,
-                drugId: item.drugId,
-                quantityRequested: item.quantityRequested,
-                unitPrice: item.unitPrice || 0,
-                drugName: drug?.name || "Unknown Drug", 
-                unit: drug?.unit || "OTHER"           
-              };
-            }),
+          // Validate all drugs exist and are active
+          for (const item of input.items) {
+            const drug = drugMap.get(item.drugId);
+            if (!drug || !drug.isActive || drug.isDeleted) {
+              throw new Error(`Drug with ID ${item.drugId} not found or inactive.`);
+            }
+          }
+
+          // Delete existing items
+          await tx.orderItem.deleteMany({
+            where: { orderId: orderId },
           });
+
+          let calculatedTotal = 0;
+          const orderItemsData = input.items.map((item) => {
+            const drug = drugMap.get(item.drugId)!;
+            const unitPrice = item.unitPrice !== undefined ? Number(item.unitPrice) : 0;
+            const lineTotal = unitPrice * item.quantityRequested;
+            calculatedTotal += lineTotal;
+
+            return {
+              orderId: orderId,
+              drugId: item.drugId,
+              quantityRequested: item.quantityRequested,
+              unitPrice: unitPrice,
+              drugName: drug.name,
+              unit: drug.unit,
+            };
+          });
+          await tx.orderItem.createMany({
+            data: orderItemsData,
+          });
+          newTotalValue = calculatedTotal;
         }
-        // 2. Update order-level details (like notes) if provided
+
+        // 2. Update order-level details (notes and recalculated totalValue)
         const orderUpdate = await tx.order.update({
           where: { id: orderId },
           data: {
             notes: input.notes !== undefined ? input.notes : order.notes,
+            totalValue: newTotalValue,
           },
           include: { items: { include: { drug: { select: { name: true, strength: true } } } } },
         });
@@ -223,7 +249,7 @@ export class OrderService {
           data: {
             userId,
             facilityId,
-            action: AuditAction.INVENTORY_UPDATED, // Use AuditAction.ORDER_UPDATED if available in your enum
+            action: AuditAction.ORDER_UPDATED || AuditAction.INVENTORY_UPDATED, 
             entityType: AuditEntity.ORDER,
             entityId: order.id,
             ipAddress,
@@ -231,6 +257,7 @@ export class OrderService {
             details: {
               message: "Order details and items updated.",
               orderNumber: order.customId,
+              totalValue: newTotalValue,
             },
           },
         });
@@ -253,7 +280,7 @@ export class OrderService {
       };
     }
   }
-
+  
  /**
    * Retrieves a paginated and filtered list of orders for a facility using Zod validation and strict typing
    */
@@ -445,6 +472,79 @@ export class OrderService {
     }
   }
 
+  static async rejectOrder(
+    orderId: string,
+    reason: string,
+    userId: string,
+    facilityId: string,
+    ipAddress?: string,
+    userAgent?: string
+  ): Promise<AppResponse> {
+    try {
+      const order = await prisma.order.findUnique({
+        where: { id: orderId },
+      });
+      if (!order) throw new Error("Order not found.");
+
+      // Ensure only the supplier or an authorized reviewer at the supplier facility can reject it
+      if (order.supplierId !== facilityId) {
+        throw new Error("Unauthorized to reject this order. Only the supplier can reject pending orders.");
+      }
+
+      // Rejection is strictly for PENDING orders
+      if (order.status !== OrderStatus.PENDING) {
+        throw new Error(`Cannot reject an order with status: ${order.status}. Only PENDING orders can be rejected.`);
+      }
+
+      const updatedOrder = await prisma.$transaction(async (tx) => {
+        // 1. Update order status and reason
+        const orderUpdate = await tx.order.update({
+          where: { id: orderId },
+          data: {
+            status: OrderStatus.REJECTED,
+            rejectionReason: reason,
+          },
+          include: { items: true },
+        });
+
+        // 2. Log the rejection in the audit trail
+        await tx.auditLog.create({
+          data: {
+            userId,
+            facilityId,
+            action: AuditAction.ORDER_REJECTED, // Reusing your existing action enum
+            entityType: AuditEntity.ORDER,
+            entityId: order.id,
+            ipAddress,
+            userAgent,
+            details: { 
+              message: "Order was reviewed and rejected.", 
+              orderNumber: order.customId, 
+              reason 
+            },
+          },
+        });
+
+        return orderUpdate;
+      });
+
+      return {
+        success: true,
+        status: 200,
+        message: "Order rejected successfully.",
+        data: updatedOrder,
+      };
+    } catch (error: unknown) {
+      console.error("🚨 Error in rejectOrder:", error);
+      return {
+        success: false,
+        status: 400,
+        error: (error as Error).message || "Failed to reject order.",
+      };
+    }
+  }
+
+
   /**
    * Marks an order as shipped (performed by supplier facility) and deducts inventory
    */
@@ -561,14 +661,13 @@ export class OrderService {
       };
     }
   }
- /**
-   * Receives an order and reconciles inventory for the requester facility using processStockMovement
-   */
+
+
   static async receiveOrder(
     orderId: string,
-    receivedItemsInput: { orderItemId: string; quantitySupplied: number; inventoryId?: string; batchNumber?: string; expiryDate?: Date }[],
+    receivedItemsInput: ReceivedOrderItemInput[], // Comes from the Receive Modal containing batchNumber
     userId: string,
-    facilityId: string, // Requester facility ID
+    facilityId: string,
     ipAddress?: string,
     userAgent?: string
   ): Promise<AppResponse> {
@@ -579,15 +678,22 @@ export class OrderService {
       });
 
       if (!order) throw new Error("Order not found.");
-      if (order.requesterId !== facilityId) throw new Error("Unauthorized: Only the requester facility can receive this order.");
-      if (order.status !== OrderStatus.SHIPPED && order.status !== OrderStatus.APPROVED) {
-        throw new Error("Order must be shipped or approved before it can be received.");
-      }
+      if (order.requesterId !== facilityId) throw new Error("Unauthorized.");
+      if (!order.supplierId) throw new Error("Order has no supplier facility.");
 
       const result = await prisma.$transaction(async (tx) => {
         for (const inputItem of receivedItemsInput) {
-          const orderItem = order.items.find(i => i.id === inputItem.orderItemId);
-          if (!orderItem) throw new Error(`Order item ID ${inputItem.orderItemId} not found in this order.`);
+          const orderItem = order.items.find((i) => i.id === inputItem.orderItemId);
+          if (!orderItem) throw new Error(`Order item not found.`);
+
+          if (inputItem.quantitySupplied > orderItem.quantityRequested) {
+            throw new Error(`Supplied quantity exceeds requested quantity.`);
+          }
+
+          // Ensure the frontend passed a batch number
+          if (!inputItem.batchNumber) {
+            throw new Error(`Batch number is required to receive item ${orderItem.drugName}.`);
+          }
 
           // 1. Update order item with supplied quantity
           await tx.orderItem.update({
@@ -595,96 +701,92 @@ export class OrderService {
             data: { quantitySupplied: inputItem.quantitySupplied },
           });
 
-          // 2. Find or create inventory record at the receiving facility
-          let inventoryId = inputItem.inventoryId;
-          if (!inventoryId) {
-            const existingInventory = await tx.inventory.findFirst({
-              where: {
-                facilityId: facilityId,
-                drugId: orderItem.drugId,
-                batchNumber: inputItem.batchNumber || null,
-              },
-            });
+          // 2. Strict lookup at the supplier facility using the exact batch provided in the form
+          const supplierInventory = await tx.inventory.findFirst({
+            where: {
+              facilityId: order.supplierId!,
+              drugId: orderItem.drugId,
+              batchNumber: inputItem.batchNumber,
+            },
+          });
 
-            if (existingInventory) {
-              inventoryId = existingInventory.id;
-            } else {
-              const newInv = await tx.inventory.create({
-                data: {
-                  facilityId: facilityId,
-                  drugId: orderItem.drugId,
-                  availableQuantity: 0, // Starts at 0, processStockMovement will safely increment it
-                  batchNumber: inputItem.batchNumber || "DEFAULT-BATCH",
-                  expiryDate: inputItem.expiryDate || null,
-                  unitPrice: orderItem.unitPrice,
-                },
-              });
-              inventoryId = newInv.id;
-            }
+          if (!supplierInventory) {
+            throw new Error(`Batch '${inputItem.batchNumber}' not found at supplier facility for ${orderItem.drugName}.`);
           }
 
-          // 3. Delegate stock increment, validation, movement logs, and notifications to InventoryService
-          await InventoryService.processStockMovement(
-            {
-              inventoryId: inventoryId,
-              type: StockMovementType.IN,
-              quantityChange: inputItem.quantitySupplied,
-              referenceNo: order.customId,
-              notes: `Received from order ${order.customId}`,
-              reason: MovementReason.AUDIT_RECONCILIATION,
-              orderItemId: orderItem.id, 
+          if (supplierInventory.availableQuantity < inputItem.quantitySupplied) {
+            throw new Error(`Insufficient stock in batch ${inputItem.batchNumber}. Available: ${supplierInventory.availableQuantity}`);
+          }
+
+          // Deduct from supplier stock
+          await InventoryService.processStockMovement({
+            inventoryId: supplierInventory.id,
+            type: StockMovementType.OUT,
+            quantityChange: inputItem.quantitySupplied,
+            referenceNo: order.customId,
+            notes: `Transferred via order ${order.customId}`,
+            reason: MovementReason.TRANSFER,
+            orderItemId: orderItem.id,
+          }, userId, order.supplierId!, ipAddress, userAgent, tx);
+
+          // 3. Find or create matching batch inventory at the requester facility
+          let requesterInventory = await tx.inventory.findFirst({
+            where: {
+              facilityId: facilityId,
+              drugId: orderItem.drugId,
+              batchNumber: inputItem.batchNumber,
             },
-            userId,
-            facilityId,
-            ipAddress,
-            userAgent,
-            tx // Pass transaction client for atomicity
-          );
+          });
+
+          if (!requesterInventory) {
+            requesterInventory = await tx.inventory.create({
+              data: {
+                facilityId: facilityId,
+                drugId: orderItem.drugId,
+                availableQuantity: 0,
+                batchNumber: inputItem.batchNumber,
+                expiryDate: supplierInventory.expiryDate,
+                unitPrice: orderItem.unitPrice,
+                manufacturer: supplierInventory.manufacturer,
+              },
+            });
+          }
+
+          // Add to requester stock
+          await InventoryService.processStockMovement({
+            inventoryId: requesterInventory.id,
+            type: StockMovementType.IN,
+            quantityChange: inputItem.quantitySupplied,
+            referenceNo: order.customId,
+            notes: `Received from order ${order.customId}`,
+            reason: MovementReason.TRANSFER,
+            orderItemId: orderItem.id,
+          }, userId, facilityId, ipAddress, userAgent, tx);
         }
 
-        // 4. Update order status to RECEIVED
-        const updatedOrder = await tx.order.update({
-          where: { id: orderId },
-          data: {
-            status: OrderStatus.RECEIVED,
-            receivedAt: new Date(),
-            deliveredAt: new Date(),
-          },
-          include: { items: true },
-        });
+      // Check if all items were fully supplied
+    const isFullyFulfilled = order.items.every((item) => {
+      const input = receivedItemsInput.find((i) => i.orderItemId === item.id);
+      return input && input.quantitySupplied >= item.quantityRequested;
+    });
 
-        // 5. Create Audit Log Entry
-        await tx.auditLog.create({
-          data: {
-            userId,
-            facilityId,
-            action: AuditAction.ORDER_DELIVERED,
-            entityType: AuditEntity.ORDER,
-            entityId: order.id,
-            ipAddress,
-            userAgent,
-            details: { message: "Order received and stock reconciled.", orderNumber: order.customId },
-          },
-        });
+    const finalStatus = isFullyFulfilled ? OrderStatus.COMPLETED : OrderStatus.PARTIALLY_FULFILLED;
 
-        return updatedOrder;
+      return tx.order.update({
+        where: { id: orderId },
+        data: { status: finalStatus, receivedAt: new Date(), deliveredAt: new Date() },
+        include: { items: true },
       });
 
-      return {
-        success: true,
-        status: 200,
-        message: "Order successfully received and inventory updated.",
-        data: result,
-      };
+    });
+
+      return { success: true, status: 200, message: "Order completed successfully.", data: result };
     } catch (error: unknown) {
       console.error("🚨 Error in receiveOrder:", error);
-      return {
-        success: false,
-        status: 400,
-        error: (error as Error).message || "Failed to process order receipt.",
-      };
+      return { success: false, status: 400, error: (error as Error).message };
     }
   }
+
 
   /**
    * Cancels an order and automatically restores supplier stock if the order was already shipped
@@ -708,8 +810,8 @@ export class OrderService {
         throw new Error("Unauthorized to cancel this order.");
       }
 
-      if (order.status === OrderStatus.RECEIVED || order.status === OrderStatus.COMPLETED) {
-        throw new Error("Cannot cancel an order that has already been completed or received.");
+      if (order.status === OrderStatus.COMPLETED) {
+        throw new Error("Cannot cancel an order that has already been completed.");
       }
 
       const updatedOrder = await prisma.$transaction(async (tx) => {
@@ -739,19 +841,19 @@ export class OrderService {
               });
             }
 
-            // Restore the stock using processStockMovement (passing tx for atomicity)
+            // Restore the stock using processStockMovement (passing supplier facilityId and tx for atomicity)
             await InventoryService.processStockMovement(
               {
                 inventoryId: inventoryRecord.id,
                 type: StockMovementType.IN,
-                quantityChange: item.quantityRequested, // Return the requested quantity back to supplier
+                quantityChange: item.quantitySupplied || item.quantityRequested, // Return supplied or requested quantity back to supplier
                 referenceNo: order.customId,
                 notes: `Stock restored due to cancellation of order ${order.customId}`,
                 reason: MovementReason.AUDIT_RECONCILIATION,
                 orderItemId: item.id,
               },
-      userId,
-              facilityId,
+              userId,
+              order.supplierId, // Must be the supplier facility owning the inventory
               ipAddress,
               userAgent,
               tx

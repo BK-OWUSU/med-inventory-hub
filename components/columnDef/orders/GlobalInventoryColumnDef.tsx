@@ -20,6 +20,8 @@ import { Badge } from "@/components/ui/badge";
 import { GlobalInventoryItem } from "@/types/types/inventory.type";
 import { Prisma } from "@/generated/prisma/client";
 import { useRequisitionCartStore } from "@/store/requisition-cart.store";
+import { PERMISSIONS } from "@/lib/constants/permisions";
+import { Can } from "@/components/security/Can";
 
 export interface InventoryTableMeta {
   onAddToCart?: (item: GlobalInventoryItem) => void;
@@ -201,14 +203,18 @@ export const globalInventoryColumns: ColumnDef<GlobalInventoryItem>[] = [
 
       return (
         <div className="flex items-center justify-end gap-1.5">
+          <Can
+             permission={PERMISSIONS.ORDER_CREATE}
+             fallback={<Badge>Read Only</Badge>}>
           <Button 
             onClick={() => meta?.onAddToCart?.(item)}
             size="sm"
             className="bg-emerald-800 hover:bg-emerald-700 text-white font-semibold h-8 px-3 rounded-lg text-xs shadow-xs transition-all gap-1.5"
-          >
+            >
             <ShoppingCart className="h-3.5 w-3.5" />
             <span>Order</span>
           </Button>
+          </Can>   
 
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
@@ -219,13 +225,17 @@ export const globalInventoryColumns: ColumnDef<GlobalInventoryItem>[] = [
             <DropdownMenuContent align="end" className="w-40 rounded-xl">
               <DropdownMenuLabel className="text-xs text-slate-400 font-normal">Actions</DropdownMenuLabel>
               <DropdownMenuSeparator />
+               <Can
+                  permission={PERMISSIONS.ORDER_VIEW}
+                  fallback={<Badge>Read Only</Badge>}>
               <DropdownMenuItem 
                 onClick={() => meta?.onViewDetails?.(item)}
                 className="text-xs font-medium cursor-pointer gap-2"
-              >
+                >
                 <History className="h-4 w-4 text-slate-500" />
                 View Details
               </DropdownMenuItem>
+            </Can>  
             </DropdownMenuContent>
           </DropdownMenu>
         </div>

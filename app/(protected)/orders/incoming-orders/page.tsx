@@ -10,18 +10,25 @@ import {
   Info, 
   X,
 } from "lucide-react";
-import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 
 import TableMain from "@/components/custom/table/TableMain";
 import { useOrderStore } from "@/store/order.store";
-import { incomingOrdersColumns } from "@/components/columnDef/orders/IncomingOrdersColumnDef";
+import { incomingOrdersColumns, OrderTableMeta } from "@/components/columnDef/orders/IncomingOrdersColumnDef";
 import { OrderWithRelations } from "@/types/types/orders.type";
+import { AppSheet } from "@/components/custom/drawers/AppSheet";
+import OrderDetails from "@/components/viewDetailsCompoents/orders/OrderDetailsViewer";
+import OrderReview from "@/components/viewDetailsCompoents/orders/OrderReviewerComponent";
+import { receiveOrderAction } from "@/lib/actions/orders.actions";
+import { toast } from "sonner";
+import { ReceivedOrderItemsInput } from "@/types/schemas/order.schema";
 
 export default function IncomingOrdersPage() {
   const { isLoading, incomingOrders, fetchIncomingOrders } = useOrderStore();
-  const [selectedOrder, setSelectedOrder] = React.useState<OrderWithRelations | null>();
+  const [selectedOrder, setSelectedOrder] = React.useState<OrderWithRelations | null>(null);
   const [showAlert, setShowAlert] = React.useState<boolean>(true);
+  const [isViewOderViewerOpen, setIsViewOderViewerOpen] = React.useState<boolean>(false);
+  const [isReviewOderViewerOpen, setIsReviewOderViewerOpen] = React.useState<boolean>(false);
 
   React.useEffect(() => {
     fetchIncomingOrders();
@@ -36,7 +43,7 @@ export default function IncomingOrdersPage() {
       (o) => o.status === "PARTIALLY_FULFILLED" 
     ).length;
     const completed = incomingOrders.filter(
-      (o) => o.status === "COMPLETED" || o.status === "RECEIVED" || o.status === "DELIVERED"
+      (o) => o.status === "COMPLETED"
     ).length;
 
     return { total, pending, approved, partiallyReceived, completed };
@@ -154,9 +161,45 @@ export default function IncomingOrdersPage() {
           columnVisibilityFilter={true}
           searchKey="customId" 
           placeholder="Search order..."
-          meta={{}}
+          meta={{
+            onViewDetails(order) {
+              setSelectedOrder(order);
+              setIsViewOderViewerOpen(true);
+            },
+            onReviewOrder(order) {
+              setSelectedOrder(order);
+              setIsReviewOderViewerOpen(true);
+            },
+          } as OrderTableMeta}
         />
       </Card>
+
+      <AppSheet
+        isOpen={isViewOderViewerOpen}
+        maxWidth="xl"
+        onClose={() => setIsViewOderViewerOpen(false)}
+        title={`View Order #${selectedOrder?.customId || ''}`}
+        description="Overview of items, pricing, and fulfillment status."
+      >
+        {selectedOrder && (<OrderDetails order={selectedOrder}/>)}
+      </AppSheet>
+
+      <AppSheet
+        isOpen={isReviewOderViewerOpen}
+        maxWidth="xl"
+        onClose={() => setIsReviewOderViewerOpen(false)}
+        title={`Review Order #${selectedOrder?.customId || ''}`}
+        description="Inspect request details before making an approval decision."
+      >
+        {selectedOrder && (
+          <OrderReview 
+            order={selectedOrder}
+            onSuccess={() => {
+              fetchIncomingOrders();
+              setIsReviewOderViewerOpen(false);
+            }}
+         />)}
+      </AppSheet>
     </div>
   );
 }

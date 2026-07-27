@@ -133,11 +133,13 @@ export default function UpdateOrderForm({
 
                     {/* Unit Price */}
                     <div className="sm:col-span-3 space-y-1">
-                      <Label className="text-[10px] font-medium text-slate-600">Unit Price (Optional)</Label>
+                      <Label className="text-[10px] font-medium text-slate-600">Unit Price</Label>
                       <Input
                         type="number"
                         step="0.01"
                         min="0"
+                        readOnly
+                        disabled
                         placeholder="0.00"
                         className="text-xs bg-white"
                         {...register(`items.${index}.unitPrice` as const, { valueAsNumber: true })}

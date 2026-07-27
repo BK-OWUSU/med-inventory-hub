@@ -7,7 +7,6 @@ import {
   RefreshCw, 
   CalendarClock, 
   Package,
-  Search,
 } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
@@ -18,28 +17,57 @@ import { stockMovementColumn, StockMovementTableMeta } from "@/components/column
 import { AppSheet } from "@/components/custom/drawers/AppSheet"
 import { StockMovementDetailsView } from "@/components/viewDetailsCompoents/inventory/StockMovementDetailsViewer"
 import { Input } from "@/components/ui/input"
-
-
+import { StockMovementItem } from "@/types/types/stock-movement-adjusment.type"
 
 export default function StockMovementsPage() {
-const {fetchStockMovements, movements, movementsSummary, isLoading} = useInventoryStore();
+  const { fetchStockMovements, movements, isLoading } = useInventoryStore();
 
-const [isMovementViewerOpen, setIsMovementViewerOpen] = React.useState(false)
-const [movementId, setMovementId] = React.useState<string>("");
+  const [isMovementViewerOpen, setIsMovementViewerOpen] = React.useState(false);
+  const [movementId, setMovementId] = React.useState<string>("");
 
   // 2. Local State Management for Filters
-  const [startDateStr, setStartDateStr] = React.useState<string>("")
-  const [endDateStr, setEndDateStr] = React.useState<string>("")
+  const [startDateStr, setStartDateStr] = React.useState<string>("");
+  const [endDateStr, setEndDateStr] = React.useState<string>("");
 
-React.useEffect(()=>{
-   const filters = {
+  React.useEffect(() => {
+    const filters = {
       startDate: startDateStr ? new Date(startDateStr) : undefined,
       endDate: endDateStr ? new Date(endDateStr) : undefined,
       page: 1, // Reset page context during dynamic filtering
     };
-  fetchStockMovements(filters)
-},[endDateStr, fetchStockMovements, startDateStr])
+    fetchStockMovements(filters);
+  }, [endDateStr, fetchStockMovements, startDateStr]);
 
+  // Compute actual summary metrics dynamically from the movements array
+  const movementsSummary = React.useMemo(() => {
+    if (!movements || movements.length === 0) {
+      return { totalIn: 0, totalOut: 0, adjustmentsCount: 0, expiryLossCount: 0, netMovement: 0 };
+    }
+
+    let totalIn = 0;
+    let totalOut = 0;
+    let adjustmentsCount = 0;
+    let expiryLossCount = 0;
+
+    movements.forEach((m: StockMovementItem) => {
+      const qty = Number(m.quantity || 0);
+      const type = (m.type || "").toUpperCase();
+
+      if (type === "IN" || type === "PURCHASE" || type === "RECEIVE") {
+        totalIn += qty;
+      } else if (type === "OUT" || type === "SALE" || type === "DISPENSE") {
+        totalOut += qty;
+      } else if (type === "ADJUSTMENT") {
+        adjustmentsCount += qty;
+      } else if (type === "EXPIRY" || type === "EXPIRED") {
+        expiryLossCount += qty;
+      }
+    });
+
+    const netMovement = totalIn - totalOut;
+
+    return { totalIn, totalOut, adjustmentsCount, expiryLossCount, netMovement };
+  }, [movements]);
 
   return (
     <div className="w-full space-y-6 p-6 lg:p-8 bg-slate-50/30 min-h-screen font-sans">
@@ -69,7 +97,7 @@ React.useEffect(()=>{
               type="date" 
               value={endDateStr}
               onChange={(e) => setEndDateStr(e.target.value)}
-              className="bg-transparent border-0 p-6 text-slate-700 focus:ring-0 text-xs  cursor-pointer w-full sm:w-auto min-w-27.5"
+              className="bg-transparent border-0 p-0 text-slate-700 focus:ring-0 text-xs cursor-pointer w-full sm:w-auto min-w-27.5"
             />
           </div>
 
@@ -89,8 +117,7 @@ React.useEffect(()=>{
         </div>
       </div>
 
-
-      {/* 2. Metrics Analytics Row Grid (5 Columns Layout matching mockups) */}
+      {/* 2. Metrics Analytics Row Grid (5 Columns Layout) */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4 w-full">
         {/* Total IN */}
         <Card className="bg-white border-slate-200 shadow-3xs rounded-xl">
@@ -100,8 +127,10 @@ React.useEffect(()=>{
             </div>
             <div className="space-y-0.5">
               <p className="text-xs text-slate-400 font-medium">Total IN</p>
-              <p className="text-xl font-bold tracking-tight text-slate-900">{movementsSummary?.totalIn} <span className="text-[10px] text-slate-400 font-normal">Units</span></p>
-              <p className="text-[10px] text-emerald-600 font-semibold flex items-center gap-0.5">↑ 18.4% <span className="text-slate-400 font-normal">vs last 30 days</span></p>
+              <p className="text-xl font-bold tracking-tight text-slate-900">
+                {movementsSummary.totalIn.toLocaleString()} <span className="text-[10px] text-slate-400 font-normal">Units</span>
+              </p>
+              <p className="text-[10px] text-emerald-600 font-semibold flex items-center gap-0.5">↑ Live data</p>
             </div>
           </CardContent>
         </Card>
@@ -114,8 +143,10 @@ React.useEffect(()=>{
             </div>
             <div className="space-y-0.5">
               <p className="text-xs text-slate-400 font-medium">Total OUT</p>
-              <p className="text-xl font-bold tracking-tight text-slate-900">{movementsSummary?.totalOut} <span className="text-[10px] text-slate-400 font-normal">Units</span></p>
-              <p className="text-[10px] text-emerald-600 font-semibold flex items-center gap-0.5">↑ 12.7% <span className="text-slate-400 font-normal">vs last 30 days</span></p>
+              <p className="text-xl font-bold tracking-tight text-slate-900">
+                {movementsSummary.totalOut.toLocaleString()} <span className="text-[10px] text-slate-400 font-normal">Units</span>
+              </p>
+              <p className="text-[10px] text-emerald-600 font-semibold flex items-center gap-0.5">↑ Live data</p>
             </div>
           </CardContent>
         </Card>
@@ -128,8 +159,10 @@ React.useEffect(()=>{
             </div>
             <div className="space-y-0.5">
               <p className="text-xs text-slate-400 font-medium">Adjustments</p>
-              <p className="text-xl font-bold tracking-tight text-slate-900">{movementsSummary?.adjustmentsCount} <span className="text-[10px] text-slate-400 font-normal">Units</span></p>
-              <p className="text-[10px] text-rose-600 font-semibold flex items-center gap-0.5">↓ 8.2% <span className="text-slate-400 font-normal">vs last 30 days</span></p>
+              <p className="text-xl font-bold tracking-tight text-slate-900">
+                {movementsSummary.adjustmentsCount.toLocaleString()} <span className="text-[10px] text-slate-400 font-normal">Units</span>
+              </p>
+              <p className="text-[10px] text-slate-500 font-semibold flex items-center gap-0.5">Live data</p>
             </div>
           </CardContent>
         </Card>
@@ -142,8 +175,10 @@ React.useEffect(()=>{
             </div>
             <div className="space-y-0.5">
               <p className="text-xs text-slate-400 font-medium">Expiry</p>
-              <p className="text-xl font-bold tracking-tight text-slate-900">{movementsSummary?.expiryLossCount} <span className="text-[10px] text-slate-400 font-normal">Units</span></p>
-              <p className="text-[10px] text-rose-600 font-semibold flex items-center gap-0.5">↓ 3.1% <span className="text-slate-400 font-normal">vs last 30 days</span></p>
+              <p className="text-xl font-bold tracking-tight text-slate-900">
+                {movementsSummary.expiryLossCount.toLocaleString()} <span className="text-[10px] text-slate-400 font-normal">Units</span>
+              </p>
+              <p className="text-[10px] text-slate-500 font-semibold flex items-center gap-0.5">Live data</p>
             </div>
           </CardContent>
         </Card>
@@ -156,8 +191,10 @@ React.useEffect(()=>{
             </div>
             <div className="space-y-0.5">
               <p className="text-xs text-slate-400 font-medium">Net Movement</p>
-              <p className="text-xl font-bold tracking-tight text-emerald-700">{movementsSummary?.netMovement} <span className="text-[10px] text-slate-400 font-normal">Units</span></p>
-              <p className="text-[10px] text-emerald-600 font-semibold flex items-center gap-0.5">↑ 15.6% <span className="text-slate-400 font-normal">vs last 30 days</span></p>
+              <p className={`text-xl font-bold tracking-tight ${movementsSummary.netMovement >= 0 ? 'text-emerald-700' : 'text-rose-600'}`}>
+                {movementsSummary.netMovement.toLocaleString()} <span className="text-[10px] text-slate-400 font-normal">Units</span>
+              </p>
+              <p className="text-[10px] text-emerald-600 font-semibold flex items-center gap-0.5">Live balance</p>
             </div>
           </CardContent>
         </Card>
@@ -165,37 +202,34 @@ React.useEffect(()=>{
 
       {/* 3. Central Operational Table Grid Section */}
       <div className="bg-white rounded-2xl border border-slate-200/70 shadow-xs overflow-hidden p-4">
-        {/* TableMain wrapper passes the columns data defined below directly */}
         <TableMain
           columns={stockMovementColumn}
           data={movements}
           loading={isLoading}
           searchKey="drugName"
           columnVisibilityFilter={true}
-          tableFilterButtonVisible = {true}
-          tableExportButtonVisible = {true}
-          checkBoxVisibility = {true}
+          tableFilterButtonVisible={true}
+          tableExportButtonVisible={true}
+          checkBoxVisibility={true}
           placeholder="Filter ledger data tracking records..."
-
           meta={{
             onViewDetails(item) {
-               setIsMovementViewerOpen(true)
-               setMovementId(item.id) 
+               setIsMovementViewerOpen(true);
+               setMovementId(item.id);
             },
           } as StockMovementTableMeta}
         />
       </div>
 
-         <AppSheet
-          isOpen={isMovementViewerOpen}
-          maxWidth="xl"
-          onClose={() => setIsMovementViewerOpen(false)}
-          title="View Stock Movement Details"
-          description="Show the movement details drugs"
-        >
+      <AppSheet
+        isOpen={isMovementViewerOpen}
+        maxWidth="xl"
+        onClose={() => setIsMovementViewerOpen(false)}
+        title="View Stock Movement Details"
+        description="Show the movement details drugs"
+      >
         <StockMovementDetailsView stockMovementId={movementId}/>
-        </AppSheet>
+      </AppSheet>
     </div>
-  )
+  );
 }
-

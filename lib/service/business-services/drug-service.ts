@@ -339,11 +339,6 @@ static async updateDrug(
     }
   }
 
-  /**
-   * Fetches a paginated, filterable, and searchable list of global drug entries.
-   * Includes structural data alignment to feed tables cleanly.
-   * * @param params Filter criteria configuration payload parameters
-   */
   static async fetchAllDrugs(params: {
     page?: number;
     limit?: number;
@@ -351,8 +346,6 @@ static async updateDrug(
     categoryId?: string;
     isActive?: boolean;
     isDeleted: boolean;
-    // Note: We make facilityId optional now. 
-    // If passed, we can prioritize it in our UI, but we don't block other facility data.
     facilityId?: string; 
   }): Promise<AppResponse> {
     try {
@@ -361,7 +354,6 @@ static async updateDrug(
       const skip = (page - 1) * limit;
 
       const whereClause: Prisma.DrugWhereInput = {};
-
 
       if (typeof params.isDeleted === "boolean") {
         whereClause.isDeleted = params.isDeleted === true;
@@ -390,13 +382,17 @@ static async updateDrug(
             },
             inventories: {
               where: {
-                isActive: true, // Only fetch active stock records
+                isActive: true,
+                // If a facilityId is provided, you can ensure it's prioritized 
+                // or fetched cleanly. If you need peer data too, make sure 
+                // your frontend column cell matches the facilityId correctly.
+                ...(params.facilityId ? { facilityId: params.facilityId } : {}),
               },
               include: {
                 facility: {
                   select: {
                     id: true,
-                    name: true, // Allows admins to see which facility owns the stock
+                    name: true,
                   }
                 }
               }

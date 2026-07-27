@@ -20,7 +20,13 @@ import {
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { OrderWithRelations } from "@/types/types/orders.type";
-
+import { cancelOrderAction } from "@/lib/actions/orders.actions";
+import { toast } from "sonner";
+import { useTransition } from "react";
+import { useOrderStore } from "@/store/order.store";
+import AlertWithDialogue from "@/components/custom/alerts/AlertWithDialogue";
+import { Can } from "@/components/security/Can";
+import { PERMISSIONS } from "@/lib/constants/permisions";
 
 // 1. Declare Table Meta interface for Outgoing Order Actions
 export interface OutgoingOrderTableMeta {
@@ -71,36 +77,83 @@ export function OutgoingOrderRowActions({
   row, 
   table 
 }: OutgoingOrderRowActionsProps) {
+  const { fetchOutgoingOrders } = useOrderStore();
   const order = row.original;
   const meta = table.options.meta as OutgoingOrderTableMeta | undefined;
+  const [isPending, startTransition] = useTransition();
+
+  const handleCancelOrder = (reason: string): void => {
+    if (!reason.trim()) {
+      toast.error("Please provide a cancellation reason");
+      return;
+    }
+
+    startTransition(async () => {
+      const res = await cancelOrderAction(order.id, reason);
+      if (!res.success) {
+        toast.error(res.error || "Failed to cancel order");
+      } else {
+        toast.success(res.message || "Order cancelled successfully");
+        fetchOutgoingOrders();
+      }
+    });
+  };
 
   // Determine primary action button based on order status for outgoing requests
   const renderPrimaryAction = () => {
     switch (order.status) {
       case "PENDING":
         return (
-          <Button 
-            variant="outline"
-            size="sm"
-            className="h-8 border-rose-200 text-rose-700 hover:bg-rose-50 text-xs font-semibold rounded-lg px-3 shadow-xs"
-            onClick={() => meta?.onCancelOrder?.(order)}
-          >
-            Cancel
-          </Button>
+           <Can
+            permission={PERMISSIONS.ORDER_CANCEL}
+            fallback={<Badge>Read Only</Badge>}>      
+          <AlertWithDialogue
+            buttonText="Cancel Order"
+            buttonVariant="destructive"
+            title="Cancel Order Request"
+            message="Are you sure you want to cancel this order? This action will restore inventory if the items were already shipped."
+            confirmText="Confirm Cancellation"
+            cancelText="Go Back"
+            showInput={true}
+            button={
+              <Button 
+                variant="destructive"
+                size="sm"
+                className="h-8 text-xs font-semibold rounded-lg px-3 shadow-xs"
+              >
+                Cancel
+              </Button>
+            }
+            inputPlaceholder="Provide the reason for cancelling this order..."
+            confirmFunction={(reason) => {
+              if (reason) {
+                handleCancelOrder(reason);
+              }
+            }}
+            />
+          </Can>
         );
       case "SHIPPED":
       case "APPROVED":
         return (
-          <Button 
+           <Can
+            permission={PERMISSIONS.ORDER_RECEIVE}
+            fallback={<Badge>Read Only</Badge>}>      
+          <Button
+            disabled={isPending}
             size="sm"
             className="h-8 bg-emerald-800 hover:bg-emerald-700 text-white text-xs font-semibold rounded-lg px-3 shadow-xs"
             onClick={() => meta?.onReceiveOrder?.(order)}
           >
             Receive
           </Button>
+          </Can>
         );
       default:
         return (
+           <Can
+            permission={PERMISSIONS.ORDER_VIEW}
+            fallback={<Badge>Read Only</Badge>}>      
           <Button 
             variant="outline"
             size="sm"
@@ -109,6 +162,7 @@ export function OutgoingOrderRowActions({
           >
             View
           </Button>
+          </Can>
         );
     }
   };
@@ -129,28 +183,63 @@ export function OutgoingOrderRowActions({
         <DropdownMenuContent align="end" className="w-48">
           <DropdownMenuLabel>Actions</DropdownMenuLabel>
           <DropdownMenuSeparator />
+           <Can
+            permission={PERMISSIONS.ORDER_CREATE}
+            fallback={<Badge>Read Only</Badge>}>      
           <DropdownMenuItem onClick={() => meta?.onUpdateOrder?.(order)}>
             <Edit2 className="h-4 w-4 mr-2 text-slate-400" />
-             Update Order
+            Update Order
           </DropdownMenuItem>
+          </Can>
+           <Can
+            permission={PERMISSIONS.ORDER_VIEW}
+            fallback={<Badge>Read Only</Badge>}>
           <DropdownMenuItem onClick={() => meta?.onViewDetails?.(order)}>
             <Eye className="h-4 w-4 mr-2 text-slate-400" />
             View details
           </DropdownMenuItem>
+          </Can>
           {order.status === "PENDING" && (
-            <DropdownMenuItem 
-              onClick={() => meta?.onCancelOrder?.(order)}
-              className="text-rose-600 focus:text-rose-600"
-            >
-              <Ban className="h-4 w-4 mr-2 text-rose-400" />
-              Cancel Order
-            </DropdownMenuItem>
+           <Can
+            permission={PERMISSIONS.ORDER_CANCEL}
+            fallback={<Badge>Read Only</Badge>}>
+            <AlertWithDialogue
+              buttonText="Cancel Order"
+              buttonVariant="destructive"
+              title="Cancel Order Request"
+              message="Are you sure you want to cancel this order? This action will restore inventory if the items were already shipped."
+              confirmText="Confirm Cancellation"
+              cancelText="Go Back"
+              showInput={true}
+              button={
+                <DropdownMenuItem 
+                  disabled={isPending}
+                  onSelect={(e) => e.preventDefault()}
+                  className="text-rose-600 focus:text-rose-600"
+                >
+                  <Ban className="h-4 w-4 mr-2 text-rose-400" />
+                  Cancel Order
+                </DropdownMenuItem>
+              }
+              inputPlaceholder="Provide the reason for cancelling this order..."
+              confirmFunction={(reason) => {
+                if (reason) {
+                  handleCancelOrder(reason);
+                }
+              }}
+            />
+            </Can>
           )}
+
           {(order.status === "SHIPPED" || order.status === "APPROVED") && (
-            <DropdownMenuItem onClick={() => meta?.onReceiveOrder?.(order)}>
-              <CheckCircle2 className="h-4 w-4 mr-2 text-slate-400" />
-              Receive Shipment
+             <Can
+                permission={PERMISSIONS.ORDER_RECEIVE}
+                fallback={<Badge>Read Only</Badge>}>      
+             <DropdownMenuItem onClick={() => meta?.onReceiveOrder?.(order)}>
+              <CheckCircle2 className="h-4 w-4 mr-2 text-emerald-600" />
+              Receive Order
             </DropdownMenuItem>
+            </Can>
           )}
         </DropdownMenuContent>
       </DropdownMenu>
@@ -222,7 +311,8 @@ export const outgoingOrdersColumns: ColumnDef<OrderWithRelations>[] = [
     },
   },
   {
-    accessorKey: "requestedBy",
+    id: "requestedBy",
+    accessorKey: "requester",
     header: "Placed By",
     cell: ({ row }) => {
       const requestedBy = row.original.requester;
@@ -268,11 +358,9 @@ export const outgoingOrdersColumns: ColumnDef<OrderWithRelations>[] = [
       let badgeStyle = "bg-amber-50 text-amber-700 border-amber-200"; // PENDING
       if (status === "APPROVED") badgeStyle = "bg-emerald-50 text-emerald-700 border-emerald-200";
       if (status === "PARTIALLY_FULFILLED" || status === "SHIPPED") badgeStyle = "bg-sky-50 text-sky-700 border-sky-200";
-      if (status === "RECEIVED" || status === "DELIVERED" || status === "COMPLETED") badgeStyle = "bg-slate-100 text-slate-700 border-slate-200";
+      if (status === "COMPLETED") badgeStyle = "bg-slate-100 text-slate-700 border-slate-200";
       if (status === "REJECTED" || status === "CANCELLED") badgeStyle = "bg-rose-50 text-rose-700 border-rose-200";
-
       const formattedStatus = status.replace(/_/g, " ");
-
       return (
         <Badge 
           variant="outline" 

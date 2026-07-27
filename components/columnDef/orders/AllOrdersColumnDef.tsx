@@ -7,7 +7,8 @@ import {
   FileText,
   CheckCircle2,
   Ban,
-  Building2
+  Building2,
+  PackageCheck
 } from "lucide-react";
 import { 
   DropdownMenu, 
@@ -20,12 +21,18 @@ import {
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { OrderWithRelations } from "@/types/types/orders.type";
+import { useTransition } from "react";
+import { toast } from "sonner";
+import { cancelOrderAction } from "@/lib/actions/orders.actions";
+import AlertWithDialogue from "@/components/custom/alerts/AlertWithDialogue";
+import { useOrderStore } from "@/store/order.store";
+import { PERMISSIONS } from "@/lib/constants/permisions";
+import { Can } from "@/components/security/Can";
 
 // 1. Declare Table Meta interface for All Orders Actions
 export interface AllOrdersTableMeta {
   onViewDetails?: (order: OrderWithRelations) => void;
   onReviewOrder?: (order: OrderWithRelations) => void;
-  onReceiveOrder?: (order: OrderWithRelations) => void;
   onCancelOrder?: (order: OrderWithRelations) => void;
 }
 
@@ -70,8 +77,27 @@ export function AllOrdersRowActions({
   row, 
   table 
 }: AllOrdersRowActionsProps) {
+  const { fetchOrders } = useOrderStore();
   const order = row.original;
   const meta = table.options.meta as AllOrdersTableMeta | undefined;
+  const [isPending, startTransition] = useTransition();
+
+  const handleCancelOrder = (reason: string): void => {
+    if (!reason.trim()) {
+      toast.error("Please provide a cancellation reason");
+      return;
+    }
+
+    startTransition(async () => {
+      const res = await cancelOrderAction(order.id, reason);
+      if (!res.success) {
+        toast.error(res.error || "Failed to cancel order");
+      } else {
+        toast.success(res.message || "Order cancelled successfully");
+        fetchOrders();
+      }
+    });
+  };
 
   // Determine dynamic primary action button based on order status
   const renderPrimaryAction = () => {
@@ -86,24 +112,12 @@ export function AllOrdersRowActions({
             Review
           </Button>
         );
-      case "APPROVED":
-      case "PARTIALLY_FULFILLED":
-      case "SHIPPED":
-        return (
-          <Button 
-            size="sm"
-            className="h-8 bg-emerald-800 hover:bg-emerald-700 text-white text-xs font-semibold rounded-lg px-3 shadow-xs"
-            onClick={() => meta?.onReceiveOrder?.(order)}
-          >
-            Receive
-          </Button>
-        );
       default:
         return (
           <Button 
             variant="outline"
             size="sm"
-            className="h-8 border-slate-200 text-slate-700 hover:bg-slate-100 text-xs font-semibold rounded-lg px-3"
+            className="h-8 bg-emerald-800 hover:text-white hover:bg-emerald-700 text-white text-xs font-semibold rounded-lg px-3 shadow-xs"
             onClick={() => meta?.onViewDetails?.(order)}
           >
             View
@@ -111,6 +125,8 @@ export function AllOrdersRowActions({
         );
     }
   };
+
+  const isCancellable = !["COMPLETED", "REJECTED", "CANCELLED"].includes(order.status);
 
   return (
     <div className="flex items-center justify-end gap-2 pr-2">
@@ -128,30 +144,57 @@ export function AllOrdersRowActions({
         <DropdownMenuContent align="end" className="w-48">
           <DropdownMenuLabel>Actions</DropdownMenuLabel>
           <DropdownMenuSeparator />
-          <DropdownMenuItem onClick={() => meta?.onViewDetails?.(order)}>
+          <Can
+            permission={PERMISSIONS.ORDER_VIEW}
+            fallback={<Badge>Read Only</Badge>}>              
+            <DropdownMenuItem onClick={() => meta?.onViewDetails?.(order)}>
             <Eye className="h-4 w-4 mr-2 text-slate-400" />
-            View details
-          </DropdownMenuItem>
-          {order.status === "PENDING" && (
-            <>
-              <DropdownMenuItem onClick={() => meta?.onReviewOrder?.(order)}>
-                <FileText className="h-4 w-4 mr-2 text-slate-400" />
-                Review Order
-              </DropdownMenuItem>
-              <DropdownMenuItem 
-                onClick={() => meta?.onCancelOrder?.(order)}
-                className="text-rose-600 focus:text-rose-600"
-              >
-                <Ban className="h-4 w-4 mr-2 text-rose-400" />
-                Cancel Order
-              </DropdownMenuItem>
-            </>
-          )}
-          {(order.status === "APPROVED" || order.status === "PARTIALLY_FULFILLED" || order.status === "SHIPPED") && (
-            <DropdownMenuItem onClick={() => meta?.onReceiveOrder?.(order)}>
-              <CheckCircle2 className="h-4 w-4 mr-2 text-slate-400" />
-              Receive Items
+              View details
             </DropdownMenuItem>
+        </Can>
+
+          {order.status === "PENDING" && (
+          <Can
+            permission={PERMISSIONS.ORDER_APPROVE}
+            fallback={<Badge>Read Only</Badge>}>
+            <DropdownMenuItem onClick={() => meta?.onReviewOrder?.(order)}>
+              <FileText className="h-4 w-4 mr-2 text-slate-400" />
+              Review Order
+            </DropdownMenuItem>
+          </Can>      
+          )}
+
+          {isCancellable && (
+            <Can
+            permission={PERMISSIONS.ORDER_CANCEL}
+            fallback={<Badge>Read Only</Badge>}>
+
+            <AlertWithDialogue
+              buttonText="Cancel Order"
+              buttonVariant="destructive"
+              title="Cancel Order Request"
+              message="Are you sure you want to cancel this order? This action will restore inventory if the items were already shipped."
+              confirmText="Confirm Cancellation"
+              cancelText="Go Back"
+              showInput={true}
+              button={
+                <DropdownMenuItem 
+                disabled={isPending}
+                onSelect={(e) => e.preventDefault()}
+                className="text-rose-600 focus:text-rose-600"
+                >
+                  <Ban className="h-4 w-4 mr-2 text-rose-400" />
+                  Cancel Order
+                </DropdownMenuItem>
+              }
+              inputPlaceholder="Provide the reason for cancelling this order..."
+              confirmFunction={(reason) => {
+                if (reason) {
+                  handleCancelOrder(reason);
+                }
+              }}
+              />
+            </Can>      
           )}
         </DropdownMenuContent>
       </DropdownMenu>
@@ -269,7 +312,7 @@ export const allOrdersColumns: ColumnDef<OrderWithRelations>[] = [
       let badgeStyle = "bg-amber-50 text-amber-700 border-amber-200"; // PENDING
       if (status === "APPROVED") badgeStyle = "bg-emerald-50 text-emerald-700 border-emerald-200";
       if (status === "PARTIALLY_FULFILLED" || status === "SHIPPED") badgeStyle = "bg-sky-50 text-sky-700 border-sky-200";
-      if (status === "RECEIVED" || status === "DELIVERED" || status === "COMPLETED") badgeStyle = "bg-slate-100 text-slate-700 border-slate-200";
+      if (status === "COMPLETED") badgeStyle = "bg-slate-100 text-slate-700 border-slate-200";
       if (status === "REJECTED" || status === "CANCELLED") badgeStyle = "bg-rose-50 text-rose-700 border-rose-200";
 
       const formattedStatus = status.replace(/_/g, " ");

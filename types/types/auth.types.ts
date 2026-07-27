@@ -4,6 +4,8 @@ export interface AppUser {
   id: string;
   customId: string;
   email: string;
+  imageUrl: string | null;
+  fileKey:string | null;
   fullName: string;
   role: UserRole;
   phone: string | null;

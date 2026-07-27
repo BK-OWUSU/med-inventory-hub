@@ -18,6 +18,9 @@ import React from "react"
 import TableMain from "@/components/custom/table/TableMain"
 import { drugCategoryColumns, DrugCategoryTableMeta } from "@/components/columnDef/drugs/drugCategoryColumnDef"
 import { DrugCategoryWithCount } from "@/types/types/drugs.types"
+import { Badge } from "@/components/ui/badge"
+import { PERMISSIONS } from "@/lib/constants/permisions"
+import { Can } from "@/components/security/Can"
 
 export default function DrugCategoriesPage() {
   const { fetchCategories, categories, loading } = useDrugCategoryStore()
@@ -57,12 +60,16 @@ export default function DrugCategoriesPage() {
             Manage drug categories used to organize medicines in the system.
           </p>
         </div>
+        <Can
+           permission={PERMISSIONS.DRUG_CREATE}
+           fallback={<Badge>Read Only</Badge>}>
         <Button
           onClick={handleOpenAddCategory} 
           className="bg-emerald-800 hover:bg-emerald-700 text-white font-medium text-xs h-9 rounded-lg gap-1.5 self-start sm:self-auto px-4 shadow-xs"
-        >
+          >
           <Plus className="h-4 w-4" /> Add Category
         </Button>
+        </Can>
       </div>
 
       {/* Top Metrics Cards Layout Grid */}

@@ -18,12 +18,16 @@ import { outgoingOrdersColumns, OutgoingOrderTableMeta } from "@/components/colu
 import { AppSheet } from "@/components/custom/drawers/AppSheet";
 import UpdateOrderForm from "./UpdateOrderFormComponent";
 import { OrderWithRelations } from "@/types/types/orders.type";
+import OrderDetails from "@/components/viewDetailsCompoents/orders/OrderDetailsViewer";
+import OrderReceive from "@/components/viewDetailsCompoents/orders/OrderReceiverComponent";
 
 export default function OutgoingOrdersPage() {
   const {isLoading, outgoingOrders, fetchOutgoingOrders } = useOrderStore();
   const [selectedOrder, setSelectedOrder] = React.useState<OrderWithRelations | null>();
   const [showAlert, setShowAlert] = React.useState<boolean>(true);
   const [isUpdateOderViewerOpen, seIsUpdateOderViewerOpen] = React.useState<boolean>(false);
+  const [isViewOderViewerOpen, setIsViewOderViewerOpen] = React.useState<boolean>(false);
+  const [isReveiveOrderViewerOpen, setIsReceiveOderViewerOpen] = React.useState<boolean>(false);
 
   React.useEffect(() => {
     fetchOutgoingOrders();
@@ -38,7 +42,7 @@ export default function OutgoingOrdersPage() {
       (o) => o.status === "SHIPPED" || o.status === "PARTIALLY_FULFILLED"
     ).length;
     const completed = outgoingOrders.filter(
-      (o) => o.status === "COMPLETED" || o.status === "RECEIVED" || o.status === "DELIVERED"
+      (o) => o.status === "COMPLETED"
     ).length;
 
     return { total, pending, approved, shipped, completed };
@@ -154,14 +158,21 @@ export default function OutgoingOrdersPage() {
           loading={isLoading}
           tableFilterButtonVisible={true}
           columnVisibilityFilter={true}
-          searchKey="customId" 
+          searchKey="drug" 
           placeholder="Search order..."
           meta={{
             onUpdateOrder(order) {
               seIsUpdateOderViewerOpen(true)
               setSelectedOrder(order)  
             },
-
+            onViewDetails(order) {
+              setSelectedOrder(order)  
+              setIsViewOderViewerOpen(true)  
+            },
+            onReceiveOrder(order) {
+               setIsReceiveOderViewerOpen(true) 
+               setSelectedOrder(order)  
+            },
           }as OutgoingOrderTableMeta}
         />
       </Card>
@@ -169,8 +180,8 @@ export default function OutgoingOrdersPage() {
           isOpen={isUpdateOderViewerOpen}
           maxWidth="xl"
           onClose={() => seIsUpdateOderViewerOpen(false)}
-          title="View Your Cart"
-          description="Below are orders you have added to you cart"
+          title="Update Order"
+          description="Edit and update pending order"
         >
         {selectedOrder && (  
         <UpdateOrderForm
@@ -178,9 +189,37 @@ export default function OutgoingOrdersPage() {
           onSuccess={()=> {
             fetchOutgoingOrders()
             seIsUpdateOderViewerOpen(false)
+            setSelectedOrder(null)
           }}
         />
         )}
+      </AppSheet> 
+      <AppSheet
+          isOpen={isViewOderViewerOpen}
+          maxWidth="xl"
+          onClose={() => setIsViewOderViewerOpen(false)}
+          title={`View Order #${selectedOrder?.customId || ''}`}
+          description="Overview of items, pricing, and fulfillment status."
+        >
+        {selectedOrder && (<OrderDetails order={selectedOrder}/>)}
+      </AppSheet>
+
+      <AppSheet
+        isOpen={isReveiveOrderViewerOpen}
+        maxWidth="xl"
+        onClose={() => setIsReceiveOderViewerOpen(false)}
+        title={`Review Order #${selectedOrder?.customId || ''}`}
+        description="Inspect request details before making an approval decision."
+      >
+        {selectedOrder && (
+          <OrderReceive 
+            order={selectedOrder}
+            onSuccess={() => {
+              fetchOutgoingOrders();
+              setIsReceiveOderViewerOpen(false);
+              setSelectedOrder(null)
+            }}
+         />)}
       </AppSheet>
     </div>
   );

@@ -11,8 +11,6 @@ import {
   HelpCircle, 
   ArrowLeft,
   RefreshCw,
-  FileText,
-  Tag
 } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
@@ -36,6 +34,9 @@ import { toast } from "sonner"
 import { createDrugAction } from "@/lib/actions/drugs-actions"
 import { useDrugStore } from "@/store/drugStore"
 import { useDrugCategoryStore } from "@/store/drugCategory"
+import { PERMISSIONS } from "@/lib/constants/permisions"
+import { Badge } from "@/components/ui/badge"
+import { Can } from "@/components/security/Can"
 
 
 export default function AddNewDrugPage() {
@@ -255,9 +256,13 @@ export default function AddNewDrugPage() {
 
           <div className="flex items-center gap-2">
             <Button onClick={handleCancel} type="button" variant="outline" className="flex-1 h-9 text-xs font-semibold border-slate-200 text-slate-700 rounded-lg bg-white px-5 hover:bg-slate-50">Cancel</Button>
-            <Button disabled={isPending} type="submit" className="flex-1 h-9 text-xs font-semibold bg-emerald-800 hover:bg-emerald-700 text-white shadow-xs rounded-lg gap-1.5 px-5">
-                {isPending ? <RefreshCw className={`h-4 w-4 text-white ${isPending ? "animate-spin" : ""}`} />: <span className="flex gap-2"><Save className="h-4 w-4" /> Save Drug</span>}
-            </Button>
+            <Can
+               permission={PERMISSIONS.DRUG_CREATE}
+               fallback={<Badge>Read Only</Badge>}>
+              <Button disabled={isPending} type="submit" className="flex-1 h-9 text-xs font-semibold bg-emerald-800 hover:bg-emerald-700 text-white shadow-xs rounded-lg gap-1.5 px-5">
+                  {isPending ? <RefreshCw className={`h-4 w-4 text-white ${isPending ? "animate-spin" : ""}`} />: <span className="flex gap-2"><Save className="h-4 w-4" /> Save Drug</span>}
+              </Button>
+          </Can>
           </div>
         </div>
       </div>

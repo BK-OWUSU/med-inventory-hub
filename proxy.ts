@@ -92,7 +92,7 @@ export async function proxy(request: NextRequest) {
     const userRole = userPayload.role;
 
     // RBAC: Admin Dashboard boundary for SUPER_ADMIN only
-    if (routeBaseSegment === "admin" || routeBaseSegment === "admin-dashboard") {
+    if (routeBaseSegment === "admin" || routeBaseSegment === "admin-dashboard" || routeBaseSegment === "facilities") {
       if (userRole !== "SUPER_ADMIN") {
         return NextResponse.redirect(new URL("/dashboard", request.url));
       }

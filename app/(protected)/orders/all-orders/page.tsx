@@ -15,11 +15,19 @@ import { Card, CardContent } from "@/components/ui/card";
 
 import TableMain from "@/components/custom/table/TableMain";
 import { useOrderStore } from "@/store/order.store";
-import { allOrdersColumns } from "@/components/columnDef/orders/AllOrdersColumnDef";
+import { allOrdersColumns, AllOrdersTableMeta } from "@/components/columnDef/orders/AllOrdersColumnDef";
+import { AppSheet } from "@/components/custom/drawers/AppSheet";
+import { OrderWithRelations } from "@/types/types/orders.type";
+import OrderDetails from "@/components/viewDetailsCompoents/orders/OrderDetailsViewer";
+import OrderReview from "@/components/viewDetailsCompoents/orders/OrderReviewerComponent";
+
 
 export default function AllOrdersPage() {
   const { isLoading, fetchOrders, orders } = useOrderStore();
   const [showAlert, setShowAlert] = React.useState<boolean>(true);
+  const [selectedOrder, setSelectedOrder] = React.useState<OrderWithRelations | null>(null);
+  const [isViewOderViewerOpen, setIsViewOderViewerOpen] = React.useState<boolean>(false);
+  const [isReviewOderViewerOpen, setIsReviewOderViewerOpen] = React.useState<boolean>(false);
 
   React.useEffect(() => {
     fetchOrders();
@@ -34,7 +42,7 @@ export default function AllOrdersPage() {
       (o) => o.status === "SHIPPED" || o.status === "PARTIALLY_FULFILLED"
     ).length;
     const completed = orders.filter(
-      (o) => o.status === "COMPLETED" || o.status === "RECEIVED" || o.status === "DELIVERED"
+      (o) => o.status === "COMPLETED"
     ).length;
     const cancelled = orders.filter(
       (o) => o.status === "CANCELLED" || o.status === "REJECTED"
@@ -169,9 +177,45 @@ export default function AllOrdersPage() {
           columnVisibilityFilter={true}
           searchKey="customId" 
           placeholder="Search order..."
-          meta={{}}
+          meta={{
+            onViewDetails(order) {
+              setSelectedOrder(order);
+              setIsViewOderViewerOpen(true);
+            },
+            onReviewOrder(order) {
+              setSelectedOrder(order);
+              setIsReviewOderViewerOpen(true);
+            },
+          } as AllOrdersTableMeta}
         />
       </Card>
+
+      <AppSheet
+        isOpen={isViewOderViewerOpen}
+        maxWidth="xl"
+        onClose={() => setIsViewOderViewerOpen(false)}
+        title={`View Order #${selectedOrder?.customId || ''}`}
+        description="Overview of items, pricing, and fulfillment status."
+      >
+        {selectedOrder && (<OrderDetails order={selectedOrder}/>)}
+      </AppSheet>
+
+      <AppSheet
+        isOpen={isReviewOderViewerOpen}
+        maxWidth="xl"
+        onClose={() => setIsReviewOderViewerOpen(false)}
+        title={`Review Order #${selectedOrder?.customId || ''}`}
+        description="Inspect request details before making an approval decision."
+      >
+        {selectedOrder && (
+          <OrderReview 
+            order={selectedOrder}
+            onSuccess={() => {
+              fetchOrders();
+              setIsReviewOderViewerOpen(false);
+            }}
+         />)}
+      </AppSheet>
     </div>
   );
 }
