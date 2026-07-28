@@ -20,7 +20,7 @@ export async function sendTempPasswordEmail(
   name: string, 
   facilityName?: string 
 ): Promise<void> {
-    const loginUrl = `${process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000"}/login`; 
+    const loginUrl = `${"https://med-inventory-hub.vercel.app"}/login`; 
 
     await transporter.sendMail({
         from: process.env.EMAIL_FROM,
