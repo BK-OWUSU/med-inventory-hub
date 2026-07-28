@@ -3,7 +3,7 @@
 import * as React from "react"
 import { useForm, Controller, useWatch } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
-import { User2, Mail, Shield, Phone, Save, RefreshCw } from "lucide-react"
+import { User2, Save, RefreshCw } from "lucide-react"
 import { toast } from "sonner"
 
 import { Button } from "@/components/ui/button"
@@ -23,12 +23,12 @@ import { Switch } from "@/components/ui/switch"
 import {
   UpdateUserSchema,
   UpdateUserInput,
+  VISIBLE_ROLES,
 } from "@/types/schemas/user.schema"
-import { UserRole } from "@/generated/prisma/browser"
 import { updateUserAction } from "@/lib/actions/user.action"
 import type { UserListResponse } from "@/types/types/user.types"
 
-const VISIBLE_ROLES = [UserRole.ADMIN, UserRole.PHARMACIST, UserRole.STAFF, UserRole.VIEWER] as const;
+
 
 interface EditUserFormProps {
   user: UserListResponse["users"][number]
@@ -37,6 +37,7 @@ interface EditUserFormProps {
 
 export default function EditUserForm({ user, onSuccess }: EditUserFormProps) {
   const [isPending, startTransition] = React.useTransition()
+  
 
   const form = useForm<UpdateUserInput>({
     resolver: zodResolver(UpdateUserSchema),
@@ -44,7 +45,7 @@ export default function EditUserForm({ user, onSuccess }: EditUserFormProps) {
       id: user.id,
       customId: user.customId,
       fullName: user.fullName ?? "",
-      role: user.role,
+      role: user.role as any, 
       email: user.email ?? "",
       phone: user.phone ?? "",
       facilityId: user.facility?.id ?? "",

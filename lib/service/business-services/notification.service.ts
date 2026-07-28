@@ -23,26 +23,33 @@ export class NotificationService {
   return users.map((u) => u.id);
 }
 
+// Updated method in NotificationService class
+static async createNotification(
+  facilityId: string,
+  title: string,
+  message: string,
+  type: NotificationType, 
+  userId?: string
+) {
+  return await prisma.notification.create({
+    data: {
+      facilityId,
+      title,
+      message,
+      type,
+      // Only generate a recipient record if a userId was actually provided
+      ...(userId && {
+        recipients: {
+          create: {
+            userId: userId,
+            isRead: false, // Moved here because isRead belongs to the recipient link
+          },
+        },
+      }),
+    },
+  });
+}
 
-  // Updated method in NotificationService class
-  static async createNotification(
-    facilityId: string,
-    title: string,
-    message: string,
-    type: NotificationType, 
-    userId?: string
-  ) {
-    return await prisma.notification.create({
-      data: {
-        facilityId,
-        userId,
-        title,
-        message,
-        type, // Use the passed type instead of a hardcoded value
-        isRead: false,
-      },
-    });
-  }
 
 
 // Create base notification + batch create recipients

@@ -39,7 +39,7 @@ export default function FAQ() {
           </p>
         </div>
 
-        <Accordion  className="w-full bg-white px-6 py-4 rounded-2xl border border-slate-200 shadow-sm space-y-2">
+        <Accordion  type="single"   className="w-full bg-white px-6 py-4 rounded-2xl border border-slate-200 shadow-sm space-y-2">
           {faqItems.map((item) => (
             <AccordionItem key={item.value} value={item.value} className="border-b border-slate-100 last:border-0">
               <AccordionTrigger className="text-slate-900 hover:text-green-700 font-semibold text-left transition-colors duration-200 py-4">
