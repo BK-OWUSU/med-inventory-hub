@@ -254,4 +254,3 @@ export const localInventoryColumns: ColumnDef<LocalInventoryItem>[] = [
     cell: ({ row, table }) => <InventoryRowActions row={row} table={table} />,
   }
 ];
-

@@ -2,7 +2,7 @@
 
 import { AppResponse } from "@/types/types/app.type";
 import { revalidatePath } from "next/cache";
-import { getAppSession, getRequestMeta, hashPassword, verifyPassword } from "../auths/auths-functions";
+import { getAppSession, getRequestMeta } from "../auths/auths-functions";
 import { UserService } from "../service/auth-services/user-service";
 import { CreateUserInput, UpdateUserInput } from "@/types/schemas/user.schema";
 import { PasswordChangeInput } from "@/types/schemas/auth.schema";

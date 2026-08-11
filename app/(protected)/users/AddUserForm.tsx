@@ -23,13 +23,16 @@ import { Switch } from "@/components/ui/switch"
 import { CreateUserSchema, CreateUserInput, VISIBLE_ROLES } from "@/types/schemas/user.schema"
 import { UserRole } from "@/generated/prisma/browser"
 import { createUserAction } from "@/lib/actions/user.action"
+import { useAuthStore } from "@/store/authStore"
 
 interface AddUserFormProps {
   onSuccess?: () => void;
 }
 
 export default function AddUserForm({ onSuccess }: AddUserFormProps) {
-  const [isPending, startTransition] = React.useTransition()
+  const [isPending, startTransition] = React.useTransition();
+  const {user} = useAuthStore();
+  const currentUserFacilityId = user?.facility?.id || "";
 
   const form = useForm<CreateUserInput>({
     resolver: zodResolver(CreateUserSchema),
@@ -38,7 +41,7 @@ export default function AddUserForm({ onSuccess }: AddUserFormProps) {
       fullName: "",
       role: UserRole.PHARMACIST,
       phone: "",
-      facilityId: "",
+      facilityId: currentUserFacilityId,
       isActive: true,
       needsPasswordChange: true,
     },

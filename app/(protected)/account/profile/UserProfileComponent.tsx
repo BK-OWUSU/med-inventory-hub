@@ -187,8 +187,8 @@ export default function UserProfilePage({ user, onEditProfile,onPasswordChange, 
             onSuccess={() => {
                 setIsPasswordModalOpen(false);
                 // Optionally trigger a router refresh or update global store state
-        }}
-    />
+            }}
+            />
 
           </div>
         </CardContent>

@@ -83,6 +83,18 @@ export async function generateNextCustomId({
     let found: unknown = null;
 
     switch (sequenceType) {
+      case "USER": // 👈 Add this block to fix the user collision error
+        found = await tx.user.findUnique({ where: { customId } }); 
+        break;
+      case "FACILITY_ID": // 👈 Add this block to fix the user collision error
+        found = await tx.user.findUnique({ where: { customId } });
+        break;
+      case "DRUG": // 👈 Add this block to fix the user collision error
+        found = await tx.user.findUnique({ where: { customId } });
+        break;
+      case "USER_ID": // 👈 Add this block to fix the user collision error
+        found = await tx.user.findUnique({ where: { customId } });
+        break;
       case "STOCK_MOVEMENT":
         found = await tx.stockMovement.findUnique({ where: { customId } });
         break;
