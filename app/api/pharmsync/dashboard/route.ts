@@ -12,7 +12,7 @@ export async function GET() {
   try {
     // 1. Total active drugs count (global catalog count or adjust if Drug has facilityId)
     const totalDrugs = await prisma.drug.count({
-      where: { isDeleted: false },
+      where: { isDeleted: false, facilityId: facilityId },
     });
     
     // 2. Fetch inventories for this specific facility with related drug data

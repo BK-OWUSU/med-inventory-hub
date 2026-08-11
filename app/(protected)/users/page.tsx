@@ -35,7 +35,7 @@ export default function UsersPage() {
   
   const metrics = React.useMemo(() => {
     // Explicitly ensure it's an array
-    const safeUsers = Array.isArray(users) ? users : [];
+  const safeUsers = Array.isArray(users) ? users : [];
 
   
   const total = safeUsers.length;
