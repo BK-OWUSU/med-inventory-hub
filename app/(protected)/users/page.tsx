@@ -22,20 +22,21 @@ import { useUserStore } from "@/store/userStore"
 import { UserListResponse } from "@/types/types/user.types"
 import { toggleUserStatus } from "@/lib/actions/user.action"
 import { toast } from "sonner"
+import { useAuthStore } from "@/store/authStore"
 
 export default function UsersPage() {
+  const {user} = useAuthStore()
   const { fetchUsers, isLoading, users = [] } = useUserStore()
   const [isAddUserOpen, setIsAddUserOpen] = React.useState(false)
   const [isEditUserOpen, setIsEditUserOpen] = React.useState(false)
   const [selectedUser, setSelectedUser] = React.useState<UserListResponse["users"][number] | null>(null)
   
+  const currentUserFacilityId = user?.facility?.id;
+  
   const metrics = React.useMemo(() => {
     // Explicitly ensure it's an array
     const safeUsers = Array.isArray(users) ? users : [];
-    // const safeUsers = users || [];
-    
-    console.log('SAFE')
-    console.log(safeUsers)
+
   
   const total = safeUsers.length;
   const active = safeUsers.filter(u => u.isActive).length;
@@ -49,8 +50,8 @@ export default function UsersPage() {
 }, [users]);
 
   React.useEffect(() => {
-    fetchUsers()
-  }, [fetchUsers])
+    fetchUsers({facilityId: currentUserFacilityId})
+  }, [currentUserFacilityId, fetchUsers])
 
   const handleToggleStatus = async (user: UserListResponse["users"][number]) => {
     const res = await toggleUserStatus(user.id)
